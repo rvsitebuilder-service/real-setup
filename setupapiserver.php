@@ -28,11 +28,12 @@ use splitbrain\PHPArchive\Tar;
 
 
 $responsetype           = $_SESSION['responsetype'] ;
-$action                 = $_SESSION['action'];
+$action                 = (isset($_SESSION['action']) ? $_SESSION['action'] : '');
 $rvsb_installing_token  = $_SESSION['rvsb_installing_token'];
 $firstreg               = (isset($_SESSION['firstreg']) ? $_SESSION['firstreg'] : false);
-    
-
+$homeuser               = (isset($_SESSION['homeuser']) ? $_SESSION['homeuser'] : '');
+$domainname             = (isset($_SESSION['domainname']) ? $_SESSION['domainname'] : '');
+$publicpath                = (isset($_SESSION['public_path']) ? $_SESSION['public_path'] : '');
 
 $setupObj = new RVsitebuilder_Setup_API($responsetype,$rvsb_installing_token);
 
@@ -52,6 +53,10 @@ if($action == 'download_vendor'){
     $setupObj->download_vendor();
 }
 
+if($action == 'install_all_pkg' && $homeuser != '' && $domainname != '' && $publicpath != ''){
+    $setupObj->install_all_pkg($homeuser,$domainname,$publicpath);
+}
+
 
 
 
@@ -60,7 +65,6 @@ if($action == 'download_vendor'){
 
 class RVsitebuilder_Setup_API {
     
-    protected $pathPublic;
     protected $responseType;
     protected $response;
     protected $serverconf;
@@ -91,7 +95,7 @@ class RVsitebuilder_Setup_API {
             return $this->print_response($this->response);
         }
         $tokenvalue = file_get_contents(dirname(__FILE__).'/.Rvsb-Installing-Token');
-        if($tokenvalue != $rvsb_installing_token){
+        if(trim($tokenvalue) != trim($rvsb_installing_token)){
             $this->response['message'] = 'Wrong!!!!';
             $this->clear_session();
             return $this->print_response($this->response);
@@ -203,12 +207,11 @@ class RVsitebuilder_Setup_API {
         $source = dirname(__FILE__).'/tmp/vendor/vendor/';
         $destination = dirname(__FILE__).'/tmp/vendor/';
         foreach ($files as $file) {
-            if (in_array($file, array(".",".."))) continue;
+            if (in_array($file, [".",".."])) continue;
             rename($source.$file, $destination.$file);
         }
         
         // Delete all successfully-copied files
-        // TODO de
         rmdir(dirname(__FILE__).'/tmp/vendor/vendor');
         
         $this->response['status'] = true;
@@ -217,6 +220,36 @@ class RVsitebuilder_Setup_API {
         
         
         //TODO loop all package and download if $rvsbjson['vendor-packages'] NOT SET
+        
+    }
+    
+    public function install_all_pkg($homeuser,$domainname,$publicpath) {
+        
+        //move temp to freamwork path
+        $files = scandir(dirname(__FILE__).'/tmp');
+        $source = dirname(__FILE__).'/tmp/';
+        $destination = $homeuser.'/rvsitebuildercms/'.$domainname.'/';
+        if (!file_exists($destination)) {
+            mkdir($destination, 0755, true);
+        }
+        foreach ($files as $file) {
+            if (in_array($file, [".",".."])) continue;
+            rename($source.$file, $destination.$file);
+        }
+        
+        //move framework/public to public path
+        $files = scandir($homeuser.'/rvsitebuildercms/'.$domainname.'/public');
+        $source = $homeuser.'/rvsitebuildercms/'.$domainname.'/public/';
+        $destination = $publicpath.'/';
+        foreach ($files as $file) {
+            if (in_array($file, [".",".."])) continue;
+            rename($source.$file, $destination.$file);
+        }
+        
+        
+        $this->response['status'] = true;
+        $this->response['message'] = 'Move Freamwork and Public success';
+        return $this->print_response($this->response);
         
     }
     
