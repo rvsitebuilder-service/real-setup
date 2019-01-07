@@ -198,7 +198,7 @@ class RVsitebuilder_Setup_API {
         $this->response['status'] = true;
         $this->response['message'] = 'Download Framework Success';
         return $this->print_response($this->response);
-    }
+    } 
     
     public function download_vendor() {
         
