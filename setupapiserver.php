@@ -33,7 +33,16 @@ $rvsb_installing_token  = $_SESSION['rvsb_installing_token'];
 $firstreg               = (isset($_SESSION['firstreg']) ? $_SESSION['firstreg'] : false);
 $homeuser               = (isset($_SESSION['homeuser']) ? $_SESSION['homeuser'] : '');
 $domainname             = (isset($_SESSION['domainname']) ? $_SESSION['domainname'] : '');
-$publicpath                = (isset($_SESSION['public_path']) ? $_SESSION['public_path'] : '');
+$publicpath             = (isset($_SESSION['public_path']) ? $_SESSION['public_path'] : '');
+$dbhost                 = (isset($_SESSION['dbhost']) ? $_SESSION['dbhost'] : '');
+$dbname                 = (isset($_SESSION['dbname']) ? $_SESSION['dbname'] : '');
+$dbuser                 = (isset($_SESSION['dbuser']) ? $_SESSION['dbuser'] : '');
+$dbpassword             = (isset($_SESSION['dbpassword']) ? $_SESSION['dbpassword'] : '');
+$ftpaccount             = (isset($_SESSION['ftpaccount']) ? $_SESSION['ftpaccount'] : '');
+$ftppassword            = (isset($_SESSION['ftppassword']) ? $_SESSION['ftppassword'] : '');
+
+
+
 
 $setupObj = new RVsitebuilder_Setup_API($responsetype,$rvsb_installing_token);
 
@@ -53,10 +62,25 @@ if($action == 'download_vendor'){
     $setupObj->download_vendor();
 }
 
+if($action == 'setup_env'){
+    $setupObj->setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword);
+}
+
+if($action == 'install_common_pkg'){
+    $setupObj->install_common_pkg();
+}
+
 if($action == 'install_all_pkg' && $homeuser != '' && $domainname != '' && $publicpath != ''){
     $setupObj->install_all_pkg($homeuser,$domainname,$publicpath);
 }
 
+if($action == 'artisan_call'){
+    $setupObj->artisan_call($homeuser,$domainname,$publicpath);
+}
+
+if($action == 'finished_setup'){
+    $setupObj->finished_setup($homeuser,$domainname);
+}
 
 
 
@@ -69,9 +93,13 @@ class RVsitebuilder_Setup_API {
     protected $response;
     protected $serverconf;
     protected $downloadurl;
+    protected $debug;
     
     public function __construct($responsetype,$rvsb_installing_token)
     {   
+        //debug var
+        $this->debug = true;
+        
         //response type
         $this->responseType = $responsetype;
         
@@ -223,6 +251,163 @@ class RVsitebuilder_Setup_API {
         
     }
     
+    public function setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword) {
+        $env_data['APP_URL'] = 'http://'.$domainname;
+        $env_data['DB_HOST'] = $dbhost;
+        $env_data['DB_DATABASE'] = $dbname;
+        $env_data['DB_USERNAME'] = $dbuser;
+        $env_data['DB_PASSWORD'] = $dbpassword;
+        //$env_data['RV_CDN'] = '';
+        //$env_data['HTTP_AS_USER'] = 'FALSE';
+        
+        if($this->setEnv(dirname(__FILE__).'/tmp/env.example',$env_data,true)) {
+            rename(dirname(__FILE__).'/tmp/env.example',dirname(__FILE__).'/tmp/.env');
+            $this->response['status'] = true;
+            $this->response['message'] = 'Setup .env Success';
+            $this->clear_session();
+            return $this->print_response($this->response);
+        }
+        
+        $this->response['message'] = 'Setup .env Failed';
+        $this->clear_session();
+        return $this->print_response($this->response);
+    }
+    
+    public function install_common_pkg() {
+        $commonpkg = [  'blog',
+                        'core',
+                        'email',
+                        'manage',
+                        'queuesharedhost',
+                        'scheduler',
+                        'wysiwyg',
+                    ];
+        
+        foreach ($commonpkg as $pkg) {
+            $downloadpkg = $this->download('GET' , $this->downloadurl.'/rvsitebuilder/'.$pkg , dirname(__FILE__).'/'.$pkg.'.tar.gz');
+            if(! $downloadpkg){
+                $this->response['message'] = 'Can not download package '.$pkg;
+                $this->clear_session();
+                return $this->print_response($this->response);
+            }
+            //extract package
+            $extractpkg = $this->extract(dirname(__FILE__).'/'.$pkg.'.tar.gz',dirname(__FILE__).'/tmp/packages/');
+            if(! $extractpkg) {
+                $this->response['message'] = 'Can not extract package '.$pkg;
+                $this->clear_session();
+                return $this->print_response($this->response);
+            }
+        }
+        
+        
+        $this->response['status'] = true;
+        $this->response['message'] = 'Install Common Package(s) Success';
+        return $this->print_response($this->response);
+        
+    }
+    
+    public function artisan_call($homeuser,$domainname,$publicpath) {
+        
+        //loader
+        // /home/arnut/rvsitebuildercms/arnut.cpdev1.rvglobalsoft.net/vendor/autoload.php
+        $loader = require $homeuser.'/rvsitebuildercms/'.$domainname.'/vendor/autoload.php';
+
+        
+        //change path app_path/rvsitebuildercms/storage/packages to app_path/rvsitebuildercms/packages
+        $packagesPath = $homeuser.'/rvsitebuildercms/'.$domainname.'/packages';
+        
+        $vendor_names = scandir($packagesPath);
+        foreach($vendor_names as $vendor_name){
+            if($vendor_name === '.' || $vendor_name === '..') {continue;}
+            $package_names = scandir($packagesPath . '/' . $vendor_name);
+            foreach($package_names as $package_name){
+                if($package_name === '.' || $package_name === '..') {continue;}
+                $auto_load_file = $packagesPath . '/' . $vendor_name . '/' . $package_name . '/vendor/autoload.php';
+                if(is_file($auto_load_file)){
+                    require $auto_load_file;
+                }
+            }
+        }
+        
+        //call artisan
+        $app = require_once  $homeuser.'/rvsitebuildercms/'.$domainname.'/bootstrap/app.php';
+        $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+        
+        
+        //Common
+        $kernel->call('key:generate', []);
+        $this->print_debug($kernel->output());
+        $kernel->call('migrate', ['--force'=>true]);
+        $this->print_debug($kernel->output());
+        $kernel->call('db:seed', ['--force'=>true]);
+        $this->print_debug($kernel->output());
+        //Manage
+        $kernel->call('db:seed', ['--class'=> Rvsitebuilder\Manage\Database\Seeds\ManageCreateCoreAppsTableSeeder::class,'--force' => true]);
+        $this->print_debug($kernel->output());
+        //Core
+        $kernel->call('db:seed', ['--class'=> Rvsitebuilder\Core\Database\Seeds\CoreDatabaseSeeder::class,'--force' => true]);
+        $this->print_debug($kernel->output());
+        //Blog
+        $kernel->call('db:seed', ['--class'=> Rvsitebuilder\Blog\Database\Seeds\BlogDatabaseSeeder::class,'--force' => true]);
+        $this->print_debug($kernel->output());
+        //Email
+        $kernel->call('db:seed', ['--class'=> Rvsitebuilder\Email\Database\Seeds\EmailDatabaseSeeder::class,'--force' => true]);
+        $this->print_debug($kernel->output());
+        //Scheduler
+        $kernel->call('db:seed', ['--class'=> Rvsitebuilder\Scheduler\Database\Seeds\SchedulerDatabaseSeeder::class,'--force' => true]);
+        $this->print_debug($kernel->output());
+        //user secret key
+        $kernel->call('rvsitebuilder:updateenduserdb-run', ['secretkey' => $this->generateSecretKey()]);
+        $this->print_debug($kernel->output());
+        //clear cache
+        $kernel->call('cache:clear', []);
+        $this->print_debug($kernel->output());
+        $kernel->call('config:clear', []);
+        $this->print_debug($kernel->output());
+        $kernel->call('route:clear', []);
+        $this->print_debug($kernel->output());
+        $kernel->call('view:clear', []);
+        $this->print_debug($kernel->output());
+       
+        
+        $this->response['status'] = true;
+        $this->response['message'] = 'Artisan Command Success';
+        $this->clear_session();
+        return $this->print_response($this->response);
+    }
+    
+    public function finished_setup($homeuser,$domainname) {
+        //touch install completed
+        file_put_contents($homeuser.'/rvsitebuildercms/'.$domainname.'/INSTALL_COMPLETED', '');
+        
+        //remove dirname(__FILE__).'/.Rvsb-Installing-Token'
+        unlink(dirname(__FILE__).'/.Rvsb-Installing-Token');
+        
+        $this->response['status'] = true;
+        $this->response['message'] = 'Finished Setup';
+        $this->clear_session();
+        return $this->print_response($this->response);
+    }
+    
+    public function generateSecretKey($length = 64) {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $randstring = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randstring .= $characters[rand(0, $charactersLength - 1)];
+        }
+        return $randstring;
+    }
+    
+    public function print_debug($data) {
+        if($this->debug) {
+            echo '<pre>';
+            print_r($data);
+            echo '</pre>';
+        }
+        return true;
+    }
+    
     public function install_all_pkg($homeuser,$domainname,$publicpath) {
         
         //move temp to freamwork path
@@ -287,6 +472,47 @@ class RVsitebuilder_Setup_API {
         $_SESSION = array();
         return;
     }
+    
+    public function setEnv($env_file,$env_data = [],$force = false){
+        
+        if(count($env_data) > 0){
+            // Read .env-file
+            $env = file_get_contents($env_file);
+            // Split string on every "\n" and write into array
+            $env = preg_split('/\n/', $env);
+            // Loop through given data
+            foreach((array)$env_data as $key => $value){
+                // Loop through .env-data
+                $found = 0;
+                foreach($env as $env_key => $env_value){
+                    // Turn the value into an array and stop after the first split
+                    // So it's not possible to split e.g. the App-Key by accident
+                    $entry = explode("=", $env_value, 2);
+                    // Check, if new key fits the actual .env-key
+                    //check for comment #KEY (#) too
+                    if($entry[0] == $key || substr($entry[0],1) == $key){
+                        // If yes, overwrite it with the new one
+                        $env[$env_key] = $key . "=" . $value;
+                        $found = 1;
+                    } else {
+                        // If not, keep the old one
+                        $env[$env_key] = $env_value;
+                    }
+                }
+                if(!$found && $force){
+                    array_push($env,"$key=$value");
+                }
+            }
+            // Turn the array back to an String
+            $env = implode("\n", $env);
+            // And overwrite the .env with the new data
+            file_put_contents($env_file, $env);
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
     
    
 }
