@@ -271,7 +271,8 @@ class RVsitebuilder_Setup_API {
         $env_data['DB_PASSWORD'] = $dbpassword;
         $env_data['HTTP_AS_USER'] = ($this->httpasuser) ? 'true' : 'false';
         $env_data['APP_NAME']   = $appname;
-        //$env_data['RV_CDN'] = '';
+        $env_data['FTP_ACCOUNT'] = $ftpaccount;
+        $env_data['FTP_PASSWORD'] = $ftppassword;
         
         if($this->setEnv(dirname(__FILE__).'/tmp/env.example',$env_data,true)) {
             rename(dirname(__FILE__).'/tmp/env.example',dirname(__FILE__).'/tmp/.env');
