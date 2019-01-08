@@ -40,7 +40,7 @@ $dbuser                 = (isset($_SESSION['dbuser']) ? $_SESSION['dbuser'] : ''
 $dbpassword             = (isset($_SESSION['dbpassword']) ? $_SESSION['dbpassword'] : '');
 $ftpaccount             = (isset($_SESSION['ftpaccount']) ? $_SESSION['ftpaccount'] : '');
 $ftppassword            = (isset($_SESSION['ftppassword']) ? $_SESSION['ftppassword'] : '');
-
+$appname                = (isset($_SESSION['appname']) ? $_SESSION['appname'] : 'RVsitebuilder');
 
 
 
@@ -63,7 +63,7 @@ if($action == 'download_vendor'){
 }
 
 if($action == 'setup_env'){
-    $setupObj->setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword);
+    $setupObj->setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname);
 }
 
 if($action == 'install_common_pkg'){
@@ -94,6 +94,7 @@ class RVsitebuilder_Setup_API {
     protected $serverconf;
     protected $downloadurl;
     protected $debug;
+    protected $httpasuser;
     
     public function __construct($responsetype,$rvsb_installing_token)
     {   
@@ -111,9 +112,20 @@ class RVsitebuilder_Setup_API {
         $this->regtoken = $rvsb_installing_token;
         $this->verify_token($rvsb_installing_token);
         
+        $this->httpasuser = $this->gethttpasuser();
+        
         //download url
         $this->downloadurl = 'http://files.mirror1.rvsitebuilder.com/download';
         
+    }
+    
+    public function gethttpasuser() {
+        $homepath_owner = posix_getpwuid(fileowner($_SERVER["DOCUMENT_ROOT"]))['name'];
+        $site_run_as = posix_getpwuid(posix_geteuid())['name'];
+        if($homepath_owner == $site_run_as){
+            return true;
+        }
+        return false;
     }
     
     public function verify_token($rvsb_installing_token='') {
@@ -251,14 +263,15 @@ class RVsitebuilder_Setup_API {
         
     }
     
-    public function setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword) {
+    public function setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname) {
         $env_data['APP_URL'] = 'http://'.$domainname;
         $env_data['DB_HOST'] = $dbhost;
         $env_data['DB_DATABASE'] = $dbname;
         $env_data['DB_USERNAME'] = $dbuser;
         $env_data['DB_PASSWORD'] = $dbpassword;
+        $env_data['HTTP_AS_USER'] = ($this->httpasuser) ? 'true' : 'false';
+        $env_data['APP_NAME']   = $appname;
         //$env_data['RV_CDN'] = '';
-        //$env_data['HTTP_AS_USER'] = 'FALSE';
         
         if($this->setEnv(dirname(__FILE__).'/tmp/env.example',$env_data,true)) {
             rename(dirname(__FILE__).'/tmp/env.example',dirname(__FILE__).'/tmp/.env');
@@ -431,11 +444,32 @@ class RVsitebuilder_Setup_API {
             rename($source.$file, $destination.$file);
         }
         
+        //chmod
+        if($this->httpasuser == false) {
+            $this->chmod_r($publicpath.'/storage', 0777);
+            $this->chmod_r($publicpath.'/vendor', 0777);
+            $this->chmod_r($homeuser.'/rvsitebuildercms/'.$domainname.'/storage', 777);
+        }
+        
         
         $this->response['status'] = true;
         $this->response['message'] = 'Move Freamwork and Public success';
         return $this->print_response($this->response);
         
+    }
+    
+    function chmod_r($path,$perm) {
+        if(!is_dir($path)) {
+            return true;
+        }
+        $dir = new DirectoryIterator($path);
+        foreach ($dir as $item) {
+            chmod($item->getPathname(), $perm);
+            if ($item->isDir() && !$item->isDot()) {
+                $this->chmod_r($item->getPathname());
+            }
+        }
+        return true;
     }
     
     public function download($type, $url, $sink) {
