@@ -264,6 +264,7 @@ class RVsitebuilder_Setup_API {
     }
     
     public function setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname) {
+        
         $env_data['APP_URL'] = 'http://'.$domainname;
         $env_data['DB_HOST'] = $dbhost;
         $env_data['DB_DATABASE'] = $dbname;
