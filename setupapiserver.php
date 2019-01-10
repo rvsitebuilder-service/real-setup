@@ -82,6 +82,10 @@ if($action == 'finished_setup'){
     $setupObj->finished_setup($homeuser,$domainname);
 }
 
+if($action == 'remove_installer_api'){
+    $setupObj->remove_installer_api($homeuser,$domainname);
+}
+
 
 
 
@@ -395,6 +399,13 @@ class RVsitebuilder_Setup_API {
         //touch install completed
         file_put_contents($homeuser.'/rvsitebuildercms/'.$domainname.'/INSTALL_COMPLETED', '');
         
+        $this->response['status'] = true;
+        $this->response['message'] = 'Finished Setup';
+        $this->clear_session();
+        return $this->print_response($this->response);
+    }
+    
+    public function remove_installer_api($homeuser,$domainname) {
         //remove file
         if ( file_exists(dirname(__FILE__).'/.Rvsb-Installing-Token') ) unlink(dirname(__FILE__).'/.Rvsb-Installing-Token');
         if ( file_exists(dirname(__FILE__).'/blog.tar.gz') ) unlink(dirname(__FILE__).'/blog.tar.gz');
@@ -406,14 +417,17 @@ class RVsitebuilder_Setup_API {
         if ( file_exists(dirname(__FILE__).'/scheduler.tar.gz') ) unlink(dirname(__FILE__).'/scheduler.tar.gz');
         if ( file_exists(dirname(__FILE__).'/setup.tar.gz') ) unlink(dirname(__FILE__).'/setup.tar.gz');
         if ( file_exists(dirname(__FILE__).'/wysiwyg.tar.gz') ) unlink(dirname(__FILE__).'/wysiwyg.tar.gz');
+        if ( file_exists(dirname(__FILE__).'/composer.json') ) unlink(dirname(__FILE__).'/composer.json');
+        if ( file_exists(dirname(__FILE__).'/composer.lock') ) unlink(dirname(__FILE__).'/composer.lock');
         //remove dir
         $this->rrmdir(dirname(__FILE__).'/tmp');
         $this->rrmdir(dirname(__FILE__).'/vendor');
-        
+        //response
         $this->response['status'] = true;
-        $this->response['message'] = 'Finished Setup';
+        $this->response['message'] = 'Remove Installer';
         $this->clear_session();
         return $this->print_response($this->response);
+        
     }
     
     public function generateSecretKey($length = 64) {
