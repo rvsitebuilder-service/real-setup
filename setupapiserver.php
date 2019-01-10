@@ -103,7 +103,7 @@ class RVsitebuilder_Setup_API {
     public function __construct($responsetype,$rvsb_installing_token)
     {   
         //debug var
-        $this->debug = true;
+        $this->debug = false;
         
         //response type
         $this->responseType = $responsetype;
