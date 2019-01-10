@@ -395,8 +395,20 @@ class RVsitebuilder_Setup_API {
         //touch install completed
         file_put_contents($homeuser.'/rvsitebuildercms/'.$domainname.'/INSTALL_COMPLETED', '');
         
-        //remove dirname(__FILE__).'/.Rvsb-Installing-Token'
-        unlink(dirname(__FILE__).'/.Rvsb-Installing-Token');
+        //remove file
+        if ( file_exists(dirname(__FILE__).'/.Rvsb-Installing-Token') ) unlink(dirname(__FILE__).'/.Rvsb-Installing-Token');
+        if ( file_exists(dirname(__FILE__).'/blog.tar.gz') ) unlink(dirname(__FILE__).'/blog.tar.gz');
+        if ( file_exists(dirname(__FILE__).'/core.tar.gz') ) unlink(dirname(__FILE__).'/core.tar.gz');
+        if ( file_exists(dirname(__FILE__).'/email.tar.gz') ) unlink(dirname(__FILE__).'/email.tar.gz');
+        if ( file_exists(dirname(__FILE__).'/manage.tar.gz') ) unlink(dirname(__FILE__).'/manage.tar.gz');
+        if ( file_exists(dirname(__FILE__).'/queuesharedhost.tar.gz') ) unlink(dirname(__FILE__).'/queuesharedhost.tar.gz');
+        if ( file_exists(dirname(__FILE__).'/README.md') ) unlink(dirname(__FILE__).'/README.md');
+        if ( file_exists(dirname(__FILE__).'/scheduler.tar.gz') ) unlink(dirname(__FILE__).'/scheduler.tar.gz');
+        if ( file_exists(dirname(__FILE__).'/setup.tar.gz') ) unlink(dirname(__FILE__).'/setup.tar.gz');
+        if ( file_exists(dirname(__FILE__).'/wysiwyg.tar.gz') ) unlink(dirname(__FILE__).'/wysiwyg.tar.gz');
+        //remove dir
+        $this->rrmdir(dirname(__FILE__).'/tmp');
+        $this->rrmdir(dirname(__FILE__).'/vendor');
         
         $this->response['status'] = true;
         $this->response['message'] = 'Finished Setup';
@@ -507,6 +519,22 @@ class RVsitebuilder_Setup_API {
         session_destroy();
         $_SESSION = array();
         return;
+    }
+    
+    public function rrmdir($dir) {
+        if (is_dir($dir)) {
+            $objects = scandir($dir);
+            foreach ($objects as $object) {
+                if ($object != "." && $object != "..") {
+                    if (filetype($dir."/".$object) == "dir")
+                        $this->rrmdir($dir."/".$object);
+                        else unlink   ($dir."/".$object);
+                }
+            }
+            reset($objects);
+            rmdir($dir);
+        }
+        return true;
     }
     
     public function setEnv($env_file,$env_data = [],$force = false){
