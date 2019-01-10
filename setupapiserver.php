@@ -378,6 +378,9 @@ class RVsitebuilder_Setup_API {
         //user secret key
         $kernel->call('rvsitebuilder:updateenduserdb-run', ['secretkey' => $this->generateSecretKey()]);
         $this->print_debug($kernel->output());
+        //vendor publish
+        $kernel->call('vendor:publish', ['--tag'=> 'public','--force' => true]);
+        $this->print_debug($kernel->output());
         //clear cache
         $kernel->call('cache:clear', []);
         $this->print_debug($kernel->output());
@@ -387,7 +390,8 @@ class RVsitebuilder_Setup_API {
         $this->print_debug($kernel->output());
         $kernel->call('view:clear', []);
         $this->print_debug($kernel->output());
-       
+        
+        
         
         $this->response['status'] = true;
         $this->response['message'] = 'Artisan Command Success';
