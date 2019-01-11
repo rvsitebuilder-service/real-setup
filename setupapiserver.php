@@ -83,7 +83,7 @@ if($action == 'finished_setup'){
 }
 
 if($action == 'remove_installer_api'){
-    $setupObj->remove_installer_api($homeuser,$domainname);
+    $setupObj->remove_installer_api();
 }
 
 
@@ -409,7 +409,7 @@ class RVsitebuilder_Setup_API {
         return $this->print_response($this->response);
     }
     
-    public function remove_installer_api($homeuser,$domainname) {
+    public function remove_installer_api() {
         //remove file
         if ( file_exists(dirname(__FILE__).'/.Rvsb-Installing-Token') ) unlink(dirname(__FILE__).'/.Rvsb-Installing-Token');
         if ( file_exists(dirname(__FILE__).'/blog.tar.gz') ) unlink(dirname(__FILE__).'/blog.tar.gz');
