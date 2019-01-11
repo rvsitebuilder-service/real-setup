@@ -216,7 +216,7 @@ class RVsitebuilder_Setup_API {
         return $this->print_response($this->response);
     } 
     
-    public function download_vendor() {
+    public function download_vendor_backup() {
         
         //read rvsitebuilder.json
         if(! file_exists(dirname(__FILE__).'/tmp/rvsitebuilder.json')){
@@ -266,6 +266,47 @@ class RVsitebuilder_Setup_API {
         //TODO loop all package and download if $rvsbjson['vendor-packages'] NOT SET
         
     }
+    
+    
+    public function download_vendor() {
+        
+        //### ใช้ download จากtmp domain ที่สร้างไว้ก่อน พี่บูมแก้ link download เสร็จ ต้อง แก้ setupapiserver.php->download_vendor ให้กลับมาเหมือนเดิม
+        //### และต้องแก้ setupapiserver.php->download_vendor ให้กลับมา download จาก files.mirror1.rvglobalsoft.net ด้วย
+        //### และต้อง pack rvsb cpanel plugin ใหม่ และ build stable ใหม่ ด้วย
+        
+        $downloadvendorurl = 'http://tmpbundlevendor.cpdev1.rvglobalsoft.net/bundle_vendor.tar.gz';
+        $downloadvendor = $this->download('GET' , $downloadvendorurl , dirname(__FILE__).'/bundle_vendor.tar.gz');
+        if(! $downloadvendor) {
+            $this->response['message'] = 'Can not download vendor';
+            $this->clear_session();
+            return $this->print_response($this->response);
+        }
+        $extractvendor = $this->extract(dirname(__FILE__).'/bundle_vendor.tar.gz',dirname(__FILE__).'/tmp/vendor/');
+        if(! $extractvendor) {
+            $this->response['message'] = 'Can not extract vendor.tar.gz';
+            $this->clear_session();
+            return $this->print_response($this->response);
+        }
+        
+        //move vendor package to vendor path
+        $files = scandir(dirname(__FILE__).'/tmp/vendor/vendor');
+        $source = dirname(__FILE__).'/tmp/vendor/vendor/';
+        $destination = dirname(__FILE__).'/tmp/vendor/';
+        foreach ($files as $file) {
+            if (in_array($file, [".",".."])) continue;
+            rename($source.$file, $destination.$file);
+        }
+        
+        // Delete all successfully-copied files
+        rmdir(dirname(__FILE__).'/tmp/vendor/vendor');
+        
+        $this->response['status'] = true;
+        $this->response['message'] = 'Download Vendor Success';
+        return $this->print_response($this->response);
+        
+    }
+    
+    
     
     public function setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname) {
         
