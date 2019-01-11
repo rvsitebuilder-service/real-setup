@@ -119,7 +119,7 @@ class RVsitebuilder_Setup_API {
         $this->httpasuser = $this->gethttpasuser();
         
         //download url
-        $this->downloadurl = 'http://files.mirror1.rvsitebuilder.com/download';
+        $this->downloadurl = 'https://files.mirror1.rvsitebuilder.com/download';
         
     }
     
@@ -361,19 +361,19 @@ class RVsitebuilder_Setup_API {
         $kernel->call('db:seed', ['--force'=>true]);
         $this->print_debug($kernel->output());
         //Manage
-        $kernel->call('db:seed', ['--class'=> Rvsitebuilder\Manage\Database\Seeds\ManageCreateCoreAppsTableSeeder::class,'--force' => true]);
+        $kernel->call('db:seed', ['--class'=> Rvsitebuilder\Manage\Database\Seeds\AppSeeder::class,'--force' => true]);
         $this->print_debug($kernel->output());
         //Core
-        $kernel->call('db:seed', ['--class'=> Rvsitebuilder\Core\Database\Seeds\CoreDatabaseSeeder::class,'--force' => true]);
+        $kernel->call('db:seed', ['--class'=> Rvsitebuilder\Core\Database\Seeds\AppSeeder::class,'--force' => true]);
         $this->print_debug($kernel->output());
         //Blog
-        $kernel->call('db:seed', ['--class'=> Rvsitebuilder\Blog\Database\Seeds\BlogDatabaseSeeder::class,'--force' => true]);
+        $kernel->call('db:seed', ['--class'=> Rvsitebuilder\Blog\Database\Seeds\AppSeeder::class,'--force' => true]);
         $this->print_debug($kernel->output());
         //Email
-        $kernel->call('db:seed', ['--class'=> Rvsitebuilder\Email\Database\Seeds\EmailDatabaseSeeder::class,'--force' => true]);
+        $kernel->call('db:seed', ['--class'=> Rvsitebuilder\Email\Database\Seeds\AppSeeder::class,'--force' => true]);
         $this->print_debug($kernel->output());
         //Scheduler
-        $kernel->call('db:seed', ['--class'=> Rvsitebuilder\Scheduler\Database\Seeds\SchedulerDatabaseSeeder::class,'--force' => true]);
+        $kernel->call('db:seed', ['--class'=> Rvsitebuilder\Scheduler\Database\Seeds\AppSeeder::class,'--force' => true]);
         $this->print_debug($kernel->output());
         //user secret key
         $kernel->call('rvsitebuilder:updateenduserdb-run', ['secretkey' => $this->generateSecretKey()]);
