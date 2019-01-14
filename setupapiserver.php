@@ -401,6 +401,11 @@ class RVsitebuilder_Setup_API {
         $this->print_debug($kernel->output());
         $kernel->call('db:seed', ['--force'=>true]);
         $this->print_debug($kernel->output());
+        
+        //user secret key
+        $kernel->call('rvsitebuilder:updateenduserdb-run', ['secretkey' => $this->generateSecretKey()]);
+        $this->print_debug($kernel->output());
+        
         //Manage
         $kernel->call('db:seed', ['--class'=> Rvsitebuilder\Manage\Database\Seeds\AppSeeder::class,'--force' => true]);
         $this->print_debug($kernel->output());
@@ -416,12 +421,11 @@ class RVsitebuilder_Setup_API {
         //Scheduler
         $kernel->call('db:seed', ['--class'=> Rvsitebuilder\Scheduler\Database\Seeds\SchedulerDatabaseSeeder::class,'--force' => true]);
         $this->print_debug($kernel->output());
-        //user secret key
-        $kernel->call('rvsitebuilder:updateenduserdb-run', ['secretkey' => $this->generateSecretKey()]);
-        $this->print_debug($kernel->output());
+      
         //vendor publish
         $kernel->call('vendor:publish', ['--tag'=> 'public','--force' => true]);
         $this->print_debug($kernel->output());
+        
         //clear cache
         $kernel->call('cache:clear', []);
         $this->print_debug($kernel->output());
