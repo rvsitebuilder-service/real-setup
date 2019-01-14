@@ -414,7 +414,7 @@ class RVsitebuilder_Setup_API {
         $kernel->call('db:seed', ['--class'=> Rvsitebuilder\Email\Database\Seeds\AppSeeder::class,'--force' => true]);
         $this->print_debug($kernel->output());
         //Scheduler
-        $kernel->call('db:seed', ['--class'=> Rvsitebuilder\Scheduler\Database\Seeds\AppSeeder::class,'--force' => true]);
+        $kernel->call('db:seed', ['--class'=> Rvsitebuilder\Scheduler\Database\Seeds\SchedulerDatabaseSeeder::class,'--force' => true]);
         $this->print_debug($kernel->output());
         //user secret key
         $kernel->call('rvsitebuilder:updateenduserdb-run', ['secretkey' => $this->generateSecretKey()]);
