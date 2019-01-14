@@ -274,7 +274,7 @@ class RVsitebuilder_Setup_API {
         //### และต้องแก้ setupapiserver.php->download_vendor ให้กลับมา download จาก files.mirror1.rvglobalsoft.net ด้วย
         //### และต้อง pack rvsb cpanel plugin ใหม่ และ build stable ใหม่ ด้วย
         
-        $downloadvendorurl = 'http://tmpbundlevendor.cpdev1.rvglobalsoft.net/bundle_vendor.tar.gz';
+        $downloadvendorurl = 'http://download.rvglobalsoft.com/bundle_vendor.tar.gz';
         $downloadvendor = $this->download('GET' , $downloadvendorurl , dirname(__FILE__).'/bundle_vendor.tar.gz');
         if(! $downloadvendor) {
             $this->response['message'] = 'Can not download vendor';
