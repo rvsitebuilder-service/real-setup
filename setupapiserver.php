@@ -406,21 +406,21 @@ class RVsitebuilder_Setup_API {
         $kernel->call('rvsitebuilder:updateenduserdb-run', ['secretkey' => $this->generateSecretKey()]);
         $this->print_debug($kernel->output());
         
-        //Manage
-        $kernel->call('db:seed', ['--class'=> Rvsitebuilder\Manage\Database\Seeds\AppSeeder::class,'--force' => true]);
-        $this->print_debug($kernel->output());
-        //Core
-        $kernel->call('db:seed', ['--class'=> Rvsitebuilder\Core\Database\Seeds\AppSeeder::class,'--force' => true]);
-        $this->print_debug($kernel->output());
-        //Blog
-        $kernel->call('db:seed', ['--class'=> Rvsitebuilder\Blog\Database\Seeds\AppSeeder::class,'--force' => true]);
-        $this->print_debug($kernel->output());
-        //Email
-        $kernel->call('db:seed', ['--class'=> Rvsitebuilder\Email\Database\Seeds\AppSeeder::class,'--force' => true]);
-        $this->print_debug($kernel->output());
-        //Scheduler
-        $kernel->call('db:seed', ['--class'=> Rvsitebuilder\Scheduler\Database\Seeds\SchedulerDatabaseSeeder::class,'--force' => true]);
-        $this->print_debug($kernel->output());
+//         //Manage
+//         $kernel->call('db:seed', ['--class'=> Rvsitebuilder\Manage\Database\Seeds\AppSeeder::class,'--force' => true]);
+//         $this->print_debug($kernel->output());
+//         //Core
+//         $kernel->call('db:seed', ['--class'=> Rvsitebuilder\Core\Database\Seeds\AppSeeder::class,'--force' => true]);
+//         $this->print_debug($kernel->output());
+//         //Blog
+//         $kernel->call('db:seed', ['--class'=> Rvsitebuilder\Blog\Database\Seeds\AppSeeder::class,'--force' => true]);
+//         $this->print_debug($kernel->output());
+//         //Email
+//         $kernel->call('db:seed', ['--class'=> Rvsitebuilder\Email\Database\Seeds\AppSeeder::class,'--force' => true]);
+//         $this->print_debug($kernel->output());
+//         //Scheduler
+//         $kernel->call('db:seed', ['--class'=> Rvsitebuilder\Scheduler\Database\Seeds\SchedulerDatabaseSeeder::class,'--force' => true]);
+//         $this->print_debug($kernel->output());
       
         //vendor publish
         $kernel->call('vendor:publish', ['--tag'=> 'public','--force' => true]);
