@@ -649,10 +649,10 @@ class RVsitebuilder_Setup_API {
 
 $ftp_server = 'ftp.amarin.rvwizard.com';
 $ftp_user_name = 'testftp@amarin.rvwizard.com';
-$ftp_user_pass = '16rVjyp6SVg';
+$ftp_user_pass = 'xxxxxxxx';
 
-$src_dir = '/home/amarin/public_html/source';
-$ftp_remote_dir = '/rvsitebuilder';
+$src_dir = '/home/arnut/public_html/rvsitebuilder/tmp';
+$ftp_remote_dir = '/rvsitebuildercms/arnut.cprelease.rvglobalsoft.net';
 
 $ftpHandler = new FTP_Handler();
 $result = $ftpHandler->connect($ftp_server);
