@@ -644,4 +644,171 @@ class RVsitebuilder_Setup_API {
    
 }
 
+/*
+ * echo 'Begin test ftp <br/>';
+
+$ftp_server = 'ftp.amarin.rvwizard.com';
+$ftp_user_name = 'testftp@amarin.rvwizard.com';
+$ftp_user_pass = '16rVjyp6SVg';
+
+$src_dir = '/home/amarin/public_html/source';
+$ftp_remote_dir = '/rvsitebuilder';
+
+$ftpHandler = new FTP_Handler();
+$result = $ftpHandler->connect($ftp_server);
+if(!$result['success']){
+    echo "Error: " . $result['msg'];
+    exit;
+}
+$ftpHandler->login($ftp_user_name, $ftp_user_pass);
+if(!$result['success']){
+    echo "Error: " . $result['msg'];
+    exit;
+}
+
+$ftpHandler->ftp_copy($src_dir, $ftp_remote_dir);
+$ftpHandler->close();
+
+echo 'End test ftp <br/>';
+ */
+
+class FTP_Handler{
+    protected $conn_id;    
+    
+    public function __construct( ) {
+    }
+    
+    function connect($ftp_server) {
+        $result = [];
+        $result['success'] = 1;
+        $this->conn_id = ftp_connect($ftp_server);
+        if ( ! $this->conn_id ) {
+            $result['success'] = 0;
+            $result['msg'] = 'Fail to connect ' . $ftp_server;
+        }
+        return $result;
+    }
+    
+    function testftp() {
+        $src_dir = '/home/amarin/public_html/source';
+        $dest = 'dest/dir1';
+        
+        ftp_chdir($this->conn_id, $dest);
+        
+        $pwd =  ftp_pwd($this->conn_id); // /public_html
+        printf("FTP: current directory = %s <br/>", $pwd);
+        
+        $file = 'aaaa.txt';
+        //$upload = ftp_put($this->conn_id, $file, $src_dir."/".$file, FTP_ASCII);
+        $file = 'sub1';
+        @ftp_mkdir($this->conn_id, $file);
+    }
+    
+    function login($ftp_user_name, $ftp_user_pass) {
+        $result = [];
+        $result['success'] = 1;
+        $login = ftp_login($this->conn_id, $ftp_user_name, $ftp_user_pass);
+        if ( ! $login ) {
+            $result['success'] = 0;
+            $result['msg'] = 'Fail to login ftp ';
+        }
+        
+        ftp_pasv( $this->conn_id, true );
+        return $result;
+    }
+    
+    function nlist($path = '.') {
+        $dirLists = ftp_nlist($this->conn_id, $path);
+        return $dirLists;
+    }
+    
+    function put($dest = '', $source = '', $mode = 'FTP_ASCII') {
+        $result = [];
+        $result['success'] = 1;
+        $upload = ftp_put($this->conn_id, $dest, $source, $mode);
+        if (!$upload) {
+            $result['success'] = 0;
+            $result['msg'] = 'Fail to ftp upload ';
+        }
+        return $result;
+    }
+    /*
+     $src_dir = '/home/amarin/public_html/source';
+     $ftp_remote_dir = 'dest';
+     ftp_copy(/home/amarin/public_html/source, dest)
+     ftp_copy(/home/amarin/public_html/source, dest/app)
+     */
+    function ftp_copy($src_dir, $dst_dir) {
+        $debug = 0;
+        $chdir = $dst_dir;
+        if($debug){
+            echo "- ftp_copy $src_dir , $dst_dir <br/>";
+            echo "-- ftp_chdir to $chdir <br/>";
+        }
+        ftp_chdir($this->conn_id, $chdir);
+        
+        if(is_dir($src_dir)){
+            $dir = new DirectoryIterator($src_dir);
+            foreach($dir as $fileinfo) {
+                $file = $fileinfo->getFilename();
+                if ($file != "." && $file != "..") {
+                    if (is_dir($src_dir."/".$file)) {
+                        if (!$this->ftp_is_dir($this->conn_id, $file)) {
+                            ftp_chdir($this->conn_id, $dst_dir);
+                            $pushd = ftp_pwd($this->conn_id);
+                            if($debug){
+                                echo "--- ftp pwd = $pushd<br/>";
+                                echo "--- Not found ftp dir now do ftp_mkdir $file at $dst_dir<br/>";
+                            }
+                            @ftp_mkdir($this->conn_id, $file);
+                            @ftp_chmod($this->conn_id, 0777, $file);
+                        }
+                        $this->ftp_copy($src_dir."/".$file, $dst_dir."/".$file);
+                    }
+                    else {
+                        ftp_chdir($this->conn_id, $dst_dir);
+                        $pushd = ftp_pwd($this->conn_id);
+                        if($debug){
+                            echo "------ ftp pwd = $pushd<br/>";
+                            echo "------ ftp_put $file to $dst_dir<br/>";
+                        }
+                        $pushd = ftp_pwd($this->conn_id);
+                        $upload = ftp_put($this->conn_id, $file, $src_dir."/".$file, FTP_BINARY);
+                        @ftp_chmod($this->conn_id, 0777, $file);
+                    }
+                }
+            }
+        }else{
+            ftp_chdir($this->conn_id, $dst_dir);
+            $pushd = ftp_pwd($this->conn_id);
+            if($debug){
+                echo "------ ftp pwd = $pushd<br/>";
+                echo "------ ftp_put $file to $dst_dir<br/>";
+            }
+            $upload = ftp_put($this->conn_id, $file, $src_dir."/".$file, FTP_BINARY);
+            @ftp_chmod($this->conn_id, 0777, $file);
+        }
+    }
+    
+    function ftp_is_dir($dir)
+    {
+        $pushd = ftp_pwd($this->conn_id);
+        
+        if ($pushd !== false && @ftp_chdir($this->conn_id, $dir))
+        {
+            ftp_chdir($this->conn_id, $pushd);
+            return true;
+        }
+        
+        return false;
+    }
+    
+    function close() {
+        if($this->conn_id){
+            ftp_close($this->conn_id);
+        }
+        return true;
+    }
+}
+
 ?>
