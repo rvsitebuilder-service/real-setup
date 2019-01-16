@@ -155,6 +155,12 @@ class RVsitebuilder_Setup_API {
     
     public function pre_check_php() {
         
+        //TODO support http run as not user
+        if(! $this->httpasuser) {
+            $this->response['message'] = 'HTTP run as nobody.Not currently supported';
+            return $this->print_response($this->response);
+        }
+        
         $phpversion = '7.1.0';
         $phpextension = ['mysqlnd','pdo','gd','curl','iconv','mbstring','fileinfo','exif','zip'];
         $iniconfig = [
@@ -216,21 +222,27 @@ class RVsitebuilder_Setup_API {
         return $this->print_response($this->response);
     } 
     
-    public function download_vendor_backup() {
+    public function download_vendor() {
         
-        //read rvsitebuilder.json
+        //check rvsitebuilder.json
         if(! file_exists(dirname(__FILE__).'/tmp/rvsitebuilder.json')){
             $this->response['message'] = 'Can not open file rvsitebuilder.json';
             $this->clear_session();
             return $this->print_response($this->response);
         }
+        
+        //read rvsitebuilder.json
         $rvsbjson = json_decode(file_get_contents(dirname(__FILE__).'/tmp/rvsitebuilder.json'), true);
         
-        //download from key vendor-packages
+        //first download from key vendor-packages (bundle_vendor) if key exists
+        // link download = http://files.mirror1.rvsitebuilder.com/download/rvsitebuilder/framework%2Fbundle_vendor/version/0.0.8
+        // vendor-packages = rvsitebuilder\/framework\/bundle_vendor
         if(isset($rvsbjson['vendor-packages']) && key($rvsbjson['vendor-packages']) != ''){
-            $link = '/'.key($rvsbjson['vendor-packages']);
+            $vendorkey = key($rvsbjson['vendor-packages']);
+            list($product_name, $app_name) = preg_split('/\//', $vendorkey, 2);
+            $package_name_encoded = '/'.$product_name.'/'.urlencode($app_name);
             $version = '/version/'.$rvsbjson['version'];
-            $downloadvendorurl = $this->downloadurl.$link.$version;
+            $downloadvendorurl = $this->downloadurl.$package_name_encoded.$version;
             $downloadvendor = $this->download('GET' , $downloadvendorurl , dirname(__FILE__).'/bundle_vendor.tar.gz');
             if(! $downloadvendor) {
                 $this->response['message'] = 'Can not download vendor';
@@ -242,6 +254,35 @@ class RVsitebuilder_Setup_API {
                 $this->response['message'] = 'Can not extract vendor.tar.gz';
                 $this->clear_session();
                 return $this->print_response($this->response);
+            }
+        } 
+        
+        //lookup and download all from key packages
+        //วิธีนี้ อาจเจอ timeout
+        else {
+            foreach($rvsbjson['packages'] as $package_key => $value){
+                $update_package_name = $rvsbjson['packages'][$package_key]['name'];
+                $update_package_version = isset($rvsbjson['packages'][$package_key]['version']) ? $rvsbjson['packages'][$package_key]['version'] : '';
+                list($product_name, $app_name) = preg_split('/\//', $update_package_name, 2);
+                $package_name_encoded = urlencode($app_name);
+                if ($update_package_version != '') {
+                    $update_package_version = '/version/' . $update_package_version;
+                }
+                
+                $downloadvendorurl = $this->downloadurl.'/'.$product_name.'/'.urlencode($app_name).$update_package_version;
+                $downloadvendor = $this->download('GET' , $downloadvendorurl , dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
+                if(! $downloadvendor) {
+                    $this->response['message'] = 'Can not download vendor '.$downloadvendorurl;
+                    $this->clear_session();
+                    return $this->print_response($this->response);
+                }
+                $extractvendor = $this->extract(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz',dirname(__FILE__).'/tmp/vendor/');
+                if(! $extractvendor) {
+                    $this->response['message'] = 'Can not extract vendor '.$package_name_encoded;
+                    $this->clear_session();
+                    return $this->print_response($this->response);
+                }
+                unlink(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
             }
             
         }
@@ -263,12 +304,10 @@ class RVsitebuilder_Setup_API {
         return $this->print_response($this->response);
         
         
-        //TODO loop all package and download if $rvsbjson['vendor-packages'] NOT SET
-        
     }
     
     
-    public function download_vendor() {
+    public function download_vendor_bak() {
         
         //### ใช้ download จากtmp domain ที่สร้างไว้ก่อน พี่บูมแก้ link download เสร็จ ต้อง แก้ setupapiserver.php->download_vendor ให้กลับมาเหมือนเดิม
         //### และต้องแก้ setupapiserver.php->download_vendor ให้กลับมา download จาก files.mirror1.rvglobalsoft.net ด้วย
@@ -309,6 +348,9 @@ class RVsitebuilder_Setup_API {
     
     
     public function setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname) {
+        
+        //TODO clear whitespace
+        if (preg_match('/\s/',$appname)) $appname = '"'.$appname.'"';
         
         $env_data['APP_URL'] = 'http://'.$domainname;
         $env_data['DB_HOST'] = $dbhost;
@@ -406,6 +448,7 @@ class RVsitebuilder_Setup_API {
         $kernel->call('rvsitebuilder:updateenduserdb-run', ['secretkey' => $this->generateSecretKey()]);
         $this->print_debug($kernel->output());
         
+// ยกเลิกการรัน seeder 01/15/2019
 //         //Manage
 //         $kernel->call('db:seed', ['--class'=> Rvsitebuilder\Manage\Database\Seeds\AppSeeder::class,'--force' => true]);
 //         $this->print_debug($kernel->output());
