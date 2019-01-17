@@ -161,20 +161,15 @@ class RVsitebuilder_Setup_API {
             return $this->print_response($this->response);
         }
         
-        $phpversion = '7.1.0';
-        $phpextension = ['mysqlnd','pdo','gd','curl','iconv','mbstring','fileinfo','exif','zip'];
-        $iniconfig = [
-            'allow_url_fopen' => 1,
-            'memory_limit' => 64 
-        ];
-        
         //php version
+        $phpversion = '7.1.0';
         if (version_compare(PHP_VERSION, $phpversion) < 0) {
             $this->response['message'] = 'System required PHP Version > = 7.1.0';
             return $this->print_response($this->response);
         }
         
         //php extension
+        $phpextension = ['mysqlnd','pdo','gd','curl','iconv','mbstring','fileinfo','exif','zip'];
         foreach ($phpextension as $extension) {
             if (!extension_loaded($extension)) {
                 $this->response['message'] = 'Can not load PHP Extension ('.$extension.')';
@@ -183,8 +178,9 @@ class RVsitebuilder_Setup_API {
         }
         
         //php config
+        $iniconfig = ['allow_url_fopen' => 1,'memory_limit' => 64];
         if(ini_get('allow_url_fopen') != $iniconfig['allow_url_fopen']){
-            $this->response['message'] = 'Error php.ini, Set allow_url_fopen=ON';
+            $this->response['message'] = 'Error php.ini, Must set allow_url_fopen=ON';
             return $this->print_response($this->response);
         }
         preg_match('/[1-9]+/',ini_get('memory_limit'),$match);
@@ -352,7 +348,7 @@ class RVsitebuilder_Setup_API {
         //TODO clear whitespace
         if (preg_match('/\s/',$appname)) $appname = '"'.$appname.'"';
         
-        $env_data['APP_URL'] = 'http://'.$domainname;
+        $env_data['APP_URL'] = 'https://'.$domainname;
         $env_data['DB_HOST'] = $dbhost;
         $env_data['DB_DATABASE'] = $dbname;
         $env_data['DB_USERNAME'] = $dbuser;
