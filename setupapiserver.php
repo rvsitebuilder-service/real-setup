@@ -552,13 +552,11 @@ class RVsitebuilder_Setup_API {
         }
         
         //move framework/public to public path
-        $files = scandir($homeuser.'/rvsitebuildercms/'.$domainname.'/public');
-        $source = $homeuser.'/rvsitebuildercms/'.$domainname.'/public/';
-        $destination = $publicpath.'/';
-        foreach ($files as $file) {
-            if (in_array($file, [".",".."])) continue;
-            rename($source.$file, $destination.$file);
-        }
+        $source = $homeuser.'/rvsitebuildercms/'.$domainname.'/public';
+        $destination = $publicpath;
+        $files = new File_Handler();
+        $copy = $files->copyDirectory($source, $destination);
+
         
         //chmod
         if($this->httpasuser == false) {
@@ -849,5 +847,69 @@ class FTP_Handler{
         return true;
     }
 }
+
+
+
+class File_Handler{
+    
+    public function __construct( ) {
+    }
+    
+    public function isDirectory($directory)
+    {
+        return is_dir($directory);
+    }
+    
+    public function copyDirectory($directory, $destination, $options = null)
+    {
+        if (! $this->isDirectory($directory)) {
+            return false;
+        }
+        
+        $options = $options ?: FilesystemIterator::SKIP_DOTS;
+        
+        if (! $this->isDirectory($destination)) {
+            $this->makeDirectory($destination, 0777, true);
+        }
+        
+        $items = new FilesystemIterator($directory, $options);
+        
+        foreach ($items as $item) {
+            $target = $destination.'/'.$item->getBasename();
+            
+            if ($item->isDir()) {
+                $path = $item->getPathname();
+                
+                if (! $this->copyDirectory($path, $target, $options)) {
+                    return false;
+                }
+            }
+            
+            else {
+                if (! $this->copy($item->getPathname(), $target)) {
+                    return false;
+                }
+            }
+        }
+        
+        return true;
+    }
+    
+    public  function makeDirectory($path, $mode = 0755, $recursive = false, $force = false)
+    {
+        if ($force) {
+            return @mkdir($path, $mode, $recursive);
+        }
+        
+        return mkdir($path, $mode, $recursive);
+    }
+    
+    public  function copy($path, $target)
+    {
+        return copy($path, $target);
+    }
+}
+
+
 
 ?>
