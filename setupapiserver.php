@@ -309,8 +309,8 @@ class RVsitebuilder_Setup_API {
         $env_data['APP_NAME']   = $appname;
         $env_data['FTP_ACCOUNT'] = $ftpaccount;
         $env_data['FTP_PASSWORD'] = $ftppassword;
-        $env_data['FTP_SERVER'] = $ftpaccount;
-        $env_data['FTP_PORT'] = $ftppassword;
+        $env_data['FTP_SERVER'] = $ftpserver;
+        $env_data['FTP_PORT'] = $ftpport;
         $env_data['DOCUMENT_ROOT'] = $publicpath;
         
         if($this->setEnv(dirname(__FILE__).'/tmp/env.example',$env_data,true)) {
@@ -394,28 +394,34 @@ class RVsitebuilder_Setup_API {
         //Common
         $kernel->call('key:generate', []);
         $this->print_debug($kernel->output());
+        $this->install_log($kernel->output());
         $kernel->call('migrate', ['--force'=>true]);
         $this->print_debug($kernel->output());
-        $kernel->call('db:seed', []);
+        $this->install_log($kernel->output());
+        $kernel->call('db:seed', ['--force'=>true]);
         $this->print_debug($kernel->output());
-        
+        $this->install_log($kernel->output());
         //user secret key
         $kernel->call('rvsitebuilder:updateenduserdb-run', ['secretkey' => $this->generateSecretKey()]);
         $this->print_debug($kernel->output());
-        
+        $this->install_log($kernel->output());
         //vendor publish
         $kernel->call('vendor:publish', ['--tag'=> 'public','--force' => true]);
         $this->print_debug($kernel->output());
-        
+        $this->install_log($kernel->output());
         //clear cache
         $kernel->call('cache:clear', []);
         $this->print_debug($kernel->output());
+        $this->install_log($kernel->output());
         $kernel->call('config:clear', []);
         $this->print_debug($kernel->output());
+        $this->install_log($kernel->output());
         $kernel->call('route:clear', []);
         $this->print_debug($kernel->output());
+        $this->install_log($kernel->output());
         $kernel->call('view:clear', []);
         $this->print_debug($kernel->output());
+        $this->install_log($kernel->output());
         
         
         $this->response['status'] = true;
@@ -424,6 +430,12 @@ class RVsitebuilder_Setup_API {
         return $this->print_response($this->response);
     }
     
+    public function install_log($output) {
+        $logfile = fopen(dirname(__FILE__)."/install_log","a");
+        fwrite($logfile , "\n".$output);
+        fclose($logfile);
+        return true;
+    }
     
     public function finished_setup($homeuser,$domainname) {
         //touch install completed
