@@ -395,7 +395,7 @@ class RVsitebuilder_Setup_API {
         $this->print_debug($kernel->output());
         $kernel->call('migrate', ['--force'=>true]);
         $this->print_debug($kernel->output());
-        $kernel->call('db:seed', ['--force'=>true]);
+        $kernel->call('db:seed', []);
         $this->print_debug($kernel->output());
         
         //user secret key
