@@ -112,7 +112,8 @@ class RVsitebuilder_Setup_API {
     }
     
     public function check_getlatestversion(){
-        if(file_exists($_SERVER['DOCUMENT_ROOT'].'/.getlatestversion')) {
+        $homepath_dir = posix_getpwuid(posix_getuid())['dir'];
+        if(file_exists($homepath_dir.'/.getlatestversion')) {
             return true;
         }
         return false;
