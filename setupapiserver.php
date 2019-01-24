@@ -526,19 +526,26 @@ class RVsitebuilder_Setup_API {
             return $this->print_response($this->response);
         }
         if(!file_exists($ftp_remote_dir)){
-            $result = $ftpHandler->ftp_make_dir($ftp_remote_dir);
+            $result = $ftpHandler->ftp_make_dir($homeuser,$ftp_remote_dir);
             if(!$result['success']) {
                 $this->response['message'] = 'Error '.$result['msg'];
                 return $this->print_response($this->response);
             }
         }
         
-        #copy file
+        #copy file to framework path
         $ftpHandler->ftp_copy($src_dir, $ftp_remote_dir);
+        
+        #copy file to public path
+        $src_dir = $homeuser.'/rvsitebuildercms/'.$domainname.'/public';
+        $exploded = explode('/',$publicpath);
+        $public_html = '/'.end($exploded);
+        $ftpHandler->ftp_copy($src_dir, $public_html);
+        
         #chmod folder
-        $ftpHandler->ftp_change_mod_r($publicpath.'/storage' , 0777);
-        $ftpHandler->ftp_change_mod_r($publicpath.'/vendor' , 0777);
-        $ftpHandler->ftp_change_mod_r($homeuser.'/rvsitebuildercms/'.$domainname.'/storage' , 0777);
+        $ftpHandler->ftp_change_mod_r($publicpath.'/storage',$public_html.'/storage' , 0777);
+        $ftpHandler->ftp_change_mod_r($publicpath.'/vendor',$public_html.'/vendor' , 0777);
+        $ftpHandler->ftp_change_mod_r($homeuser.'/rvsitebuildercms/'.$domainname.'/storage','/rvsitebuildercms/'.$domainname.'/storage' , 0777);
         #close connect
         $ftpHandler->close();
         
@@ -757,7 +764,7 @@ class FTP_Handler{
      ftp_copy(/home/amarin/public_html/source, dest/app)
      */
     function ftp_copy($src_dir, $dst_dir) {
-        $debug = 0;
+        $debug = false;
         $chdir = $dst_dir;
         if($debug){
             echo "- ftp_copy $src_dir , $dst_dir <br/>";
@@ -808,35 +815,47 @@ class FTP_Handler{
         }
     }
     
-    function ftp_make_dir ($dir) {
-        if (ftp_mkdir($this->conn_id, $dir))
-        {
-            $result['success'] = 1;
-            $result['msg'] = 'success';
-        }
-        else
-        {
-            $result['success'] = 0;
-            $result['msg'] = 'Fail to create directory '.$dir;
-        }
-        return $result;
-    }
-    
-    function ftp_change_mod_r($path, $perm='0777') {
+    function ftp_change_mod_r($realpath , $path , $perm=0777) {
         
-        if(!is_dir($path)) {
-            return true;
-        }
-        $dir = new DirectoryIterator($path);
-        foreach ($dir as $item) {
-            @ftp_chmod($this->conn_id , $perm ,  $item->getPathname());
-            if ($item->isDir() && !$item->isDot()) {
-                $this->ftp_change_mod_r($item->getPathname());
+        ftp_chmod($this->conn_id, $perm, $path);
+        ftp_chdir($this->conn_id, $path);
+        
+        $dir = new DirectoryIterator($realpath);
+        foreach($dir as $fileinfo) {
+            $file = $fileinfo->getFilename();
+            if ($file != "." && $file != "..") {
+                @ftp_chmod($this->conn_id, $perm, $path.'/'.$file);
+                if (is_dir($realpath.'/'.$file)) {
+                    $this->ftp_change_mod_r( $realpath.'/'.$file , $path.'/'.$file , $perm);
+                }
             }
         }
         return true;
+    }
+    
+    function ftp_make_dir ($homeuserdir , $dir) {
         
-    } 
+        $result['success'] = 0;
+        $result['msg'] = 'Fail to create directory '.$dir;
+        
+        @ftp_chdir($this->conn_id, $homeuserdir); 
+        $parts = explode('/',$dir); 
+        foreach($parts as $part){
+            if(!@ftp_chdir($this->conn_id, $part)){
+                ftp_mkdir($this->conn_id, $part);
+                ftp_chdir($this->conn_id, $part);
+            }
+        }
+        
+        if(@ftp_chdir($this->conn_id, $dir)) {
+            $result['success'] = 1;
+            $result['msg'] = 'success';
+        }
+        
+        return $result;
+    }
+    
+    
     
     function ftp_is_dir($dir)
     {
