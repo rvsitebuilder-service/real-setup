@@ -64,7 +64,7 @@ if($action == 'finished_setup'){
 }
 
 if($action == 'remove_installer_api'){
-    $setupObj->remove_installer_api($homeuser);
+    $setupObj->remove_installer_api();
 }
 
 
@@ -112,8 +112,7 @@ class RVsitebuilder_Setup_API {
     }
     
     public function check_getlatestversion(){
-        $homepath_dir = posix_getpwuid(posix_getuid())['dir'];
-        if(file_exists($homepath_dir.'/.getlatestversion')) {
+        if(file_exists(dirname(__FILE__).'/.getlatestversion')) {
             return true;
         }
         return false;
@@ -448,9 +447,9 @@ class RVsitebuilder_Setup_API {
     }
     
     
-    public function remove_installer_api($homeuser) {
+    public function remove_installer_api() {
         //remove file
-        if(! file_exists($homeuser.'/.rvsitebuilderinstallerdebug')) {
+        if(! file_exists(dirname(__FILE__).'/.rvsitebuilderinstallerdebug')) {
             if ( file_exists(dirname(__FILE__).'/.Rvsb-Installing-Token') ) unlink(dirname(__FILE__).'/.Rvsb-Installing-Token');
             if ( file_exists(dirname(__FILE__).'/blog.tar.gz') ) unlink(dirname(__FILE__).'/blog.tar.gz');
             if ( file_exists(dirname(__FILE__).'/core.tar.gz') ) unlink(dirname(__FILE__).'/core.tar.gz');
