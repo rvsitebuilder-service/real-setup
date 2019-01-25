@@ -451,6 +451,8 @@ class RVsitebuilder_Setup_API {
         //remove file
         if(! file_exists(dirname(__FILE__).'/.rvsitebuilderinstallerdebug')) {
             if ( file_exists(dirname(__FILE__).'/.Rvsb-Installing-Token') ) unlink(dirname(__FILE__).'/.Rvsb-Installing-Token');
+            if ( file_exists(dirname(__FILE__).'/framework.tar.gz') ) unlink(dirname(__FILE__).'/framework.tar.gz');
+            if ( file_exists(dirname(__FILE__).'/bundle_vendor.tar.gz') ) unlink(dirname(__FILE__).'/bundle_vendor.tar.gz');
             if ( file_exists(dirname(__FILE__).'/blog.tar.gz') ) unlink(dirname(__FILE__).'/blog.tar.gz');
             if ( file_exists(dirname(__FILE__).'/core.tar.gz') ) unlink(dirname(__FILE__).'/core.tar.gz');
             if ( file_exists(dirname(__FILE__).'/email.tar.gz') ) unlink(dirname(__FILE__).'/email.tar.gz');
@@ -462,6 +464,9 @@ class RVsitebuilder_Setup_API {
             if ( file_exists(dirname(__FILE__).'/wysiwyg.tar.gz') ) unlink(dirname(__FILE__).'/wysiwyg.tar.gz');
             if ( file_exists(dirname(__FILE__).'/composer.json') ) unlink(dirname(__FILE__).'/composer.json');
             if ( file_exists(dirname(__FILE__).'/composer.lock') ) unlink(dirname(__FILE__).'/composer.lock');
+            if ( file_exists(dirname(__FILE__).'/error_log') ) unlink(dirname(__FILE__).'/error_log');
+            if ( file_exists(dirname(__FILE__).'/install_log') ) unlink(dirname(__FILE__).'/install_log');
+            
             //remove dir
             $this->rrmdir(dirname(__FILE__).'/tmp');
             $this->rrmdir(dirname(__FILE__).'/vendor');
@@ -546,6 +551,8 @@ class RVsitebuilder_Setup_API {
         $ftpHandler->ftp_change_mod_r($publicpath.'/storage',$public_html.'/storage' , 0777);
         $ftpHandler->ftp_change_mod_r($publicpath.'/vendor',$public_html.'/vendor' , 0777);
         $ftpHandler->ftp_change_mod_r($homeuser.'/rvsitebuildercms/'.$domainname.'/storage','/rvsitebuildercms/'.$domainname.'/storage' , 0777);
+        $ftpHandler->ftp_change_mod_r($homeuser.'/rvsitebuildercms/'.$domainname.'/bootstrap','/rvsitebuildercms/'.$domainname.'/bootstrap' , 0777);
+        $ftpHandler->ftp_change_mod_r($homeuser.'/rvsitebuildercms/'.$domainname.'/.env','/rvsitebuildercms/'.$domainname.'/.env' , 0777);
         
         #chmod installer folder for delete
         $ftpHandler->ftp_change_mod_r($publicpath.'/rvsitebuilder',$public_html.'/rvsitebuilder' , 0777);
