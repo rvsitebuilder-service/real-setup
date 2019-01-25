@@ -60,7 +60,7 @@ if($action == 'artisan_call'){
 }
 
 if($action == 'finished_setup'){
-    $setupObj->finished_setup($homeuser,$domainname);
+    $setupObj->finished_setup($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport);
 }
 
 if($action == 'remove_installer_api'){
@@ -436,9 +436,27 @@ class RVsitebuilder_Setup_API {
         return true;
     }
     
-    public function finished_setup($homeuser,$domainname) {
+    public function finished_setup($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport) {
         //touch install completed
-        file_put_contents($homeuser.'/rvsitebuildercms/'.$domainname.'/INSTALL_COMPLETED', '');
+        if($this->httpasuser){
+            file_put_contents($homeuser.'/rvsitebuildercms/'.$domainname.'/INSTALL_COMPLETED', '');
+        } else {
+            $ftpHandler = new FTP_Handler();
+            $result = $ftpHandler->connect($ftpserver);
+            if(!$result['success']){
+                $this->response['message'] = 'Error '.$result['msg'];
+                return $this->print_response($this->response);
+            }
+            $result = $ftpHandler->login($ftpaccount, $ftppassword);
+            if(!$result['success']){
+                $this->response['message'] = 'Error '.$result['msg'];
+                return $this->print_response($this->response);
+            }
+            $result = $ftpHandler->put($publicpath.'/rvsitebuilder/INSTALL_COMPLETED','/rvsitebuildercms/'.$domainname);
+            $ftpHandler->close();
+            
+        }
+        
         
         $this->response['status'] = true;
         $this->response['message'] = 'Finished Setup';
@@ -758,7 +776,7 @@ class FTP_Handler{
         return $dirLists;
     }
     
-    function put($dest = '', $source = '', $mode = 'FTP_ASCII') {
+    function put($source = '' , $dest = '' , $mode = 'FTP_ASCII') {
         $result = [];
         $result['success'] = 1;
         $upload = ftp_put($this->conn_id, $dest, $source, $mode);
