@@ -452,7 +452,7 @@ class RVsitebuilder_Setup_API {
                 $this->response['message'] = 'Error '.$result['msg'];
                 return $this->print_response($this->response);
             }
-            $result = $ftpHandler->put($publicpath.'/rvsitebuilder/INSTALL_COMPLETED','/rvsitebuildercms/'.$domainname,FTP_BINARY);
+            $result = $ftpHandler->put($publicpath.'/rvsitebuilder/INSTALL_COMPLETED','/rvsitebuildercms/'.$domainname.'/INSTALL_COMPLETED',FTP_BINARY);
             $ftpHandler->close();
             
         }
