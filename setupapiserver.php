@@ -546,6 +546,10 @@ class RVsitebuilder_Setup_API {
         $ftpHandler->ftp_change_mod_r($publicpath.'/storage',$public_html.'/storage' , 0777);
         $ftpHandler->ftp_change_mod_r($publicpath.'/vendor',$public_html.'/vendor' , 0777);
         $ftpHandler->ftp_change_mod_r($homeuser.'/rvsitebuildercms/'.$domainname.'/storage','/rvsitebuildercms/'.$domainname.'/storage' , 0777);
+        
+        #chmod installer folder for delete
+        $ftpHandler->ftp_change_mod_r($publicpath.'/rvsitebuilder',$public_html.'/rvsitebuilder' , 0777);
+        
         #close connect
         $ftpHandler->close();
         
