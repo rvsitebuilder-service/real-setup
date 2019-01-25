@@ -151,9 +151,9 @@ class RVsitebuilder_Setup_API {
     public function pre_check_php() {
         
         //php version
-        $phpversion = '7.1.0';
+        $phpversion = '7.1.3';
         if (version_compare(PHP_VERSION, $phpversion) < 0) {
-            $this->response['message'] = 'System required PHP Version > = 7.1.0';
+            $this->response['message'] = 'System required PHP Version > = 7.1.3';
             return $this->print_response($this->response);
         }
         
