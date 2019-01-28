@@ -423,6 +423,9 @@ class RVsitebuilder_Setup_API {
         $this->install_log($kernel->output());
         
         
+        //chmod -R 777 for storage/medialibrary after atissan call seed
+        
+        
         $this->response['status'] = true;
         $this->response['message'] = 'Artisan Command Success';
         $this->clear_session();
@@ -453,9 +456,15 @@ class RVsitebuilder_Setup_API {
                 return $this->print_response($this->response);
             }
             $result = $ftpHandler->put($publicpath.'/rvsitebuilder/INSTALL_COMPLETED','/rvsitebuildercms/'.$domainname.'/INSTALL_COMPLETED',FTP_BINARY);
+            
+            //chmod 777 after atisan call
+            $ftpHandler->ftp_change_mod_r($homeuser.'/rvsitebuildercms/'.$domainname.'/storage','/rvsitebuildercms/'.$domainname.'/storage' , 0777);
+            $ftpHandler->ftp_change_mod_r($homeuser.'/rvsitebuildercms/'.$domainname.'/bootstrap','/rvsitebuildercms/'.$domainname.'/bootstrap' , 0777);
+            
             $ftpHandler->close();
             
         }
+        
         
         
         $this->response['status'] = true;
