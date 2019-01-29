@@ -910,6 +910,14 @@ class File_Handler{
     }
 }
 
+function getFrameworkVendorPath($filePath = ''){
+    $vendorDir = realpath(dirname($filePath) . '/../../../../../') . '/vendor';
+    return $vendorDir;
+}
 
+function getPackageBaseDir($filePath = ''){
+    $baseDir = realpath(dirname($filePath) . '/../../');
+    return $baseDir;
+}
 
 ?>
