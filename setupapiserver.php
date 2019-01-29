@@ -361,6 +361,11 @@ class RVsitebuilder_Setup_API {
                 list($product_name, $app_name) = preg_split('/\//', $update_package_name, 2);
                 $app_name = urldecode($app_name);
                 $package_name_encoded = urlencode($app_name);
+                
+                if(is_dir(dirname(__FILE__).'/tmp/' . $product_name . '/' . $app_name)){
+                    continue;
+                }
+                
                 if ($update_package_version != '') {
                     $update_package_version = '/version/' . $update_package_version;
                 }
