@@ -1,27 +1,6 @@
 <?php 
 
 
-/*
- * -step to setup
- *  -download rvsitebuilder package rvsitebuilder/framework (ได้ stable)
- *  -extract framework
- *  -read rvsitebuilder.json
- *  case: new install
- *      -read vendor-packages and download from key name เพื่อ ต่อ string url download package
- *      -if have vendor bundle package
- *          -download vendor bundle
- *          -extract vendor
- *          -ไปอ่าน apps.json เพื่อ หา default require package
- *          -request ไป route manage เพื่อ install (package name , url)
- *      -if not have
- *          -go to case update
- *  case: update
- *      -read key packages
- *      -check ว่า มี package ไหน ที่ v ไม่ตรงกับ package เดิมบ้าง
- *
- * */
-
-
 require 'vendor/autoload.php';
 use GuzzleHttp\Client;
 use splitbrain\PHPArchive\Tar;
@@ -41,6 +20,8 @@ $dbpassword             = (isset($_SESSION['dbpassword']) ? $_SESSION['dbpasswor
 $ftpaccount             = (isset($_SESSION['ftpaccount']) ? $_SESSION['ftpaccount'] : '');
 $ftppassword            = (isset($_SESSION['ftppassword']) ? $_SESSION['ftppassword'] : '');
 $appname                = (isset($_SESSION['appname']) ? $_SESSION['appname'] : 'RVsitebuilder');
+$ftpserver              = (isset($_SESSION['ftpserver']) ? $_SESSION['ftpserver'] : '');
+$ftpport                = (isset($_SESSION['ftpport']) ? $_SESSION['ftpport'] : '');
 
 
 
@@ -63,7 +44,7 @@ if($action == 'download_vendor'){
 }
 
 if($action == 'setup_env'){
-    $setupObj->setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname);
+    $setupObj->setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname,$ftpserver,$ftpport);
 }
 
 if($action == 'install_common_pkg'){
@@ -71,7 +52,7 @@ if($action == 'install_common_pkg'){
 }
 
 if($action == 'install_all_pkg' && $homeuser != '' && $domainname != '' && $publicpath != ''){
-    $setupObj->install_all_pkg($homeuser,$domainname,$publicpath);
+    $setupObj->install_all_pkg($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport);
 }
 
 if($action == 'artisan_call'){
@@ -79,7 +60,7 @@ if($action == 'artisan_call'){
 }
 
 if($action == 'finished_setup'){
-    $setupObj->finished_setup($homeuser,$domainname);
+    $setupObj->finished_setup($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport);
 }
 
 if($action == 'remove_installer_api'){
@@ -99,6 +80,8 @@ class RVsitebuilder_Setup_API {
     protected $downloadurl;
     protected $debug;
     protected $httpasuser;
+    protected $getlatestversion;
+    
     
     public function __construct($responsetype,$rvsb_installing_token)
     {   
@@ -121,6 +104,18 @@ class RVsitebuilder_Setup_API {
         //download url
         $this->downloadurl = 'https://files.mirror1.rvsitebuilder.com/download';
         
+        //get latest version
+        $this->getlatestversion = $this->check_getlatestversion();
+        
+        
+        
+    }
+    
+    public function check_getlatestversion(){
+        if(file_exists(dirname(__FILE__).'/.getlatestversion')) {
+            return true;
+        }
+        return false;
     }
     
     public function gethttpasuser() {
@@ -155,16 +150,10 @@ class RVsitebuilder_Setup_API {
     
     public function pre_check_php() {
         
-        //TODO support http run as not user
-        if(! $this->httpasuser) {
-            $this->response['message'] = 'HTTP run as nobody.Not currently supported';
-            return $this->print_response($this->response);
-        }
-        
         //php version
-        $phpversion = '7.1.0';
+        $phpversion = '7.1.3';
         if (version_compare(PHP_VERSION, $phpversion) < 0) {
-            $this->response['message'] = 'System required PHP Version > = 7.1.0';
+            $this->response['message'] = 'System required PHP Version > = 7.1.3';
             return $this->print_response($this->response);
         }
         
@@ -199,7 +188,9 @@ class RVsitebuilder_Setup_API {
     public function download_framework() {
         
         //download framework
-        $downloadframework = $this->download('GET' , $this->downloadurl.'/rvsitebuilder/framework' , dirname(__FILE__).'/framework.tar.gz');
+        $downloadurl = ($this->getlatestversion) ? $this->downloadurl.'/rvsitebuilder/framework/tier/latest' 
+                                                 : $this->downloadurl.'/rvsitebuilder/framework' ;
+        $downloadframework = $this->download('GET' , $downloadurl , dirname(__FILE__).'/framework.tar.gz');
         if(! $downloadframework){
             $this->response['message'] = 'Can not download framework';
             $this->clear_session();
@@ -303,47 +294,7 @@ class RVsitebuilder_Setup_API {
     }
     
     
-    public function download_vendor_bak() {
-        
-        //### ใช้ download จากtmp domain ที่สร้างไว้ก่อน พี่บูมแก้ link download เสร็จ ต้อง แก้ setupapiserver.php->download_vendor ให้กลับมาเหมือนเดิม
-        //### และต้องแก้ setupapiserver.php->download_vendor ให้กลับมา download จาก files.mirror1.rvglobalsoft.net ด้วย
-        //### และต้อง pack rvsb cpanel plugin ใหม่ และ build stable ใหม่ ด้วย
-        
-        $downloadvendorurl = 'http://download.rvglobalsoft.com/bundle_vendor.tar.gz';
-        $downloadvendor = $this->download('GET' , $downloadvendorurl , dirname(__FILE__).'/bundle_vendor.tar.gz');
-        if(! $downloadvendor) {
-            $this->response['message'] = 'Can not download vendor';
-            $this->clear_session();
-            return $this->print_response($this->response);
-        }
-        $extractvendor = $this->extract(dirname(__FILE__).'/bundle_vendor.tar.gz',dirname(__FILE__).'/tmp/vendor/');
-        if(! $extractvendor) {
-            $this->response['message'] = 'Can not extract vendor.tar.gz';
-            $this->clear_session();
-            return $this->print_response($this->response);
-        }
-        
-        //move vendor package to vendor path
-        $files = scandir(dirname(__FILE__).'/tmp/vendor/vendor');
-        $source = dirname(__FILE__).'/tmp/vendor/vendor/';
-        $destination = dirname(__FILE__).'/tmp/vendor/';
-        foreach ($files as $file) {
-            if (in_array($file, [".",".."])) continue;
-            rename($source.$file, $destination.$file);
-        }
-        
-        // Delete all successfully-copied files
-        rmdir(dirname(__FILE__).'/tmp/vendor/vendor');
-        
-        $this->response['status'] = true;
-        $this->response['message'] = 'Download Vendor Success';
-        return $this->print_response($this->response);
-        
-    }
-    
-    
-    
-    public function setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname) {
+    public function setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname,$ftpserver,$ftpport) {
         
         //TODO clear whitespace
         if (preg_match('/\s/',$appname)) $appname = '"'.$appname.'"';
@@ -357,6 +308,9 @@ class RVsitebuilder_Setup_API {
         $env_data['APP_NAME']   = $appname;
         $env_data['FTP_ACCOUNT'] = $ftpaccount;
         $env_data['FTP_PASSWORD'] = $ftppassword;
+        $env_data['FTP_SERVER'] = $ftpserver;
+        $env_data['FTP_PORT'] = $ftpport;
+        $env_data['DOCUMENT_ROOT'] = $publicpath;
         
         if($this->setEnv(dirname(__FILE__).'/tmp/env.example',$env_data,true)) {
             rename(dirname(__FILE__).'/tmp/env.example',dirname(__FILE__).'/tmp/.env');
@@ -371,6 +325,7 @@ class RVsitebuilder_Setup_API {
         return $this->print_response($this->response);
     }
     
+    
     public function install_common_pkg() {
         $commonpkg = [  'blog',
                         'core',
@@ -382,7 +337,9 @@ class RVsitebuilder_Setup_API {
                     ];
         
         foreach ($commonpkg as $pkg) {
-            $downloadpkg = $this->download('GET' , $this->downloadurl.'/rvsitebuilder/'.$pkg , dirname(__FILE__).'/'.$pkg.'.tar.gz');
+            $downloadurl = ($this->getlatestversion) ? $this->downloadurl.'/rvsitebuilder/'.$pkg.'/tier/latest' 
+                                                     : $this->downloadurl.'/rvsitebuilder/'.$pkg ;
+            $downloadpkg = $this->download('GET' , $downloadurl , dirname(__FILE__).'/'.$pkg.'.tar.gz');
             if(! $downloadpkg){
                 $this->response['message'] = 'Can not download package '.$pkg;
                 $this->clear_session();
@@ -403,6 +360,7 @@ class RVsitebuilder_Setup_API {
         return $this->print_response($this->response);
         
     }
+    
     
     public function artisan_call($homeuser,$domainname,$publicpath) {
         
@@ -435,46 +393,37 @@ class RVsitebuilder_Setup_API {
         //Common
         $kernel->call('key:generate', []);
         $this->print_debug($kernel->output());
+        $this->install_log($kernel->output());
         $kernel->call('migrate', ['--force'=>true]);
         $this->print_debug($kernel->output());
-        $kernel->call('db:seed', []);
+        $this->install_log($kernel->output());
+        $kernel->call('db:seed', ['--force'=>true]);
         $this->print_debug($kernel->output());
-        
+        $this->install_log($kernel->output());
         //user secret key
         $kernel->call('rvsitebuilder:updateenduserdb-run', ['secretkey' => $this->generateSecretKey()]);
         $this->print_debug($kernel->output());
-        
-// ยกเลิกการรัน seeder 01/15/2019
-//         //Manage
-//         $kernel->call('db:seed', ['--class'=> Rvsitebuilder\Manage\Database\Seeds\AppSeeder::class,'--force' => true]);
-//         $this->print_debug($kernel->output());
-//         //Core
-//         $kernel->call('db:seed', ['--class'=> Rvsitebuilder\Core\Database\Seeds\AppSeeder::class,'--force' => true]);
-//         $this->print_debug($kernel->output());
-//         //Blog
-//         $kernel->call('db:seed', ['--class'=> Rvsitebuilder\Blog\Database\Seeds\AppSeeder::class,'--force' => true]);
-//         $this->print_debug($kernel->output());
-//         //Email
-//         $kernel->call('db:seed', ['--class'=> Rvsitebuilder\Email\Database\Seeds\AppSeeder::class,'--force' => true]);
-//         $this->print_debug($kernel->output());
-//         //Scheduler
-//         $kernel->call('db:seed', ['--class'=> Rvsitebuilder\Scheduler\Database\Seeds\SchedulerDatabaseSeeder::class,'--force' => true]);
-//         $this->print_debug($kernel->output());
-      
+        $this->install_log($kernel->output());
         //vendor publish
         $kernel->call('vendor:publish', ['--tag'=> 'public','--force' => true]);
         $this->print_debug($kernel->output());
-        
+        $this->install_log($kernel->output());
         //clear cache
         $kernel->call('cache:clear', []);
         $this->print_debug($kernel->output());
+        $this->install_log($kernel->output());
         $kernel->call('config:clear', []);
         $this->print_debug($kernel->output());
+        $this->install_log($kernel->output());
         $kernel->call('route:clear', []);
         $this->print_debug($kernel->output());
+        $this->install_log($kernel->output());
         $kernel->call('view:clear', []);
         $this->print_debug($kernel->output());
+        $this->install_log($kernel->output());
         
+        
+        //chmod -R 777 for storage/medialibrary after atissan call seed
         
         
         $this->response['status'] = true;
@@ -483,9 +432,37 @@ class RVsitebuilder_Setup_API {
         return $this->print_response($this->response);
     }
     
-    public function finished_setup($homeuser,$domainname) {
+    public function install_log($output) {
+        $logfile = fopen(dirname(__FILE__)."/install_log","a");
+        fwrite($logfile , "\n".$output);
+        fclose($logfile);
+        return true;
+    }
+    
+    public function finished_setup($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport) {
         //touch install completed
-        file_put_contents($homeuser.'/rvsitebuildercms/'.$domainname.'/INSTALL_COMPLETED', '');
+        if($this->httpasuser){
+            file_put_contents($homeuser.'/rvsitebuildercms/'.$domainname.'/INSTALL_COMPLETED', '');
+        } else {
+            $ftpHandler = new FTP_Handler();
+            $result = $ftpHandler->connect($ftpserver);
+            if(!$result['success']){
+                $this->response['message'] = 'Error '.$result['msg'];
+                return $this->print_response($this->response);
+            }
+            $result = $ftpHandler->login($ftpaccount, $ftppassword);
+            if(!$result['success']){
+                $this->response['message'] = 'Error '.$result['msg'];
+                return $this->print_response($this->response);
+            }
+            $result = $ftpHandler->put($publicpath.'/rvsitebuilder/INSTALL_COMPLETED','/rvsitebuildercms/'.$domainname.'/INSTALL_COMPLETED',FTP_BINARY);
+            
+            
+            $ftpHandler->close();
+            
+        }
+        
+        
         
         $this->response['status'] = true;
         $this->response['message'] = 'Finished Setup';
@@ -493,23 +470,32 @@ class RVsitebuilder_Setup_API {
         return $this->print_response($this->response);
     }
     
+    
     public function remove_installer_api() {
         //remove file
-        if ( file_exists(dirname(__FILE__).'/.Rvsb-Installing-Token') ) unlink(dirname(__FILE__).'/.Rvsb-Installing-Token');
-        if ( file_exists(dirname(__FILE__).'/blog.tar.gz') ) unlink(dirname(__FILE__).'/blog.tar.gz');
-        if ( file_exists(dirname(__FILE__).'/core.tar.gz') ) unlink(dirname(__FILE__).'/core.tar.gz');
-        if ( file_exists(dirname(__FILE__).'/email.tar.gz') ) unlink(dirname(__FILE__).'/email.tar.gz');
-        if ( file_exists(dirname(__FILE__).'/manage.tar.gz') ) unlink(dirname(__FILE__).'/manage.tar.gz');
-        if ( file_exists(dirname(__FILE__).'/queuesharedhost.tar.gz') ) unlink(dirname(__FILE__).'/queuesharedhost.tar.gz');
-        if ( file_exists(dirname(__FILE__).'/README.md') ) unlink(dirname(__FILE__).'/README.md');
-        if ( file_exists(dirname(__FILE__).'/scheduler.tar.gz') ) unlink(dirname(__FILE__).'/scheduler.tar.gz');
-        if ( file_exists(dirname(__FILE__).'/setup.tar.gz') ) unlink(dirname(__FILE__).'/setup.tar.gz');
-        if ( file_exists(dirname(__FILE__).'/wysiwyg.tar.gz') ) unlink(dirname(__FILE__).'/wysiwyg.tar.gz');
-        if ( file_exists(dirname(__FILE__).'/composer.json') ) unlink(dirname(__FILE__).'/composer.json');
-        if ( file_exists(dirname(__FILE__).'/composer.lock') ) unlink(dirname(__FILE__).'/composer.lock');
-        //remove dir
-        $this->rrmdir(dirname(__FILE__).'/tmp');
-        $this->rrmdir(dirname(__FILE__).'/vendor');
+        if(! file_exists(dirname(__FILE__).'/.rvsitebuilderinstallerdebug')) {
+            if ( file_exists(dirname(__FILE__).'/.Rvsb-Installing-Token') ) unlink(dirname(__FILE__).'/.Rvsb-Installing-Token');
+            if ( file_exists(dirname(__FILE__).'/framework.tar.gz') ) unlink(dirname(__FILE__).'/framework.tar.gz');
+            if ( file_exists(dirname(__FILE__).'/bundle_vendor.tar.gz') ) unlink(dirname(__FILE__).'/bundle_vendor.tar.gz');
+            if ( file_exists(dirname(__FILE__).'/blog.tar.gz') ) unlink(dirname(__FILE__).'/blog.tar.gz');
+            if ( file_exists(dirname(__FILE__).'/core.tar.gz') ) unlink(dirname(__FILE__).'/core.tar.gz');
+            if ( file_exists(dirname(__FILE__).'/email.tar.gz') ) unlink(dirname(__FILE__).'/email.tar.gz');
+            if ( file_exists(dirname(__FILE__).'/manage.tar.gz') ) unlink(dirname(__FILE__).'/manage.tar.gz');
+            if ( file_exists(dirname(__FILE__).'/queuesharedhost.tar.gz') ) unlink(dirname(__FILE__).'/queuesharedhost.tar.gz');
+            if ( file_exists(dirname(__FILE__).'/README.md') ) unlink(dirname(__FILE__).'/README.md');
+            if ( file_exists(dirname(__FILE__).'/scheduler.tar.gz') ) unlink(dirname(__FILE__).'/scheduler.tar.gz');
+            if ( file_exists(dirname(__FILE__).'/setup.tar.gz') ) unlink(dirname(__FILE__).'/setup.tar.gz');
+            if ( file_exists(dirname(__FILE__).'/wysiwyg.tar.gz') ) unlink(dirname(__FILE__).'/wysiwyg.tar.gz');
+            if ( file_exists(dirname(__FILE__).'/composer.json') ) unlink(dirname(__FILE__).'/composer.json');
+            if ( file_exists(dirname(__FILE__).'/composer.lock') ) unlink(dirname(__FILE__).'/composer.lock');
+            if ( file_exists(dirname(__FILE__).'/error_log') ) unlink(dirname(__FILE__).'/error_log');
+            if ( file_exists(dirname(__FILE__).'/install_log') ) unlink(dirname(__FILE__).'/install_log');
+            
+            //remove dir
+            $this->rrmdir(dirname(__FILE__).'/tmp');
+            $this->rrmdir(dirname(__FILE__).'/vendor');
+        }
+        
         //response
         $this->response['status'] = true;
         $this->response['message'] = 'Remove Installer';
@@ -517,6 +503,7 @@ class RVsitebuilder_Setup_API {
         return $this->print_response($this->response);
         
     }
+    
     
     public function generateSecretKey($length = 64) {
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -528,6 +515,7 @@ class RVsitebuilder_Setup_API {
         return $randstring;
     }
     
+    
     public function print_debug($data) {
         if($this->debug) {
             echo '<pre>';
@@ -537,7 +525,71 @@ class RVsitebuilder_Setup_API {
         return true;
     }
     
-    public function install_all_pkg($homeuser,$domainname,$publicpath) {
+    
+    public function install_all_pkg($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport) {
+        
+        if($this->httpasuser == true) {
+            $this->copyFileDefault($homeuser,$domainname,$publicpath);
+        } else {
+            $this->copyFileFTP($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport);            
+        }
+        
+        return;
+       
+    }
+    
+    function copyFileFTP($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport) {
+        
+        $src_dir = $publicpath.'/rvsitebuilder/tmp';
+        $ftp_remote_dir = '/rvsitebuildercms/'.$domainname;
+        
+        $ftpHandler = new FTP_Handler();
+        $result = $ftpHandler->connect($ftpserver);
+        if(!$result['success']){
+            $this->response['message'] = 'Error '.$result['msg'];
+            return $this->print_response($this->response);
+        }
+        $result = $ftpHandler->login($ftpaccount, $ftppassword);
+        if(!$result['success']){
+            $this->response['message'] = 'Error '.$result['msg'];
+            return $this->print_response($this->response);
+        }
+        if(!file_exists($ftp_remote_dir)){
+            $result = $ftpHandler->ftp_make_dir($homeuser,$ftp_remote_dir);
+            if(!$result['success']) {
+                $this->response['message'] = 'Error '.$result['msg'];
+                return $this->print_response($this->response);
+            }
+        }
+        
+        #copy file to framework path
+        $ftpHandler->ftp_copy($src_dir, $ftp_remote_dir);
+        
+        #copy file to public path
+        $src_dir = $homeuser.'/rvsitebuildercms/'.$domainname.'/public';
+        $exploded = explode('/',$publicpath);
+        $public_html = '/'.end($exploded);
+        $ftpHandler->ftp_copy($src_dir, $public_html);
+        
+        #chmod folder
+        $ftpHandler->ftp_change_mod_r($publicpath.'/storage',$public_html.'/storage' , 0777);
+        $ftpHandler->ftp_change_mod_r($publicpath.'/vendor',$public_html.'/vendor' , 0777);
+        $ftpHandler->ftp_change_mod_r($homeuser.'/rvsitebuildercms/'.$domainname.'/storage','/rvsitebuildercms/'.$domainname.'/storage' , 0777);
+        $ftpHandler->ftp_change_mod_r($homeuser.'/rvsitebuildercms/'.$domainname.'/bootstrap','/rvsitebuildercms/'.$domainname.'/bootstrap' , 0777);
+        $ftpHandler->ftp_change_mod('/rvsitebuildercms/'.$domainname.'/.env' , 0777);
+        
+        #chmod installer folder for delete
+        $ftpHandler->ftp_change_mod_r($publicpath.'/rvsitebuilder',$public_html.'/rvsitebuilder' , 0777);
+        
+        #close connect
+        $ftpHandler->close();
+        
+        $this->response['status'] = true;
+        $this->response['message'] = 'Move Freamwork and Public success (FTP)';
+        return $this->print_response($this->response);
+    }
+    
+    function copyFileDefault($homeuser,$domainname,$publicpath) {
         
         //move temp to freamwork path
         $files = scandir(dirname(__FILE__).'/tmp');
@@ -556,21 +608,13 @@ class RVsitebuilder_Setup_API {
         $destination = $publicpath;
         $files = new File_Handler();
         $copy = $files->copyDirectory($source, $destination);
-
-        
-        //chmod
-        if($this->httpasuser == false) {
-            $this->chmod_r($publicpath.'/storage', 0777);
-            $this->chmod_r($publicpath.'/vendor', 0777);
-            $this->chmod_r($homeuser.'/rvsitebuildercms/'.$domainname.'/storage', 777);
-        }
         
         
         $this->response['status'] = true;
-        $this->response['message'] = 'Move Freamwork and Public success';
+        $this->response['message'] = 'Move Freamwork and Public success (default)';
         return $this->print_response($this->response);
-        
     }
+    
     
     function chmod_r($path,$perm) {
         if(!is_dir($path)) {
@@ -585,6 +629,7 @@ class RVsitebuilder_Setup_API {
         }
         return true;
     }
+    
     
     public function download($type, $url, $sink) {
         $client = new Client([
@@ -607,6 +652,7 @@ class RVsitebuilder_Setup_API {
         return true;
     }
     
+    
     public function print_response($data) {
         if($this->responseType == 'application/json') {
             header('Content-type: application/json');
@@ -615,11 +661,13 @@ class RVsitebuilder_Setup_API {
         exit;
     }
     
+    
     public function clear_session() {
         session_destroy();
         $_SESSION = array();
         return;
     }
+    
     
     public function rrmdir($dir) {
         if (is_dir($dir)) {
@@ -681,35 +729,10 @@ class RVsitebuilder_Setup_API {
    
 }
 
-/*
- * echo 'Begin test ftp <br/>';
 
-$ftp_server = 'ftp.amarin.rvwizard.com';
-$ftp_user_name = 'testftp@amarin.rvwizard.com';
-$ftp_user_pass = 'xxxxxxxx';
-
-$src_dir = '/home/arnut/public_html/rvsitebuilder/tmp';
-$ftp_remote_dir = '/rvsitebuildercms/arnut.cprelease.rvglobalsoft.net';
-
-$ftpHandler = new FTP_Handler();
-$result = $ftpHandler->connect($ftp_server);
-if(!$result['success']){
-    echo "Error: " . $result['msg'];
-    exit;
-}
-$ftpHandler->login($ftp_user_name, $ftp_user_pass);
-if(!$result['success']){
-    echo "Error: " . $result['msg'];
-    exit;
-}
-
-$ftpHandler->ftp_copy($src_dir, $ftp_remote_dir);
-$ftpHandler->close();
-
-echo 'End test ftp <br/>';
- */
 
 class FTP_Handler{
+    
     protected $conn_id;    
     
     public function __construct( ) {
@@ -759,7 +782,7 @@ class FTP_Handler{
         return $dirLists;
     }
     
-    function put($dest = '', $source = '', $mode = 'FTP_ASCII') {
+    function put($source = '' , $dest = '' , $mode = 'FTP_ASCII') {
         $result = [];
         $result['success'] = 1;
         $upload = ftp_put($this->conn_id, $dest, $source, $mode);
@@ -776,7 +799,7 @@ class FTP_Handler{
      ftp_copy(/home/amarin/public_html/source, dest/app)
      */
     function ftp_copy($src_dir, $dst_dir) {
-        $debug = 0;
+        $debug = false;
         $chdir = $dst_dir;
         if($debug){
             echo "- ftp_copy $src_dir , $dst_dir <br/>";
@@ -798,7 +821,7 @@ class FTP_Handler{
                                 echo "--- Not found ftp dir now do ftp_mkdir $file at $dst_dir<br/>";
                             }
                             @ftp_mkdir($this->conn_id, $file);
-                            @ftp_chmod($this->conn_id, 0777, $file);
+                            @ftp_chmod($this->conn_id, 0755, $file);
                         }
                         $this->ftp_copy($src_dir."/".$file, $dst_dir."/".$file);
                     }
@@ -811,7 +834,7 @@ class FTP_Handler{
                         }
                         $pushd = ftp_pwd($this->conn_id);
                         $upload = ftp_put($this->conn_id, $file, $src_dir."/".$file, FTP_BINARY);
-                        @ftp_chmod($this->conn_id, 0777, $file);
+                        @ftp_chmod($this->conn_id, 0644, $file);
                     }
                 }
             }
@@ -823,9 +846,57 @@ class FTP_Handler{
                 echo "------ ftp_put $file to $dst_dir<br/>";
             }
             $upload = ftp_put($this->conn_id, $file, $src_dir."/".$file, FTP_BINARY);
-            @ftp_chmod($this->conn_id, 0777, $file);
+            @ftp_chmod($this->conn_id, 0644, $file);
         }
     }
+    
+    function ftp_change_mod_r($realpath , $path , $perm=0777) {
+        
+        ftp_chmod($this->conn_id, $perm, $path);
+        ftp_chdir($this->conn_id, $path);
+        
+        $dir = new DirectoryIterator($realpath);
+        foreach($dir as $fileinfo) {
+            $file = $fileinfo->getFilename();
+            if ($file != "." && $file != "..") {
+                @ftp_chmod($this->conn_id, $perm, $path.'/'.$file);
+                if (is_dir($realpath.'/'.$file)) {
+                    $this->ftp_change_mod_r( $realpath.'/'.$file , $path.'/'.$file , $perm);
+                }
+            }
+        }
+        return true;
+    }
+    
+    function ftp_change_mod($path , $perm=0777) {
+        
+        ftp_chmod($this->conn_id, $perm, $path);
+        return true;
+    }
+    
+    function ftp_make_dir ($homeuserdir , $dir) {
+        
+        $result['success'] = 0;
+        $result['msg'] = 'Fail to create directory '.$dir;
+        
+        @ftp_chdir($this->conn_id, $homeuserdir); 
+        $parts = explode('/',$dir); 
+        foreach($parts as $part){
+            if(!@ftp_chdir($this->conn_id, $part)){
+                ftp_mkdir($this->conn_id, $part);
+                ftp_chdir($this->conn_id, $part);
+            }
+        }
+        
+        if(@ftp_chdir($this->conn_id, $dir)) {
+            $result['success'] = 1;
+            $result['msg'] = 'success';
+        }
+        
+        return $result;
+    }
+    
+    
     
     function ftp_is_dir($dir)
     {
