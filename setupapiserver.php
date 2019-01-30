@@ -375,6 +375,40 @@ class RVsitebuilder_Setup_API {
                 $this->clear_session();
                 return $this->print_response($this->response);
             }
+            
+            #TODO install vendor
+            $rvsbjson = json_decode(file_get_contents(dirname(__FILE__).'/tmp/packages/rvsitebuilder/'.$pkg.'/rvsitebuilder.json'), true);
+            foreach($rvsbjson['packages'] as $package_key => $value){
+                $update_package_name = $rvsbjson['packages'][$package_key]['name'];
+                $update_package_version = isset($rvsbjson['packages'][$package_key]['version']) ? $rvsbjson['packages'][$package_key]['version'] : '';
+                list($product_name, $app_name) = preg_split('/\//', $update_package_name, 2);
+                $app_name = urldecode($app_name);
+                $package_name_encoded = urlencode($app_name);
+                
+                if(is_dir(dirname(__FILE__).'/tmp/' . $product_name . '/' . $app_name)){
+                    continue;
+                }
+                
+                if ($update_package_version != '') {
+                    $update_package_version = '/version/' . $update_package_version;
+                }
+                
+                $downloadvendorurl = $this->downloadurl.'/'.$product_name.'/'.urlencode($app_name).$update_package_version;
+                $downloadvendor = $this->download('GET' , $downloadvendorurl , dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
+                if(! $downloadvendor) {
+                    $this->response['message'] = 'Can not download vendor '.$downloadvendorurl;
+                    $this->clear_session();
+                    return $this->print_response($this->response);
+                }
+                $extractvendor = $this->extract(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz',dirname(__FILE__).'/tmp/');
+                if(! $extractvendor) {
+                    $this->response['message'] = 'Can not extract vendor '.$package_name_encoded;
+                    $this->clear_session();
+                    return $this->print_response($this->response);
+                }
+                unlink(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
+            }
+            
         }
         
         
@@ -1080,6 +1114,14 @@ class File_Handler{
     
 }
 
+function getFrameworkVendorPath($filePath = ''){
+    $vendorDir = realpath(dirname($filePath) . '/../../../../../') . '/vendor';
+    return $vendorDir;
+}
 
+function getPackageBaseDir($filePath = ''){
+    $baseDir = realpath(dirname($filePath) . '/../../');
+    return $baseDir;
+}
 
 ?>
