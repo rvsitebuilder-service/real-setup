@@ -5,29 +5,40 @@ require 'vendor/autoload.php';
 use GuzzleHttp\Client;
 use splitbrain\PHPArchive\Tar;
 
+$headers                = apache_request_headers();
+$responsetype           = (isset($_SESSION['responsetype'])) ?  $_SESSION['responsetype'] : 'application/json';
+$action                 = (isset($_SESSION['action'])) ? $_SESSION['action'] : '';
+$rvsb_installing_token  = (isset($_SESSION['rvsb_installing_token'])) ? $_SESSION['rvsb_installing_token'] : '';
+$firstreg               = (isset($_SESSION['firstreg'])) ? $_SESSION['firstreg'] : false;
+$homeuser               = (isset($_SESSION['homeuser'])) ? $_SESSION['homeuser'] : '';
+$domainname             = (isset($_SESSION['domainname'])) ? $_SESSION['domainname'] : '';
+$publicpath             = (isset($_SESSION['public_path'])) ? $_SESSION['public_path'] : '';
+$dbhost                 = (isset($_SESSION['dbhost'])) ? $_SESSION['dbhost'] : '';
+$dbname                 = (isset($_SESSION['dbname'])) ? $_SESSION['dbname'] : '';
+$dbuser                 = (isset($_SESSION['dbuser'])) ? $_SESSION['dbuser'] : '';
+$dbpassword             = (isset($_SESSION['dbpassword'])) ? $_SESSION['dbpassword'] : '';
+$ftpaccount             = (isset($_SESSION['ftpaccount'])) ? $_SESSION['ftpaccount'] : '';
+$ftppassword            = (isset($_SESSION['ftppassword'])) ? $_SESSION['ftppassword'] : '';
+$appname                = (isset($_SESSION['appname'])) ? $_SESSION['appname'] : 'RVsitebuilder';
+$ftpserver              = (isset($_SESSION['ftpserver'])) ? $_SESSION['ftpserver'] : '';
+$ftpport                = (isset($_SESSION['ftpport'])) ? $_SESSION['ftpport'] : '';
 
-$responsetype           = $_SESSION['responsetype'] ;
-$action                 = (isset($_SESSION['action']) ? $_SESSION['action'] : '');
-$rvsb_installing_token  = $_SESSION['rvsb_installing_token'];
-$firstreg               = (isset($_SESSION['firstreg']) ? $_SESSION['firstreg'] : false);
-$homeuser               = (isset($_SESSION['homeuser']) ? $_SESSION['homeuser'] : '');
-$domainname             = (isset($_SESSION['domainname']) ? $_SESSION['domainname'] : '');
-$publicpath             = (isset($_SESSION['public_path']) ? $_SESSION['public_path'] : '');
-$dbhost                 = (isset($_SESSION['dbhost']) ? $_SESSION['dbhost'] : '');
-$dbname                 = (isset($_SESSION['dbname']) ? $_SESSION['dbname'] : '');
-$dbuser                 = (isset($_SESSION['dbuser']) ? $_SESSION['dbuser'] : '');
-$dbpassword             = (isset($_SESSION['dbpassword']) ? $_SESSION['dbpassword'] : '');
-$ftpaccount             = (isset($_SESSION['ftpaccount']) ? $_SESSION['ftpaccount'] : '');
-$ftppassword            = (isset($_SESSION['ftppassword']) ? $_SESSION['ftppassword'] : '');
-$appname                = (isset($_SESSION['appname']) ? $_SESSION['appname'] : 'RVsitebuilder');
-$ftpserver              = (isset($_SESSION['ftpserver']) ? $_SESSION['ftpserver'] : '');
-$ftpport                = (isset($_SESSION['ftpport']) ? $_SESSION['ftpport'] : '');
+
+//request from installer wizard
+$call_action            = (isset($_GET['call_action']) ? $_GET['call_action'] : '');
+$call_responsetype      = (isset($headers['Accept'])) ? $headers['Accept'] : 'application/json';
+$ignore_token           = (isset($headers['Ignore-Token'])) ? $headers['Ignore-Token'] : 0;
+$databasehost           = (isset($_GET['db_host']) ? $_GET['db_host'] : '');
+$databasename           = (isset($_GET['db_name']) ? $_GET['db_name'] : '');
+$databaseuser           = (isset($_GET['db_user']) ? $_GET['db_user'] : '');
+$databasepassword       = (isset($_GET['db_pass']) ? $_GET['db_pass'] : '');
 
 
 
-$setupObj = new RVsitebuilder_Setup_API($responsetype,$rvsb_installing_token);
+$setupObj = new RVsitebuilder_Setup_API($responsetype,$rvsb_installing_token,$call_responsetype,$ignore_token);
 
-if($action == '' && $firstreg) {
+
+if( ($action == '' && $firstreg) && $call_action == '') {
     $setupObj->send_token();
 }
 
@@ -68,6 +79,15 @@ if($action == 'remove_installer_api'){
 }
 
 
+//call from wizard
+if($call_action == 'get_user_path'){
+    $setupObj->get_user_path();
+}
+if($call_action == 'test_database_connect') {
+    $setupObj->test_database_connect($databasehost,$databasename,$databaseuser,$databasepassword);
+}
+
+
 
 
 
@@ -81,15 +101,16 @@ class RVsitebuilder_Setup_API {
     protected $debug;
     protected $httpasuser;
     protected $getlatestversion;
+    protected $call_responsetype;
     
-    
-    public function __construct($responsetype,$rvsb_installing_token)
+    public function __construct($responsetype,$rvsb_installing_token,$call_responsetype,$ignore_token)
     {   
         //debug var
         $this->debug = false;
         
         //response type
         $this->responseType = $responsetype;
+        $this->call_responsetype = $call_responsetype;
         
         //default response
         $this->response['status'] = false;
@@ -97,7 +118,7 @@ class RVsitebuilder_Setup_API {
         
         //verify token
         $this->regtoken = $rvsb_installing_token;
-        $this->verify_token($rvsb_installing_token);
+        $this->verify_token($rvsb_installing_token,$ignore_token);
         
         $this->httpasuser = $this->gethttpasuser();
         
@@ -127,17 +148,19 @@ class RVsitebuilder_Setup_API {
         return false;
     }
     
-    public function verify_token($rvsb_installing_token='') {
-        if(! file_exists(dirname(__FILE__).'/.Rvsb-Installing-Token')) {
-            $this->response['message'] = 'Wrong!!!! token file';
-            $this->clear_session();
-            return $this->print_response($this->response);
-        }
-        $tokenvalue = file_get_contents(dirname(__FILE__).'/.Rvsb-Installing-Token');
-        if(trim($tokenvalue) != trim($rvsb_installing_token)){
-            $this->response['message'] = 'Wrong!!!!';
-            $this->clear_session();
-            return $this->print_response($this->response);
+    public function verify_token($rvsb_installing_token='',$ignore_token=0) {
+        if($ignore_token == 0) {
+            if(! file_exists(dirname(__FILE__).'/.Rvsb-Installing-Token') ) {
+                $this->response['message'] = 'Wrong!!!! token file';
+                $this->clear_session();
+                return $this->print_response($this->response);
+            }
+            $tokenvalue = file_get_contents(dirname(__FILE__).'/.Rvsb-Installing-Token');
+            if(trim($tokenvalue) != trim($rvsb_installing_token)){
+                $this->response['message'] = 'Wrong!!!!';
+                $this->clear_session();
+                return $this->print_response($this->response);
+            }
         }
     }
     
@@ -654,7 +677,7 @@ class RVsitebuilder_Setup_API {
     
     
     public function print_response($data) {
-        if($this->responseType == 'application/json') {
+        if($this->responseType == 'application/json' || $this->call_responsetype == 'application/json') {
             header('Content-type: application/json');
         }
         echo json_encode( $data );
@@ -663,8 +686,10 @@ class RVsitebuilder_Setup_API {
     
     
     public function clear_session() {
-        session_destroy();
-        $_SESSION = array();
+        if(isset($_SESSION)){
+            session_destroy();
+            $_SESSION = [];
+        }
         return;
     }
     
@@ -723,6 +748,78 @@ class RVsitebuilder_Setup_API {
         } else {
             return false;
         }
+    }
+    
+    
+    
+    
+    
+    public function get_user_path() {
+        $mainHome = '';
+     
+        $testPathInput = $_SERVER['DOCUMENT_ROOT'];
+        
+        
+        // case  have posix_getpwuid get uid by owner dir
+        if(function_exists('posix_getpwuid')){
+            $stat = stat($testPathInput);
+            $uid = $stat['uid'];
+            $userinfo = posix_getpwuid($uid);
+            if(is_dir($userinfo['dir'])){
+                $this->response['status'] = true;
+                $this->response['homepath'] = $userinfo['dir'];
+                $this->response['publicpath'] = $_SERVER['DOCUMENT_ROOT'];
+                return $this->print_response($this->response);
+            }
+        }
+        
+        // case  cpanel have rvsitebuildercms dir in home
+        $paths = preg_split("/\//", $testPathInput);
+        $loopDim = count($paths);
+        for($i=0; $i < $loopDim; $i++) {
+            $testPath = join('/', $paths);
+            if(is_dir($testPath . '/rvsitebuildercms'))
+            {
+                $mainHome = $testPath;
+                break;
+            }
+            array_pop($paths);
+        }
+        if($mainHome != ''){
+            $this->response['status'] = true;
+            $this->response['homepath'] = $mainHome;
+            $this->response['publicpath'] = $_SERVER['DOCUMENT_ROOT'];
+            return $this->print_response($this->response);
+        }
+        
+        
+        // case 4: other ../
+        if(php_sapi_name() === 'cli'){
+            $mainHome = realpath($testPathInput . '/../../');
+        }else{
+            $mainHome = realpath($testPathInput . '/../');
+        }
+        
+        $this->response['status'] = true;
+        $this->response['homepath'] = $mainHome;
+        $this->response['publicpath'] = $_SERVER['DOCUMENT_ROOT'];
+        return $this->print_response($this->response);
+        
+    }
+    
+    public function test_database_connect($databasehost,$databasename,$databaseuser,$databasepassword){
+        mysqli_report(MYSQLI_REPORT_STRICT);
+        try{
+            $conn = new mysqli($databasehost, $databaseuser, $databasepassword,$databasename);
+            $this->response['status'] = true;
+            return $this->print_response($this->response);
+            
+        } catch (Exception  $e) { 
+            $this->response['status'] = false;
+            $this->response['message'] = "Database connection failed!"; 
+            return $this->print_response($this->response);
+        }
+       
     }
     
     
@@ -979,6 +1076,8 @@ class File_Handler{
     {
         return copy($path, $target);
     }
+    
+    
 }
 
 
