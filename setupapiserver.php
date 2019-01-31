@@ -28,11 +28,17 @@ $ftpport                = (isset($_SESSION['ftpport'])) ? $_SESSION['ftpport'] :
 $call_action            = (isset($_GET['call_action']) ? $_GET['call_action'] : '');
 $call_responsetype      = (isset($headers['Accept'])) ? $headers['Accept'] : 'application/json';
 $ignore_token           = (isset($headers['Ignore-Token'])) ? $headers['Ignore-Token'] : 0;
-$databasehost           = (isset($_GET['db_host']) ? $_GET['db_host'] : '');
-$databasename           = (isset($_GET['db_name']) ? $_GET['db_name'] : '');
-$databaseuser           = (isset($_GET['db_user']) ? $_GET['db_user'] : '');
-$databasepassword       = (isset($_GET['db_pass']) ? $_GET['db_pass'] : '');
-
+$dbhost                = ($dbhost == '' && isset($_GET['db_host']) ? $_GET['db_host'] : '');
+$dbname                = ($dbname == '' && isset($_GET['db_name']) ? $_GET['db_name'] : '');
+$dbuser                = ($dbuser == '' && isset($_GET['db_user']) ? $_GET['db_user'] : '');
+$dbpassword            = ($dbpassword == '' && isset($_GET['db_pass']) ? $_GET['db_pass'] : '');
+$ftpserver             = ($ftpserver == '' && isset($_GET['ftp_server']) ? $_GET['ftp_server'] : '');
+$ftpaccount            = ($ftpaccount == '' && isset($_GET['ftp_account']) ? $_GET['ftp_account'] : '');
+$ftppassword           = ($ftppassword ==  '' && isset($_GET['ftp_password']) ? $_GET['ftp_password'] : '');
+$ftpport               = ($ftpport == '' && isset($_GET['ftp_port']) ? $_GET['ftp_port'] : '');
+$domainname            = ($domainname == '' && isset($_GET['domainname'])) ? $_GET['domainname'] : '';
+$publicpath            = ($publicpath == '' && isset($_GET['public_path'])) ? $_GET['public_path'] : '';
+$appname               = ($appname == '' && isset($_GET['appname'])) ? $_GET['appname'] : '';
 
 
 $setupObj = new RVsitebuilder_Setup_API($responsetype,$rvsb_installing_token,$call_responsetype,$ignore_token);
@@ -46,15 +52,15 @@ if($action == 'pre_check_php'){
     $setupObj->pre_check_php();
 }
 
-if($action == 'download_framework'){
+if($action == 'download_framework' || $call_action == 'download_framework'){
     $setupObj->download_framework();
 }
 
-if($action == 'download_vendor'){
+if($action == 'download_vendor' || $call_action == 'download_framework'){
     $setupObj->download_vendor();
 }
 
-if($action == 'setup_env'){
+if($action == 'setup_env' || $call_action == 'download_framework'){
     $setupObj->setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname,$ftpserver,$ftpport);
 }
 
@@ -84,8 +90,25 @@ if($call_action == 'get_user_path'){
     $setupObj->get_user_path();
 }
 if($call_action == 'test_database_connect') {
-    $setupObj->test_database_connect($databasehost,$databasename,$databaseuser,$databasepassword);
+    $setupObj->test_database_connect($dbhost,$dbname,$dbuser,$dbpassword);
 }
+if($call_action == 'check_pre_require') {
+    $setupObj->check_pre_require();
+}
+if($call_action == 'check_http_as_user') {
+    $setupObj->check_http_as_user();
+}
+if($call_action == 'test_ftp_connect') {
+    $setupObj->test_ftp_connect($ftpserver,$ftpaccount,$ftppassword,$ftpport);
+}
+if($call_action == 'check_license') {
+    $setupObj->check_license();
+}
+if($call_action == 'disk_required') {
+    $setupObj->disk_required();
+}
+
+
 
 
 
@@ -841,22 +864,130 @@ class RVsitebuilder_Setup_API {
         
     }
     
-    public function test_database_connect($databasehost,$databasename,$databaseuser,$databasepassword){
-        mysqli_report(MYSQLI_REPORT_STRICT);
-        try{
-            $conn = new mysqli($databasehost, $databaseuser, $databasepassword,$databasename);
-            $this->response['status'] = true;
-            return $this->print_response($this->response);
-            
-        } catch (Exception  $e) { 
-            $this->response['status'] = false;
-            $this->response['message'] = "Database connection failed!"; 
-            return $this->print_response($this->response);
+   
+    
+    public function check_pre_require() {
+        
+        //php version
+        $this->response['check_pre_require']['phpversion']['check'] = true;
+        if (version_compare(PHP_VERSION, '7.1.3') < 0) {
+            $this->response['check_pre_require']['phpversion']['check'] = false;
+            $this->response['check_pre_require']['phpversion']['reason'] = '';
         }
-       
+        
+        //php extension
+        $this->response['check_pre_require']['mysqlnd']['check'] = true;
+        if (!extension_loaded('mysqlnd')) {
+            $this->response['check_pre_require']['mysqlnd']['check'] = false;
+            $this->response['check_pre_require']['mysqlnd']['reason'] = '';
+        }
+        $this->response['check_pre_require']['pdo']['check'] = true;
+        if (!extension_loaded('pdo')) {
+            $this->response['check_pre_require']['pdo']['check'] = false;
+            $this->response['check_pre_require']['pdo']['reason'] = '';
+        }
+        $this->response['check_pre_require']['gd']['check'] = true;
+        if (!extension_loaded('gd')) {
+            $this->response['check_pre_require']['gd']['check'] = false;
+            $this->response['check_pre_require']['gd']['reason'] = '';
+        }
+        $this->response['check_pre_require']['curl']['check'] = true;
+        if (!extension_loaded('curl')) {
+            $this->response['check_pre_require']['curl']['check'] = false;
+            $this->response['check_pre_require']['curl']['reason'] = '';
+        }
+        $this->response['check_pre_require']['iconv']['check'] = true;
+        if (!extension_loaded('iconv')) {
+            $this->response['check_pre_require']['iconv']['check'] = false;
+            $this->response['check_pre_require']['iconv']['reason'] = '';
+        }
+        $this->response['check_pre_require']['mbstring']['check'] = true;
+        if (!extension_loaded('mbstring')) {
+            $this->response['check_pre_require']['mbstring']['check'] = false;
+            $this->response['check_pre_require']['mbstring']['reason'] = '';
+        }
+        $this->response['check_pre_require']['fileinfo']['check'] = true;
+        if (!extension_loaded('fileinfo')) {
+            $this->response['check_pre_require']['fileinfo']['check'] = false;
+            $this->response['check_pre_require']['fileinfo']['reason'] = '';
+        }
+        $this->response['check_pre_require']['exif']['check'] = true;
+        if (!extension_loaded('exif')) {
+            $this->response['check_pre_require']['exif']['check'] = false;
+            $this->response['check_pre_require']['exif']['reason'] = '';
+        }
+        $this->response['check_pre_require']['zip']['check'] = true;
+        if (!extension_loaded('zip')) {
+            $this->response['check_pre_require']['zip']['check'] = false;
+            $this->response['check_pre_require']['zip']['reason'] = '';
+        }
+        
+        
+        
+        //php config
+        $this->response['check_pre_require']['allow_url_fopen']['check'] = true;
+        if (ini_get('allow_url_fopen') != 1) {
+            $this->response['check_pre_require']['allow_url_fopen']['check'] = false;
+            $this->response['check_pre_require']['allow_url_fopen']['reason'] = '';
+        }
+        $this->response['check_pre_require']['memory_limit']['check'] = true;
+        preg_match('/[1-9]+/',ini_get('memory_limit'),$match);
+        if($match[0] < 64) {
+            $this->response['check_pre_require']['memory_limit']['check'] = false;
+            $this->response['check_pre_require']['memory_limit']['reason'] = '';
+        }
+        
+        $this->response['status'] = true;
+        return $this->print_response($this->response);
     }
     
+    public function check_http_as_user() {
+        $this->response['status'] = true;
+        $this->response['httpasuser'] = false;//$this->httpasuser;
+        return $this->print_response($this->response);
+    }
     
+    public function test_database_connect($dbhost,$dbname,$dbuser,$dbpassword){
+        //$this->response['status'] = true;
+        ini_set('display_errors', 0);
+        $conn = new mysqli($dbhost, $dbuser, $dbpassword,$dbname);
+        if ($conn->connect_error) {
+            $this->response['message'] = "Database connection failed! ".$conn->connect_error;;
+            return $this->print_response($this->response);
+        }
+        
+        $this->response['status'] = true;
+        return $this->print_response($this->response);
+        
+    }
+    
+    public function test_ftp_connect($ftpserver,$ftpaccount,$ftppassword,$ftpport) {
+        //$this->response['status'] = true;
+        ini_set('display_errors', 0);
+        
+        $ftpHandler = new FTP_Handler();
+        $result = $ftpHandler->connect($ftpserver);
+        if(!$result['success']){
+            $this->response['message'] = 'Error '.$result['msg'];
+            return $this->print_response($this->response);
+        }
+        $result = $ftpHandler->login($ftpaccount, $ftppassword);
+        if(!$result['success']){
+            $this->response['message'] = 'Error '.$result['msg'];
+            return $this->print_response($this->response);
+        }
+        
+    }
+    
+    public function check_license() {
+        $this->response['status'] = true;
+        return $this->print_response($this->response);
+    }
+    
+    public function disk_required() {
+        $this->response['status'] = true;
+        return $this->print_response($this->response);
+    }
    
 }
 
@@ -869,13 +1000,13 @@ class FTP_Handler{
     public function __construct( ) {
     }
     
-    function connect($ftp_server) {
+    function connect($ftpserver) {
         $result = [];
         $result['success'] = 1;
-        $this->conn_id = ftp_connect($ftp_server);
+        $this->conn_id = ftp_connect($ftpserver);
         if ( ! $this->conn_id ) {
             $result['success'] = 0;
-            $result['msg'] = 'Fail to connect ' . $ftp_server;
+            $result['msg'] = 'Fail to connect ' . $ftpserver;
         }
         return $result;
     }
