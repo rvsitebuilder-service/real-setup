@@ -429,7 +429,7 @@
                             <div class="row">
                                 <div class="col col-lg-4">Artisan Command</div>
                                 <div class="col col-lg-2">
-                                    <i class="fa fa-sync fa-spin artisan_command"></i><span class="artisan_command">Loadding...</span>
+                                    <i class="fa fa-sync fa-spin artisan_call"></i><span class="artisan_call">Loadding...</span>
                                 </div>
                             </div>
                             <div class="row">
@@ -696,8 +696,8 @@
             	param = {'call_action':'check_license' };
                 doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
                     console.log(data);
-                    if (data.status == false){
-                    	$('span.check_license').text(data.message);
+                    if (data === null  || data.status == false){
+                    	$('span.check_license').text((typeof data.message == 'undefined') ? 'ERROR' : data.message);
                         $('i.check_license').removeClass("fa fa-sync fa-spin").addClass("fa fa-exclamation-circle")
                     }
                     else {
@@ -707,8 +707,8 @@
                     	param = {'call_action':'disk_required' };
                     	doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
                             console.log(data);
-                            if (data.status == false){
-                            	$('span.disk_required').text(data.message);
+                            if (data === null  || data.status == false){
+                            	$('span.disk_required').text((typeof data.message == 'undefined') ? 'ERROR' : data.message);
                                 $('i.disk_required').removeClass("fa fa-sync fa-spin").addClass("fa fa-exclamation-circle")
                             }
                             else {
@@ -718,8 +718,8 @@
                                 param = {'call_action':'download_framework' };
                                 doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
                                     console.log(data);
-                                    if (data.status == false){
-                                        $('span.download_framework').text(data.message);
+                                    if (data === null  || data.status == false){
+                                        $('span.download_framework').text((typeof data.message == 'undefined') ? 'ERROR' : data.message);
                                         $('i.download_framework').removeClass("fa fa-sync fa-spin").addClass("fa fa-exclamation-circle")
                                     }
                                     else {
@@ -729,8 +729,8 @@
                                         param = {'call_action':'download_vendor' };
                                         doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
                                             console.log(data);
-                                            if (data.status == false){
-                                                $('span.download_vendor').text(data.message);
+                                            if (data === null  || data.status == false){
+                                                $('span.download_vendor').text((typeof data.message == 'undefined') ? 'ERROR' : data.message);
                                                 $('i.download_vendor').removeClass("fa fa-sync fa-spin").addClass("fa fa-exclamation-circle")
                                             }
                                             else {
@@ -739,7 +739,7 @@
                                                 
                                                 param = {
                                                 		'call_action':'setup_env',
-                                                		'domainname': $('#url').val(),
+                                                		'domainname': window.location.hostname,
                                                 		'public_path': $('#publicpath').val(),
                                                 		'db_host': $('#dbhost').val(),
                                                 		'db_name': $('#dbname').val(),
@@ -749,69 +749,98 @@
                                                 		'ftp_account': $('#ftpusername').val(),
                                                 		'ftp_password': $('#ftppassword').val(),
                                                 		'appname': "RVsitebuilder7",
-                                                		'ftp_server': $('#ftpserver').val(),
                                                 		'ftpport': $('#ftp_port').val(),
                                                 		};
                                                 doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
                                                     console.log(data);
-                                                    if (data.status == false){
-                                                        $('span.setup_env').text(data.message);
+                                                    if (data === null  || data.status == false){
+                                                        $('span.setup_env').text((typeof data.message == 'undefined') ? 'ERROR' : data.message);
                                                         $('i.setup_env').removeClass("fa fa-sync fa-spin").addClass("fa fa-exclamation-circle")
                                                     }
                                                     else {
                                                         $('span.setup_env').text('');
                                                         $('i.setup_env').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
-                                                        $domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname,$ftpserver,$ftpport
                                                         param = {
-                                                        		'call_action':'install_common_package',
-                                                        		
+                                                        		'call_action':'install_common_pkg',
                                                         		};
                                                         doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
                                                             console.log(data);
-                                                            if (data.status == false){
-                                                                $('span.install_common_package').text(data.message);
+                                                            if (data === null  || data.status == false){
+                                                                $('span.install_common_package').text((typeof data.message == 'undefined') ? 'ERROR' : data.message);
                                                                 $('i.install_common_package').removeClass("fa fa-sync fa-spin").addClass("fa fa-exclamation-circle")
                                                             }
                                                             else {
                                                                 $('span.install_common_package').text('');
                                                                 $('i.install_common_package').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
                                                                 
-                                                                param = {'call_action':'install_framework' };
+                                                                param = {
+                                                                		'call_action':'install_all_pkg',
+                                                                		'homeuser':$('#homepath').val(),
+                                                                		'domainname':window.location.hostname,
+                                                                		'public_path': $('#publicpath').val(),
+                                                                		'ftp_server': $('#ftpserver').val(),
+                                                                		'ftp_account': $('#ftpusername').val(),
+                                                                		'ftp_password': $('#ftppassword').val(),
+                                                                		'ftpport': $('#ftp_port').val(),
+                                                                		};
+                                                                
                                                                 doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
                                                                     console.log(data);
-                                                                    if (data.status == false){
-                                                                        $('span.install_framework').text(data.message);
+                                                                    if (data === null  || data.status == false){
+                                                                        $('span.install_framework').text((typeof data.message == 'undefined') ? 'ERROR' : data.message);
                                                                         $('i.install_framework').removeClass("fa fa-sync fa-spin").addClass("fa fa-exclamation-circle")
                                                                     }
                                                                     else {
                                                                         $('span.install_framework').text('');
                                                                         $('i.install_framework').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
                                                                         
-                                                                        param = {'call_action':'artisan_command' };
+                                                                        param = {
+                                                                        		'call_action':'artisan_call',
+                                                                        		'homeuser':$('#homepath').val(),
+                                                                        		'domainname':$('#url').val(),
+                                                                        		'public_path': $('#publicpath').val(),
+                                                                        		};
                                                                         doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
                                                                             console.log(data);
-                                                                            if (data.status == false){
-                                                                                $('span.artisan_command').text(data.message);
-                                                                                $('i.artisan_command').removeClass("fa fa-sync fa-spin").addClass("fa fa-exclamation-circle")
+                                                                            if (data === null  || data.status == false){
+                                                                                $('span.artisan_call').text((typeof data.message == 'undefined') ? 'ERROR' : data.message);
+                                                                                $('i.artisan_call').removeClass("fa fa-sync fa-spin").addClass("fa fa-exclamation-circle")
                                                                             }
                                                                             else {
-                                                                                $('span.artisan_command').text('');
-                                                                                $('i.artisan_command').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
+                                                                                $('span.artisan_call').text('');
+                                                                                $('i.artisan_call').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
                                                                                 
-                                                                                param = {'call_action':'finished_setup' };
+                                                                                param = {
+                                                                                		'call_action':'finished_setup',
+                                                                                		'homeuser':$('#homepath').val(),
+                                                                                		'domainname':$('#url').val(),
+                                                                                		'public_path': $('#publicpath').val(),
+                                                                                		'ftp_server': $('#ftpserver').val(),
+                                                                                		'ftp_account': $('#ftpusername').val(),
+                                                                                		'ftp_password': $('#ftppassword').val(),
+                                                                                		'ftpport': $('#ftp_port').val(),
+                                                                                		'adminemail': $('#email').val(),
+                                                                                		'adminpassword': $('#password').val(), 
+                                                                                		'adminfirstname': $('#firstname').val(),
+                                                                                		'adminlastname': $('#lastname').val(), 
+                                                                                		};
                                                                                 doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
                                                                                     console.log(data);
-                                                                                    if (data.status == false){
-                                                                                        $('span.finished_setup').text(data.message);
+                                                                                    if (data === null  || data.status == false){
+                                                                                        $('span.finished_setup').text((typeof data.message == 'undefined') ? 'ERROR' : data.message);
                                                                                         $('i.finished_setup').removeClass("fa fa-sync fa-spin").addClass("fa fa-exclamation-circle")
                                                                                     }
                                                                                     else {
                                                                                         $('span.finished_setup').text('');
                                                                                         $('i.finished_setup').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
                                                                                         
-                                                                                        
-                                                                                        
                                                                                     }
+                                                                                    
+                                                                                });
+                                                                                
+                                                                                param = {'call_action':'remove_installer_api'};
+                                                                                doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
+                                                                                    console.log(data);
                                                                                 });
                                                                                 
                                                                             }

@@ -39,6 +39,12 @@ $ftpport               = ($ftpport == '' && isset($_GET['ftp_port']) ? $_GET['ft
 $domainname            = ($domainname == '' && isset($_GET['domainname'])) ? $_GET['domainname'] : '';
 $publicpath            = ($publicpath == '' && isset($_GET['public_path'])) ? $_GET['public_path'] : '';
 $appname               = ($appname == '' && isset($_GET['appname'])) ? $_GET['appname'] : '';
+$homeuser              = ($homeuser == '' && isset($_GET['homeuser'])) ? $_GET['homeuser'] : '';
+$adminemail            = (isset($_GET['adminemail'])) ? $_GET['adminemail'] : '';
+$adminpassword         = (isset($_GET['adminpassword'])) ? $_GET['adminpassword'] : '';
+$adminfirstname        = (isset($_GET['adminfirstname'])) ? $_GET['adminfirstname'] : '';
+$adminlastname         = (isset($_GET['adminlastname'])) ? $_GET['adminlastname'] : '';
+
 
 
 $setupObj = new RVsitebuilder_Setup_API($responsetype,$rvsb_installing_token,$call_responsetype,$ignore_token);
@@ -56,31 +62,31 @@ if($action == 'download_framework' || $call_action == 'download_framework'){
     $setupObj->download_framework();
 }
 
-if($action == 'download_vendor' || $call_action == 'download_framework'){
+if($action == 'download_vendor' || $call_action == 'download_vendor'){
     $setupObj->download_vendor();
 }
 
-if($action == 'setup_env' || $call_action == 'download_framework'){
+if($action == 'setup_env' || $call_action == 'setup_env'){
     $setupObj->setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname,$ftpserver,$ftpport);
 }
 
-if($action == 'install_common_pkg'){
+if($action == 'install_common_pkg' || $call_action == 'install_common_pkg'){
     $setupObj->install_common_pkg();
 }
 
-if($action == 'install_all_pkg' && $homeuser != '' && $domainname != '' && $publicpath != ''){
+if(($action == 'install_all_pkg' && $homeuser != '' && $domainname != '' && $publicpath != '') || ($call_action == 'install_all_pkg' && $homeuser != '' && $domainname != '' && $publicpath != '')){
     $setupObj->install_all_pkg($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport);
 }
 
-if($action == 'artisan_call'){
-    $setupObj->artisan_call($homeuser,$domainname,$publicpath);
+if($action == 'artisan_call' || $call_action == 'artisan_call'){
+    $setupObj->artisan_call($homeuser,$domainname,$publicpath,$adminemail,$adminpassword,$adminfirstname,$adminlastname);
 }
 
-if($action == 'finished_setup'){
+if($action == 'finished_setup' || $call_action == 'finished_setup'){
     $setupObj->finished_setup($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport);
 }
 
-if($action == 'remove_installer_api'){
+if($action == 'remove_installer_api' || $call_action == 'remove_installer_api'){
     $setupObj->remove_installer_api();
 }
 
@@ -344,7 +350,7 @@ class RVsitebuilder_Setup_API {
         
         //TODO clear whitespace
         if (preg_match('/\s/',$appname)) $appname = '"'.$appname.'"';
-        
+        $env_data = [];
         $env_data['APP_URL'] = 'https://'.$domainname;
         $env_data['DB_HOST'] = $dbhost;
         $env_data['DB_DATABASE'] = $dbname;
@@ -442,7 +448,7 @@ class RVsitebuilder_Setup_API {
     }
     
     
-    public function artisan_call($homeuser,$domainname,$publicpath) {
+    public function artisan_call($homeuser,$domainname,$publicpath,$adminemail,$adminpassword,$adminfirstname,$adminlastname) {
         
         //loader
         // /home/arnut/rvsitebuildercms/arnut.cpdev1.rvglobalsoft.net/vendor/autoload.php
@@ -501,9 +507,15 @@ class RVsitebuilder_Setup_API {
         $kernel->call('view:clear', []);
         $this->print_debug($kernel->output());
         $this->install_log($kernel->output());
+        //update admin info from wizard request
+        if($adminemail != '' && $adminpassword != '') {
+            $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'email', 'update_val' => $adminemail]);
+            $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'password', 'update_val' => $adminpassword]);
+            $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'first_name', 'update_val' => $adminfirstname]);
+            $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'last_name', 'update_val' => $adminlastname]);
+        }
         
         
-        //chmod -R 777 for storage/medialibrary after atissan call seed
         
         
         $this->response['status'] = true;
@@ -671,22 +683,19 @@ class RVsitebuilder_Setup_API {
     
     function copyFileDefault($homeuser,$domainname,$publicpath) {
         
+        $files = new File_Handler();
+        
         //move temp to freamwork path
-        $files = scandir(dirname(__FILE__).'/tmp');
         $source = dirname(__FILE__).'/tmp/';
         $destination = $homeuser.'/rvsitebuildercms/'.$domainname.'/';
         if (!file_exists($destination)) {
             mkdir($destination, 0755, true);
         }
-        foreach ($files as $file) {
-            if (in_array($file, [".",".."])) continue;
-            rename($source.$file, $destination.$file);
-        }
+        $copy = $files->copyDirectory($source, $destination);
         
         //move framework/public to public path
         $source = $homeuser.'/rvsitebuildercms/'.$domainname.'/public';
         $destination = $publicpath;
-        $files = new File_Handler();
         $copy = $files->copyDirectory($source, $destination);
         
         
