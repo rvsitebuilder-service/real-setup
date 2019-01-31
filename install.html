@@ -1,0 +1,864 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>RVsitebuilder 7 - Installer Wizard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- some fone -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+    
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <!-- Include SmartWizard CSS -->
+    <link href="src/css/smart_wizard.css" rel="stylesheet" type="text/css" />
+
+    <!-- Optional SmartWizard theme -->
+    <link href="src/css/smart_wizard_theme_circles.css" rel="stylesheet" type="text/css" />
+    <link href="src/css/smart_wizard_theme_arrows.css" rel="stylesheet" type="text/css" />
+    <link href="src/css/smart_wizard_theme_dots.css" rel="stylesheet" type="text/css" />
+</head>
+
+
+<body>
+	<div class="container">
+	   
+		<form action="#" id="myForm" role="form" data-toggle="validator" method="post" accept-charset="utf-8">
+			<!-- SmartWizard html -->
+			<div id="smartwizard">
+			    
+				<!--  start wizard -->
+				<ul>
+					<li><a href="#form-step-0">Step 1<br /><small>This is step description</small></a></li>
+					<li><a href="#form-step-1">Step 2<br /><small>This is step description</small></a></li>
+					<li><a href="#form-step-2">Step 3<br /><small>This is step description</small></a></li>
+					<li><a href="#form-step-3">Step 4<br /><small>This is step description</small></a></li>
+				</ul>
+				
+				<div>
+				    
+				    <!-- start step block -->
+                    <div id="form-step-0" role="form" data-toggle="validator">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-4">PHP Version >= 7.1.3</div>
+                                <div class="col col-lg-2">
+                                    <input type="text" class="form-control border-0 font-weight-bold text-danger chk_pre_require" name="phpversion" style="background: none;" value="FALSE"
+                                        id="phpversion" placeholder=""  required readonly>
+                                </div>
+                                <div class="help-block with-errors"></div>
+                            </div>
+                        </div>
+                        <span>PHP Extension</span>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-4">mysqlnd ON</div>
+                                <div class="col col-lg-2">
+                                    <input type="text" class="form-control border-0 font-weight-bold text-danger chk_pre_require" name="mysqlnd" style="background: none;" value="FALSE"
+                                        id="mysqlnd" placeholder="" required readonly>
+                                </div>
+                                <div class="help-block with-errors"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-4">pdo ON</div>
+                                <div class="col col-lg-2">
+                                    <input type="text" class="form-control border-0 font-weight-bold text-danger  chk_pre_require" name="pdo" style="background: none;" value="FALSE"
+                                        id="pdo" placeholder="" required readonly>
+                                </div>
+                                <div class="help-block with-errors"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-4">gd ON</div>
+                                <div class="col col-lg-2">
+                                    <input type="text" class="form-control border-0 font-weight-bold text-danger  chk_pre_require" name="gd" style="background: none;" value="FALSE"
+                                        id="gd" placeholder="" required readonly>
+                                </div>
+                                <div class="help-block with-errors"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-4">curl ON</div>
+                                <div class="col col-lg-2">
+                                    <input type="text" class="form-control border-0 font-weight-bold text-danger  chk_pre_require" name="curl" style="background: none;" value="FALSE"
+                                        id="curl" placeholder="" required readonly>
+                                </div>
+                                <div class="help-block with-errors"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-4">iconv ON</div>
+                                <div class="col col-lg-2">
+                                    <input type="text" class="form-control border-0 font-weight-bold text-danger  chk_pre_require" name="iconv" style="background: none;" value="FALSE"
+                                        id="iconv" placeholder="" required readonly>
+                                </div>
+                                <div class="help-block with-errors"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-4">mbstring ON</div>
+                                <div class="col col-lg-2">
+                                    <input type="text" class="form-control border-0 font-weight-bold text-danger  chk_pre_require" name="mbstring" style="background: none;" value="FALSE"
+                                        id="mbstring" placeholder="" required readonly>
+                                </div>
+                                <div class="help-block with-errors"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-4">fileinfo ON</div>
+                                <div class="col col-lg-2">
+                                    <input type="text" class="form-control border-0 font-weight-bold text-danger  chk_pre_require" name="fileinfo" style="background: none;" value="FALSE"
+                                        id="fileinfo" placeholder="" required readonly>
+                                </div>
+                                <div class="help-block with-errors"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-4">exif ON</div>
+                                <div class="col col-lg-2">
+                                    <input type="text" class="form-control border-0 font-weight-bold text-danger  chk_pre_require" name="exif" style="background: none;" value="FALSE"
+                                        id="exif" placeholder="" required readonly>
+                                </div>
+                                <div class="help-block with-errors"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-4">zip ON</div>
+                                <div class="col col-lg-2">
+                                    <input type="text" class="form-control border-0 font-weight-bold text-danger  chk_pre_require" name="zip" style="background: none;" value="FALSE"
+                                        id="zip" placeholder="" required readonly>
+                                </div>
+                                <div class="help-block with-errors"></div>
+                            </div>
+                        </div>
+                        <span>PHP INI</span>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-4">allow_url_fopen ON</div>
+                                <div class="col col-lg-2">
+                                    <input type="text" class="form-control border-0 font-weight-bold text-danger  chk_pre_require" name="allow_url_fopen" style="background: none;" value="FALSE"
+                                        id="allow_url_fopen" placeholder="" required readonly>
+                                </div>
+                                <div class="help-block with-errors"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-4">memory_limit >= 64</div>
+                                <div class="col col-lg-2">
+                                    <input type="text" class="form-control border-0 font-weight-bold text-danger  chk_pre_require" name="memory_limit" style="background: none;" value="FALSE"
+                                        id="memory_limit" placeholder="" required readonly>
+                                </div>
+                                <div class="help-block with-errors"></div>
+                            </div>
+                        </div>
+                        <span id="chk_pre_require_error" class="d-none"></span>
+                    </div>
+                    <!-- end step block -->
+                    
+                    <!-- start step block -->
+                    <div id="form-step-1" role="form" data-toggle="validator">
+                        <div class="form-group">
+                               <div class="row">
+                                   <div class="col col-lg-2">Database host:</div>
+                                   <div class="col col-lg-4">
+                                       <input type="text" class="form-control"
+                                           name="dbhost" id="dbhost"
+                                           placeholder="Write your Database Host" required value="555">
+                                   </div>
+                                   <div class="help-block with-errors"></div>
+                               </div>
+                        </div>
+                        <div class="form-group">
+                               <div class="row">
+                                   <div class="col col-lg-2">Database name:</div>
+                                   <div class="col col-lg-4">
+                                       <input type="text" class="form-control"
+                                           name="dbname" id="dbname"
+                                           placeholder="Write your Database Name" required value="555">
+                                   </div>
+                                   <div class="help-block with-errors"></div>
+                               </div>
+                        </div>
+                        <div class="form-group">
+                               <div class="row">
+                                   <div class="col col-lg-2">Database user:</div>
+                                   <div class="col col-lg-4">
+                                       <input type="text" class="form-control"
+                                           name="dbuser" id="dbuser"
+                                           placeholder="Write your Database User" required value="555">
+                                   </div>
+                                   <div class="help-block with-errors"></div>
+                               </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-2">Database password:</div>
+                                <div class="col col-lg-4">
+                                    <input type="password" class="form-control"
+                                        name="dbpassword" id="dbpassword"
+                                        placeholder="Write your Database password" required value="555">
+                                </div>
+                                <div class="help-block with-errors"></div>
+                            </div>
+                        </div>
+                        <span id="connect_db_error" class="d-none"></span>
+                        <div id="ftpinfo" class="d-none">
+                            <div class="form-group">
+                               <div class="row">
+                                   <div class="col col-lg-2">FTP server:</div>
+                                   <div class="col col-lg-4">
+                                       <input type="text" class="form-control"
+                                           name="ftpserver" id="ftpserver"
+                                           placeholder="Write your FTP server" value="555">
+                                   </div>
+                                   <div class="help-block with-errors"></div>
+                               </div>
+	                        </div>
+	                        <div class="form-group">
+	                               <div class="row">
+	                                   <div class="col col-lg-2">FTP username:</div>
+	                                   <div class="col col-lg-4">
+	                                       <input type="email" class="form-control"
+	                                           name="ftpusername" id="ftpusername"
+	                                           placeholder="Write your FTP username" value="555@ddd">
+	                                   </div>
+	                                   <div class="help-block with-errors"></div>
+	                               </div>
+	                        </div>
+	                        <div class="form-group">
+	                               <div class="row">
+	                                   <div class="col col-lg-2">FTP password:</div>
+	                                   <div class="col col-lg-4">
+	                                       <input type="password" class="form-control"
+	                                           name="ftppassword" id="ftppassword"
+	                                           placeholder="Write your FTP password" value="555">
+	                                   </div>
+	                                   <div class="help-block with-errors"></div>
+	                               </div>
+	                        </div>
+	                        <div class="form-group">
+	                            <div class="row">
+	                                <div class="col col-lg-2">FTP port:</div>
+	                                <div class="col col-lg-4">
+	                                    <input type="text" class="form-control"
+	                                        name="ftpport" id="ftpport"
+	                                        placeholder="Write your FTP port"  value="555">
+	                                </div>
+	                                <div class="help-block with-errors"></div>
+	                            </div>
+	                        </div>
+	                        <span id="connect_ftp_error" class="d-none"></span>
+                        </div>
+                    </div>
+                    <!-- end step block -->
+				   
+					<!-- start step block -->
+					<div id="form-step-2" role="form" data-toggle="validator">
+					    <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-2">Setup for:</div>
+                                <div class="col col-lg-4">
+                                    <input type="url" class="form-control " name="url"
+                                        id="url" placeholder="" required disabled>
+                                </div>
+                                <div class="help-block with-errors"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-2">Home path:</div>
+                                <div class="col col-lg-4">
+                                    <input type="text" class="form-control " name="homepath"
+                                        id="homepath" placeholder="" required disabled>
+                                </div>
+                                <div class="help-block with-errors"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-2">Public path:</div>
+                                <div class="col col-lg-4">
+                                    <input type="text" class="form-control " name="publicpath"
+                                        id="publicpath" placeholder="" required disabled>
+                                </div>
+                                <div class="help-block with-errors"></div>
+                            </div>
+                        </div>
+						<div class="form-group">
+							<div class="row">
+								<div class="col col-lg-2">Admin e-mail:</div>
+								<div class="col col-lg-4">
+									<input type="email" class="form-control " name="email"
+										id="email" placeholder="Write your email address" required>
+								</div>
+								<div class="help-block with-errors"></div>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="row">
+								<div class="col col-lg-2">Admin firstname:</div>
+								<div class="col col-lg-4">
+									<input type="text" class="form-control"
+										pattern="^[_A-z0-9]{1,}$" name="firstname" id="firstname"
+										placeholder="Write your Firstname" required>
+								</div>
+								<div class="help-block with-errors"></div>
+							</div>
+						</div>
+						<div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-2">Admin lastname:</div>
+                                <div class="col col-lg-4">
+                                    <input type="text" class="form-control"
+                                        name="lastname" id="lastname"
+                                        placeholder="Write your Lastname" >
+                                </div>
+                                <div class="help-block with-errors"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-2">Admin password:</div>
+                                <div class="col col-lg-4">
+                                    <input type="password" class="form-control"
+                                        name="password" id="password"
+                                        placeholder="Write your password" required data-minlength="6">
+                                </div>
+                                <div class="help-block with-errors"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-2">Password again:</div>
+                                <div class="col col-lg-4">
+                                    <input type="password" class="form-control"
+                                        name="password2" id="password2"
+                                        placeholder="Write your password again" required data-match="#password">
+                                </div>
+                                <div class="help-block with-errors"></div>
+                            </div>
+                        </div>
+					</div>
+					<!-- end step block -->
+					
+					<!-- start step block -->
+                    <div id="form-step-3" role="form" data-toggle="validator">
+                        <div id="confirmation">
+                            <div class="form-group">
+	                            <div class="col col-lg-12">
+	                                <div class="row">
+		                                    <div class="alert alert-info " role="alert">
+												  <h4 class="alert-heading">Well done!</h4>
+												  <p>Aww yeah, you successfully read this important alert message. This example text is going to run a bit longer so that you can see how spacing within an alert works with this kind of content.</p>
+												  <div class="form-check">
+													  <input class="form-check-input" type="checkbox" value="" id="confirmoverwrite">
+													  <label class="form-check-label" for="defaultCheck1">
+													      The installer will overwrite any files that exist whose names match a file name 
+													  </label>
+												  </div>
+												  <div class="form-check">
+	                                                  <input class="form-check-input" type="checkbox" value="" id="confirmagreement">
+	                                                  <label class="form-check-label" for="defaultCheck2">
+	                                                      Agree <a class="endusereula" href="https://rvsitebuilder.com/software-agreement" target="_blank">End User License Agreement</a>
+	                                                  </label>
+                                                  </div>
+                                                  <div class="row">
+                                                    <button type="button" id="buttoninstall" class="btn btn-primary" disabled>Install</button>
+                                                  </div>
+									        </div>
+									</div>
+									
+									
+	                            </div>
+                            </div>
+                        </div>
+                        <div id="doinstall" class="d-none">
+                            <div class="row">
+                                <div class="col col-lg-4">Check License</div>
+                                <div class="col col-lg-2">
+                                    <i class="fa fa-sync fa-spin check_license"></i><span class="check_license">Loadding...</span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-lg-4">Disk space required</div>
+                                <div class="col col-lg-2">
+                                    <i class="fa fa-sync fa-spin disk_required"></i><span class="disk_required">Loadding...</span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-lg-4">Download Framework</div>
+                                <div class="col col-lg-2">
+                                    <i class="fa fa-sync fa-spin download_framework"></i><span class="download_framework">Loadding...</span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-lg-4">Download Vendor</div>
+                                <div class="col col-lg-2">
+                                    <i class="fa fa-sync fa-spin download_vendor"></i><span class="download_vendor">Loadding...</span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-lg-4">Setup ENV</div>
+                                <div class="col col-lg-2">
+                                    <i class="fa fa-sync fa-spin setup_env"></i><span class="setup_env">Loadding...</span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-lg-4">Install Common Package</div>
+                                <div class="col col-lg-2">
+                                    <i class="fa fa-sync fa-spin install_common_package"></i><span class="install_common_package">Loadding...</span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-lg-4">Install Framework</div>
+                                <div class="col col-lg-2">
+                                    <i class="fa fa-sync fa-spin install_framework"></i><span class="install_framework">Loadding...</span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-lg-4">Artisan Command</div>
+                                <div class="col col-lg-2">
+                                    <i class="fa fa-sync fa-spin artisan_command"></i><span class="artisan_command">Loadding...</span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-lg-4">Finished setup</div>
+                                <div class="col col-lg-2">
+                                    <i class="fa fa-sync fa-spin finished_setup"></i><span class="finished_setup">Loadding...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end step block -->
+			     
+				</div>
+				<!-- end wizard -->
+			         
+			</div>
+		</form>
+	
+	
+	</div>
+
+
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.min.js"
+      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+      crossorigin="anonymous"></script>
+    
+    <!-- Include jQuery Validator plugin -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/1000hz-bootstrap-validator/0.11.5/validator.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <!-- Include SmartWizard JavaScript source -->
+    <script type="text/javascript" src="src/js/jquery.smartWizard.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+        	
+        	// Toolbar extra buttons
+            var btnFinish = $('<button></button>').text('Finish')
+                                             .addClass('btn btn-info btn-finish d-none')
+                                             .on('click', function(){ alert('Finish Clicked'); });
+            var btnCancel = $('<button></button>').text('Cancel')
+                                             .addClass('btn btn-danger btn-cancel')
+                                             .on('click', function(){ $('#smartwizard').smartWizard("reset"); });
+            // Step show event
+            $("#smartwizard").on("showStep", function(e, anchorObject, stepNumber, stepDirection, stepPosition) {
+               //alert("You are on step "+stepNumber+" now");
+               if(stepPosition === 'first'){
+                   $("#prev-btn").addClass('disabled');
+               }else if(stepPosition === 'final'){
+            	   $("#next-btn").addClass('disabled');
+               }else{
+                   $("#prev-btn").removeClass('disabled');
+                   $("#next-btn").removeClass('disabled');
+               }
+            });
+            // Smart Wizard
+            $('#smartwizard').smartWizard({
+                    selected: 0,
+                    theme: 'arrows',
+                    transitionEffect:'slide',
+                    showStepURLhash: true,
+                    toolbarSettings: {
+				                        toolbarPosition: 'bottom',
+				                        toolbarButtonPosition: 'end',
+				                        toolbarExtraButtons: [btnFinish, btnCancel]
+                                     },
+                    anchorSettings: {
+                        markDoneStep: true, // add done css
+                        markAllPreviousStepsAsDone: true, // When a step selected by url hash, all previous steps are marked done
+                        removeDoneStepOnNavigateBack: true, // While navigate back done step after active step will be cleared
+                        enableAnchorOnDoneStep: true // Enable/Disable the done steps navigation
+                    }
+            });
+            // External Button Events
+            $("#reset-btn").on("click", function() {
+                // Reset wizard
+                $('#smartwizard').smartWizard("reset");
+                return true;
+            });
+
+            $("#prev-btn").on("click", function() {
+                // Navigate previous
+                $('#smartwizard').smartWizard("prev");
+                return true;
+            });
+
+            $("#next-btn").on("click", function() {
+                // Navigate next
+                $('#smartwizard').smartWizard("next");
+                return true;
+            });
+			//$("#theme_selector").on("change", function() {
+			//  // Change theme
+			//  $('#smartwizard').smartWizard("theme", $(this).val());
+			//  return true;
+			//});
+			//// Set selected theme on page refresh
+			//$("#theme_selector").change();
+			
+			
+			//bootstrap input validate default 
+            $("#smartwizard").on("leaveStep", function(e, anchorObject, stepNumber, stepDirection) {
+                var elmForm = $("#form-step-" + stepNumber);
+                if(stepDirection === 'forward' && elmForm){
+                    elmForm.validator('validate');
+                    var elmErr = elmForm.children('.has-error');
+                    if(elmErr && elmErr.length > 0){
+                        // Form validation failed
+                        return false;
+                    }
+                }
+                
+                $.when(validate_custom(stepDirection,stepNumber)).done(function(resp){
+                    console.log(resp);
+                    return resp;
+                });
+            });
+			
+			//validate for custom 
+            function validate_custom(stepDirection,stepNumber) {
+                
+				//test connect db and connect ftp
+				if(stepDirection === 'forward' && stepNumber == 1){
+					var noerror = true;
+                    param = {
+                            'call_action':'test_database_connect',
+                            'db_host':$("#dbhost").val(),
+                            'db_name':$("#dbname").val(),
+                            'db_user':$("#dbuser").val(),
+                            'db_pass':$("#dbpassword").val(),
+                    };
+                    doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
+                        console.log(data);
+                        if (data.status == false){
+                            // test db connect error
+                            $("#connect_db_error").removeClass("d-none").text(data.message);
+                            noerror = false;
+                        } 
+                        else {
+	                        param = {
+	                                'call_action':'test_ftp_connect',
+	                                'ftp_server':$("#ftpserver").val(),
+	                                'ftp_account':$("#ftpusername").val(),
+	                                'ftp_password':$("#ftppassword").val(),
+	                                'ftp_port':$("#ftpport").val(),
+	                        };
+	                        doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
+	                            console.log(data);
+	                            if (data.status == false){
+	                                // test ftp connect error
+	                                $("#connect_ftp_error").removeClass("d-none").text(data.message);
+	                                noerror = false;
+	                            } 
+	                        });
+                        }
+                        return noerror; 
+                    }); 
+                }
+                
+                //php pre check
+                if(stepDirection === 'forward' && stepNumber == 0){
+                	var noerror = true;
+                	$("#form-step-0 .chk_pre_require").each(function() {
+                		  if($(this).val() === "FALSE") {
+                			  $("#chk_pre_require_error").removeClass("d-none").text("PHP required error");
+                			  noerror = false;
+                			  return;
+                		  }
+                	})
+                    return noerror;
+                }
+                
+                //backward true away
+                if(stepDirection === 'backward'){
+                	return true;
+                }
+            }
+			
+			
+			
+            
+            
+            //url value 
+            $("#url").val(window.location.origin);
+            
+            //home path value
+            param = {'call_action':'get_user_path'};
+            doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
+                console.log(data);
+                if (data.status == true){
+                    $("#homepath").val(data.homepath);
+                    $("#publicpath").val(data.publicpath);
+                } else {
+                    return true;
+                }
+            }); 
+            
+            //check pre require value
+            param = {'call_action':'check_pre_require'};
+            doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
+                console.log(data);
+                if (data.status == true){
+                	$.each( data.check_pre_require, function( key, value ) {
+                		  if(value.check == true) {
+                			  $("#"+key).val(value.check.toString().toUpperCase());
+                			  $("#"+key).removeClass("text-danger").addClass("text-success");
+                		  }
+                		  else {
+                			  return true;
+                		  }
+                    });
+                } else {
+                    return true;
+                }
+            }); 
+            
+            //check http as user
+            param = {'call_action':'check_http_as_user'};
+            doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
+                console.log(data);
+                if (data.status == true){
+	                if(data.httpasuser == false) {
+	                    $("#ftpinfo").removeClass("d-none");
+	                    $("#ftpserver").attr('required', 'required');
+	                    $("#ftpusername").attr('required', 'required');
+	                    $("#ftppassword").attr('required', 'required');
+	                    $("#ftpport").attr('required', 'required');
+	                }
+	                else {
+	                    return true;
+	                }
+                } else {
+                    return true;
+                }
+            }); 
+            
+            
+            //checkbox before install
+            $('#confirmoverwrite').change(function() {
+                if($(this).prop('checked') == true && $('#confirmagreement').prop('checked') == true) {
+                    $('#buttoninstall').prop('disabled', false);
+                }
+                else {
+                    $('#buttoninstall').prop('disabled', true);
+                }   
+            });
+            $('#confirmagreement').change(function() {
+                if($(this).prop('checked') == true && $('#confirmoverwrite').prop('checked') == true ) {
+                    $('#buttoninstall').prop('disabled', false);
+                }
+                else {
+                    $('#buttoninstall').prop('disabled', true);
+                }   
+            });
+            
+            //install button click
+            $('#buttoninstall').click(function() {
+            	$('#confirmation').hide();
+            	$('#doinstall').removeClass("d-none");
+            	
+            	param = {'call_action':'check_license' };
+                doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
+                    console.log(data);
+                    if (data.status == false){
+                    	$('span.check_license').text(data.message);
+                        $('i.check_license').removeClass("fa fa-sync fa-spin").addClass("fa fa-exclamation-circle")
+                    }
+                    else {
+                    	$('span.check_license').text('');
+                        $('i.check_license').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
+                        
+                    	param = {'call_action':'disk_required' };
+                    	doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
+                            console.log(data);
+                            if (data.status == false){
+                            	$('span.disk_required').text(data.message);
+                                $('i.disk_required').removeClass("fa fa-sync fa-spin").addClass("fa fa-exclamation-circle")
+                            }
+                            else {
+                            	$('span.disk_required').text('');
+                                $('i.disk_required').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
+                                
+                                param = {'call_action':'download_framework' };
+                                doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
+                                    console.log(data);
+                                    if (data.status == false){
+                                        $('span.download_framework').text(data.message);
+                                        $('i.download_framework').removeClass("fa fa-sync fa-spin").addClass("fa fa-exclamation-circle")
+                                    }
+                                    else {
+                                        $('span.download_framework').text('');
+                                        $('i.download_framework').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
+                                        
+                                        param = {'call_action':'download_vendor' };
+                                        doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
+                                            console.log(data);
+                                            if (data.status == false){
+                                                $('span.download_vendor').text(data.message);
+                                                $('i.download_vendor').removeClass("fa fa-sync fa-spin").addClass("fa fa-exclamation-circle")
+                                            }
+                                            else {
+                                                $('span.download_vendor').text('');
+                                                $('i.download_vendor').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
+                                                
+                                                param = {
+                                                		'call_action':'setup_env',
+                                                		'domainname': $('#url').val(),
+                                                		'public_path': $('#publicpath').val(),
+                                                		'db_host': $('#dbhost').val(),
+                                                		'db_name': $('#dbname').val(),
+                                                		'db_user': $('#dbuser').val(),
+                                                		'db_pass': $('#dbpassword').val(),
+                                                		'ftp_server': $('#ftpserver').val(),
+                                                		'ftp_account': $('#ftpusername').val(),
+                                                		'ftp_password': $('#ftppassword').val(),
+                                                		'appname': "RVsitebuilder7",
+                                                		'ftp_server': $('#ftpserver').val(),
+                                                		'ftpport': $('#ftp_port').val(),
+                                                		};
+                                                doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
+                                                    console.log(data);
+                                                    if (data.status == false){
+                                                        $('span.setup_env').text(data.message);
+                                                        $('i.setup_env').removeClass("fa fa-sync fa-spin").addClass("fa fa-exclamation-circle")
+                                                    }
+                                                    else {
+                                                        $('span.setup_env').text('');
+                                                        $('i.setup_env').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
+                                                        $domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname,$ftpserver,$ftpport
+                                                        param = {
+                                                        		'call_action':'install_common_package',
+                                                        		
+                                                        		};
+                                                        doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
+                                                            console.log(data);
+                                                            if (data.status == false){
+                                                                $('span.install_common_package').text(data.message);
+                                                                $('i.install_common_package').removeClass("fa fa-sync fa-spin").addClass("fa fa-exclamation-circle")
+                                                            }
+                                                            else {
+                                                                $('span.install_common_package').text('');
+                                                                $('i.install_common_package').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
+                                                                
+                                                                param = {'call_action':'install_framework' };
+                                                                doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
+                                                                    console.log(data);
+                                                                    if (data.status == false){
+                                                                        $('span.install_framework').text(data.message);
+                                                                        $('i.install_framework').removeClass("fa fa-sync fa-spin").addClass("fa fa-exclamation-circle")
+                                                                    }
+                                                                    else {
+                                                                        $('span.install_framework').text('');
+                                                                        $('i.install_framework').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
+                                                                        
+                                                                        param = {'call_action':'artisan_command' };
+                                                                        doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
+                                                                            console.log(data);
+                                                                            if (data.status == false){
+                                                                                $('span.artisan_command').text(data.message);
+                                                                                $('i.artisan_command').removeClass("fa fa-sync fa-spin").addClass("fa fa-exclamation-circle")
+                                                                            }
+                                                                            else {
+                                                                                $('span.artisan_command').text('');
+                                                                                $('i.artisan_command').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
+                                                                                
+                                                                                param = {'call_action':'finished_setup' };
+                                                                                doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
+                                                                                    console.log(data);
+                                                                                    if (data.status == false){
+                                                                                        $('span.finished_setup').text(data.message);
+                                                                                        $('i.finished_setup').removeClass("fa fa-sync fa-spin").addClass("fa fa-exclamation-circle")
+                                                                                    }
+                                                                                    else {
+                                                                                        $('span.finished_setup').text('');
+                                                                                        $('i.finished_setup').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
+                                                                                        
+                                                                                        
+                                                                                        
+                                                                                    }
+                                                                                });
+                                                                                
+                                                                            }
+                                                                        });
+                                                                        
+                                                                    }
+                                                                });
+                                                                
+                                                            }
+                                                        });
+                                                        
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            	
+            });
+            
+            
+            
+            //ajax function
+            function doAnAjax(url,param,type,callback) {
+	            $.ajax({
+	                url : url,
+	                data : param,
+	                cache : false,
+	                type : type,
+	                dataType : "json",
+	                headers : {'Ignore-Token':1},
+	                error : function() {
+	                    callback("error", null);
+	                },
+	                success : function(data) {
+	                    callback(null, data);
+	                }
+	            }); 
+            }
+            
+        });
+    </script>
+</body>
+
+
+</html>
