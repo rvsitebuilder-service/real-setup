@@ -955,7 +955,7 @@ class RVsitebuilder_Setup_API {
     
     public function check_http_as_user() {
         $this->response['status'] = true;
-        $this->response['httpasuser'] = false;//$this->httpasuser;
+        $this->response['httpasuser'] = $this->httpasuser;
         return $this->print_response($this->response);
     }
     
@@ -997,7 +997,7 @@ class RVsitebuilder_Setup_API {
         $this->response['db_connect']['message'] = "";
         $conn = new mysqli($dbhost, $dbuser, $dbpassword,$dbname);
         if ($conn->connect_error) {
-            $this->response['db_connect']['status'] = true;//false;
+            $this->response['db_connect']['status'] = false;
             $this->response['db_connect']['message'] = "Database connection failed! ".$conn->connect_error;
         }
         
@@ -1008,12 +1008,12 @@ class RVsitebuilder_Setup_API {
             $ftpHandler = new FTP_Handler();
             $result = $ftpHandler->connect($ftpserver);
             if(!$result['success']){
-                $this->response['ftp_connect']['status'] = true;//false;
+                $this->response['ftp_connect']['status'] = false;
                 $this->response['ftp_connect']['message'] = 'Error '.$result['msg'];
             }
             $result = $ftpHandler->login($ftpaccount, $ftppassword);
             if(!$result['success']){
-                $this->response['ftp_connect']['status'] = true;//false;
+                $this->response['ftp_connect']['status'] = false;
                 $this->response['ftp_connect']['message'] = 'Error '.$result['msg'];
             }
         }
