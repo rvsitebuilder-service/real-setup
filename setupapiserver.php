@@ -113,6 +113,9 @@ if($call_action == 'check_license') {
 if($call_action == 'disk_required') {
     $setupObj->disk_required();
 }
+if($call_action == 'test_database_ftp_connect') {
+    $setupObj->test_database_ftp_connect($dbhost,$dbname,$dbuser,$dbpassword,$ftpserver,$ftpaccount,$ftppassword,$ftpport);
+}
 
 
 
@@ -957,7 +960,6 @@ class RVsitebuilder_Setup_API {
     }
     
     public function test_database_connect($dbhost,$dbname,$dbuser,$dbpassword){
-        //$this->response['status'] = true;
         ini_set('display_errors', 0);
         $conn = new mysqli($dbhost, $dbuser, $dbpassword,$dbname);
         if ($conn->connect_error) {
@@ -971,7 +973,6 @@ class RVsitebuilder_Setup_API {
     }
     
     public function test_ftp_connect($ftpserver,$ftpaccount,$ftppassword,$ftpport) {
-        //$this->response['status'] = true;
         ini_set('display_errors', 0);
         
         $ftpHandler = new FTP_Handler();
@@ -986,6 +987,39 @@ class RVsitebuilder_Setup_API {
             return $this->print_response($this->response);
         }
         
+    }
+    
+    public function test_database_ftp_connect($dbhost,$dbname,$dbuser,$dbpassword,$ftpserver,$ftpaccount,$ftppassword,$ftpport) {
+        ini_set('display_errors', 0);
+        
+        //db
+        $this->response['db_connect']['status'] = true;
+        $this->response['db_connect']['message'] = "";
+        $conn = new mysqli($dbhost, $dbuser, $dbpassword,$dbname);
+        if ($conn->connect_error) {
+            $this->response['db_connect']['status'] = true;//false;
+            $this->response['db_connect']['message'] = "Database connection failed! ".$conn->connect_error;
+        }
+        
+        //ftp
+        $this->response['ftp_connect']['status'] = true;
+        $this->response['ftp_connect']['message'] = '';
+        if($ftpserver != '' && $ftpaccount != '' && $ftppassword != '') {
+            $ftpHandler = new FTP_Handler();
+            $result = $ftpHandler->connect($ftpserver);
+            if(!$result['success']){
+                $this->response['ftp_connect']['status'] = true;//false;
+                $this->response['ftp_connect']['message'] = 'Error '.$result['msg'];
+            }
+            $result = $ftpHandler->login($ftpaccount, $ftppassword);
+            if(!$result['success']){
+                $this->response['ftp_connect']['status'] = true;//false;
+                $this->response['ftp_connect']['message'] = 'Error '.$result['msg'];
+            }
+        }
+        
+        $this->response['status'] = true;
+        return $this->print_response($this->response);
     }
     
     public function check_license() {

@@ -41,6 +41,7 @@
     border-top-right-radius: 5px;
     list-style: none;
     overflow: hidden;
+    margin-bottom:15px;
 }
 .sw-theme-arrows > ul.step-anchor li+li:before {
     padding: 0;
@@ -108,20 +109,20 @@
     background: #46b8da !important;
 }
 .sw-theme-arrows > ul.step-anchor > li.active > a {
-    border-color: #5cb85c !important;
+    border-color: #2597da !important;
     color: #fff !important;
-    background: #5cb85c !important;
+    background: #2597da !important;
 }
 .sw-theme-arrows > ul.step-anchor > li.active > a:after {
-    border-left: 30px solid #5cb85c !important;
+    border-left: 30px solid #2597da !important;
 }
 .sw-theme-arrows > ul.step-anchor > li.done > a {
-    border-color: #b1dfbb !important; /*  #5cb85c */
+    border-color: #6cbcea !important; /*  #5cb85c */
     color: #fff !important;
-    background: #b1dfbb !important;
+    background: #6cbcea !important;
 }
 .sw-theme-arrows > ul.step-anchor > li.done > a:after {
-    border-left: 30px solid #b1dfbb; /* c3e6cb */
+    border-left: 30px solid #6cbcea; /* c3e6cb */
 }
 .sw-theme-arrows > ul.step-anchor > li.danger > a {
     border-color: #d9534f !important;
@@ -134,6 +135,20 @@
 
 .sw-theme-arrows > ul.step-anchor > li.disabled > a, .sw-theme-arrows > ul.step-anchor > li.disabled > a:hover {
     color: #eee !important;
+}
+.sw-theme-arrows > ul.step-anchor > li.logo {
+    background: #2597da;
+    border:rgba(255,255,255,0.5) solid 1px;
+    padding:5px;
+}
+.logo {
+    padding: 5px;
+    background: #f2f2f2;
+    margin-bottom: 10px;
+    border-bottom: #dddddd solid 1px;
+}
+.margin-b{
+	margin-bottom:15px;
 }
 
 /* Responsive CSS */
@@ -159,5 +174,5 @@
 /* Loader Custom Style */
 .sw-theme-arrows::before {
     border: 10px solid #f3f3f3;
-    border-top: 10px solid #5cb85c;
+    border-top: 10px solid #2597da;
 }

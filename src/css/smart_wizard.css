@@ -202,3 +202,30 @@
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+/******** Overwirte *********/
+#smartwizard .title {    
+	border-bottom: #efefef solid 1px;
+    padding-bottom: 5px;
+}
+#smartwizard .form-group .col-lg-2{    
+    padding-top:6px;
+}
+#smartwizard .text-success {    
+    font-size:14px;
+}
+#smartwizard .alert-info {
+    color: #0c5460;
+    background-color: #ebf5f7;
+    border-color: #bee5eb;
+}
+#smartwizard .fa-sync {
+	margin-right:8px;
+	font-size:14px;
+}
+#smartwizard .fa-check-circle {
+	color: #22a764;
+}
+#smartwizard  .doinstall .row {
+	padding-bottom:10px;
+}

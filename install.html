@@ -22,24 +22,27 @@
 
 
 <body>
+<div class="logo">
+   <div class="container"><img src="logorvsitebuilder.png" height="50"></div>
+</div>
 	<div class="container">
-	   
 		<form action="#" id="myForm" role="form" data-toggle="validator" method="post" accept-charset="utf-8">
 			<!-- SmartWizard html -->
 			<div id="smartwizard">
 			    
 				<!--  start wizard -->
 				<ul>
-					<li><a href="#form-step-0">Step 1<br /><small>This is step description</small></a></li>
-					<li><a href="#form-step-1">Step 2<br /><small>This is step description</small></a></li>
-					<li><a href="#form-step-2">Step 3<br /><small>This is step description</small></a></li>
-					<li><a href="#form-step-3">Step 4<br /><small>This is step description</small></a></li>
+					<li><a href="#form-step-0">Step 1<br /><small>Server Requirement</small></a></li>
+					<li><a href="#form-step-1">Step 2<br /><small>Database And FTP Setup</small></a></li>
+					<li><a href="#form-step-2">Step 3<br /><small>Website Properties Setup</small></a></li>
+					<li><a href="#form-step-3">Step 4<br /><small>Installing RVsitebuilder</small></a></li>
 				</ul>
 				
 				<div>
 				    
 				    <!-- start step block -->
                     <div id="form-step-0" role="form" data-toggle="validator">
+                        <h5 class="title">PHP Version</h5>
                         <div class="form-group">
                             <div class="row">
                                 <div class="col col-lg-4">PHP Version >= 7.1.3</div>
@@ -50,10 +53,10 @@
                                 <div class="help-block with-errors"></div>
                             </div>
                         </div>
-                        <span>PHP Extension</span>
+                        <h5 class="title">PHP Extension</h5>
                         <div class="form-group">
                             <div class="row">
-                                <div class="col col-lg-4">mysqlnd ON</div>
+                                <div class="col col-lg-4">mysqlnd </div>
                                 <div class="col col-lg-2">
                                     <input type="text" class="form-control border-0 font-weight-bold text-danger chk_pre_require" name="mysqlnd" style="background: none;" value="FALSE"
                                         id="mysqlnd" placeholder="" required readonly>
@@ -63,7 +66,7 @@
                         </div>
                         <div class="form-group">
                             <div class="row">
-                                <div class="col col-lg-4">pdo ON</div>
+                                <div class="col col-lg-4">pdo </div>
                                 <div class="col col-lg-2">
                                     <input type="text" class="form-control border-0 font-weight-bold text-danger  chk_pre_require" name="pdo" style="background: none;" value="FALSE"
                                         id="pdo" placeholder="" required readonly>
@@ -73,7 +76,7 @@
                         </div>
                         <div class="form-group">
                             <div class="row">
-                                <div class="col col-lg-4">gd ON</div>
+                                <div class="col col-lg-4">gd </div>
                                 <div class="col col-lg-2">
                                     <input type="text" class="form-control border-0 font-weight-bold text-danger  chk_pre_require" name="gd" style="background: none;" value="FALSE"
                                         id="gd" placeholder="" required readonly>
@@ -83,7 +86,7 @@
                         </div>
                         <div class="form-group">
                             <div class="row">
-                                <div class="col col-lg-4">curl ON</div>
+                                <div class="col col-lg-4">curl </div>
                                 <div class="col col-lg-2">
                                     <input type="text" class="form-control border-0 font-weight-bold text-danger  chk_pre_require" name="curl" style="background: none;" value="FALSE"
                                         id="curl" placeholder="" required readonly>
@@ -93,7 +96,7 @@
                         </div>
                         <div class="form-group">
                             <div class="row">
-                                <div class="col col-lg-4">iconv ON</div>
+                                <div class="col col-lg-4">iconv </div>
                                 <div class="col col-lg-2">
                                     <input type="text" class="form-control border-0 font-weight-bold text-danger  chk_pre_require" name="iconv" style="background: none;" value="FALSE"
                                         id="iconv" placeholder="" required readonly>
@@ -103,7 +106,7 @@
                         </div>
                         <div class="form-group">
                             <div class="row">
-                                <div class="col col-lg-4">mbstring ON</div>
+                                <div class="col col-lg-4">mbstring </div>
                                 <div class="col col-lg-2">
                                     <input type="text" class="form-control border-0 font-weight-bold text-danger  chk_pre_require" name="mbstring" style="background: none;" value="FALSE"
                                         id="mbstring" placeholder="" required readonly>
@@ -113,7 +116,7 @@
                         </div>
                         <div class="form-group">
                             <div class="row">
-                                <div class="col col-lg-4">fileinfo ON</div>
+                                <div class="col col-lg-4">fileinfo </div>
                                 <div class="col col-lg-2">
                                     <input type="text" class="form-control border-0 font-weight-bold text-danger  chk_pre_require" name="fileinfo" style="background: none;" value="FALSE"
                                         id="fileinfo" placeholder="" required readonly>
@@ -123,7 +126,7 @@
                         </div>
                         <div class="form-group">
                             <div class="row">
-                                <div class="col col-lg-4">exif ON</div>
+                                <div class="col col-lg-4">exif </div>
                                 <div class="col col-lg-2">
                                     <input type="text" class="form-control border-0 font-weight-bold text-danger  chk_pre_require" name="exif" style="background: none;" value="FALSE"
                                         id="exif" placeholder="" required readonly>
@@ -133,7 +136,7 @@
                         </div>
                         <div class="form-group">
                             <div class="row">
-                                <div class="col col-lg-4">zip ON</div>
+                                <div class="col col-lg-4">zip </div>
                                 <div class="col col-lg-2">
                                     <input type="text" class="form-control border-0 font-weight-bold text-danger  chk_pre_require" name="zip" style="background: none;" value="FALSE"
                                         id="zip" placeholder="" required readonly>
@@ -141,10 +144,10 @@
                                 <div class="help-block with-errors"></div>
                             </div>
                         </div>
-                        <span>PHP INI</span>
+                        <h5 class="title">PHP INI</h5>
                         <div class="form-group">
                             <div class="row">
-                                <div class="col col-lg-4">allow_url_fopen ON</div>
+                                <div class="col col-lg-4">allow_url_fopen </div>
                                 <div class="col col-lg-2">
                                     <input type="text" class="form-control border-0 font-weight-bold text-danger  chk_pre_require" name="allow_url_fopen" style="background: none;" value="FALSE"
                                         id="allow_url_fopen" placeholder="" required readonly>
@@ -174,7 +177,7 @@
                                    <div class="col col-lg-4">
                                        <input type="text" class="form-control"
                                            name="dbhost" id="dbhost"
-                                           placeholder="Write your Database Host" required value="555">
+                                           placeholder="Write your Database Host" required value="">
                                    </div>
                                    <div class="help-block with-errors"></div>
                                </div>
@@ -185,7 +188,7 @@
                                    <div class="col col-lg-4">
                                        <input type="text" class="form-control"
                                            name="dbname" id="dbname"
-                                           placeholder="Write your Database Name" required value="555">
+                                           placeholder="Write your Database Name" required value="">
                                    </div>
                                    <div class="help-block with-errors"></div>
                                </div>
@@ -196,7 +199,7 @@
                                    <div class="col col-lg-4">
                                        <input type="text" class="form-control"
                                            name="dbuser" id="dbuser"
-                                           placeholder="Write your Database User" required value="555">
+                                           placeholder="Write your Database User" required value="">
                                    </div>
                                    <div class="help-block with-errors"></div>
                                </div>
@@ -207,12 +210,13 @@
                                 <div class="col col-lg-4">
                                     <input type="password" class="form-control"
                                         name="dbpassword" id="dbpassword"
-                                        placeholder="Write your Database password" required value="555">
+                                        placeholder="Write your Database password" required value="">
                                 </div>
                                 <div class="help-block with-errors"></div>
                             </div>
                         </div>
-                        <span id="connect_db_error" class="d-none"></span>
+                        <span id="connect_db_error" class="d-none list-group-item list-group-item-action list-group-item-warning margin-b"></span>
+                       
                         <div id="ftpinfo" class="d-none">
                             <div class="form-group">
                                <div class="row">
@@ -220,7 +224,7 @@
                                    <div class="col col-lg-4">
                                        <input type="text" class="form-control"
                                            name="ftpserver" id="ftpserver"
-                                           placeholder="Write your FTP server" value="555">
+                                           placeholder="Write your FTP server" value="">
                                    </div>
                                    <div class="help-block with-errors"></div>
                                </div>
@@ -231,7 +235,7 @@
 	                                   <div class="col col-lg-4">
 	                                       <input type="email" class="form-control"
 	                                           name="ftpusername" id="ftpusername"
-	                                           placeholder="Write your FTP username" value="555@ddd">
+	                                           placeholder="Write your FTP username" value="">
 	                                   </div>
 	                                   <div class="help-block with-errors"></div>
 	                               </div>
@@ -242,7 +246,7 @@
 	                                   <div class="col col-lg-4">
 	                                       <input type="password" class="form-control"
 	                                           name="ftppassword" id="ftppassword"
-	                                           placeholder="Write your FTP password" value="555">
+	                                           placeholder="Write your FTP password" value="">
 	                                   </div>
 	                                   <div class="help-block with-errors"></div>
 	                               </div>
@@ -253,12 +257,12 @@
 	                                <div class="col col-lg-4">
 	                                    <input type="text" class="form-control"
 	                                        name="ftpport" id="ftpport"
-	                                        placeholder="Write your FTP port"  value="555">
+	                                        placeholder="Write your FTP port"  value="" pattern="^[0-9]{1,}$">
 	                                </div>
 	                                <div class="help-block with-errors"></div>
 	                            </div>
 	                        </div>
-	                        <span id="connect_ftp_error" class="d-none"></span>
+	                        <span id="connect_ftp_error" class="d-none list-group-item list-group-item-action list-group-item-warning margin-b"></span>
                         </div>
                     </div>
                     <!-- end step block -->
@@ -311,7 +315,7 @@
 								<div class="col col-lg-4">
 									<input type="text" class="form-control"
 										pattern="^[_A-z0-9]{1,}$" name="firstname" id="firstname"
-										placeholder="Write your Firstname" required>
+										placeholder="Write your Firstname" >
 								</div>
 								<div class="help-block with-errors"></div>
 							</div>
@@ -321,7 +325,7 @@
                                 <div class="col col-lg-2">Admin lastname:</div>
                                 <div class="col col-lg-4">
                                     <input type="text" class="form-control"
-                                        name="lastname" id="lastname"
+                                        pattern="^[_A-z0-9]{1,}$" name="lastname" id="lastname"
                                         placeholder="Write your Lastname" >
                                 </div>
                                 <div class="help-block with-errors"></div>
@@ -359,8 +363,8 @@
 	                            <div class="col col-lg-12">
 	                                <div class="row">
 		                                    <div class="alert alert-info " role="alert">
-												  <h4 class="alert-heading">Well done!</h4>
-												  <p>Aww yeah, you successfully read this important alert message. This example text is going to run a bit longer so that you can see how spacing within an alert works with this kind of content.</p>
+												  <h4 class="alert-heading">Almost there!</h4>
+												  <p>Please read and accept the condition and agreement to continue RVsitebuilder installation.</p>
 												  <div class="form-check">
 													  <input class="form-check-input" type="checkbox" value="" id="confirmoverwrite">
 													  <label class="form-check-label" for="defaultCheck1">
@@ -373,7 +377,8 @@
 	                                                      Agree <a class="endusereula" href="https://rvsitebuilder.com/software-agreement" target="_blank">End User License Agreement</a>
 	                                                  </label>
                                                   </div>
-                                                  <div class="row">
+                                                  <br>
+                                                  <div>
                                                     <button type="button" id="buttoninstall" class="btn btn-primary" disabled>Install</button>
                                                   </div>
 									        </div>
@@ -383,7 +388,7 @@
 	                            </div>
                             </div>
                         </div>
-                        <div id="doinstall" class="d-none">
+                        <div id="doinstall" class="d-none doinstall">
                             <div class="row">
                                 <div class="col col-lg-4">Check License</div>
                                 <div class="col col-lg-2">
@@ -474,7 +479,7 @@
                                              .addClass('btn btn-info btn-finish d-none')
                                              .on('click', function(){ alert('Finish Clicked'); });
             var btnCancel = $('<button></button>').text('Cancel')
-                                             .addClass('btn btn-danger btn-cancel')
+                                             .addClass('btn btn-secondary btn-cancel')
                                              .on('click', function(){ $('#smartwizard').smartWizard("reset"); });
             // Step show event
             $("#smartwizard").on("showStep", function(e, anchorObject, stepNumber, stepDirection, stepPosition) {
@@ -534,8 +539,10 @@
 			
 			
 			//bootstrap input validate default 
+			var ajaxInvoke = false;
             $("#smartwizard").on("leaveStep", function(e, anchorObject, stepNumber, stepDirection) {
-                var elmForm = $("#form-step-" + stepNumber);
+            	console.log('step '+stepNumber);
+            	var elmForm = $("#form-step-" + stepNumber);
                 if(stepDirection === 'forward' && elmForm){
                     elmForm.validator('validate');
                     var elmErr = elmForm.children('.has-error');
@@ -544,75 +551,85 @@
                         return false;
                     }
                 }
-                
-                $.when(validate_custom(stepDirection,stepNumber)).done(function(resp){
-                    console.log(resp);
-                    return resp;
-                });
-            });
-			
-			//validate for custom 
-            function validate_custom(stepDirection,stepNumber) {
-                
-				//test connect db and connect ftp
-				if(stepDirection === 'forward' && stepNumber == 1){
-					var noerror = true;
-                    param = {
-                            'call_action':'test_database_connect',
+                if(stepNumber == 0) {
+                	var noerror =  true;
+                    $("#form-step-0 .chk_pre_require").each(function() {
+                          if($(this).val() === "FALSE") {
+                              $("#chk_pre_require_error").removeClass("d-none").text("PHP required error");
+                              console.log('pre check error');
+                              noerror = false;
+                              return;
+                          }
+                    })
+                    return noerror;
+                } 
+                if(stepNumber == 1 && ajaxInvoke ==false) {
+                	$("#connect_db_error").addClass("d-none");
+                	$("#connect_ftp_error").addClass("d-none");
+                	
+                	ajaxInvoke = true;
+            		param = {
+                            'call_action':'test_database_ftp_connect',
                             'db_host':$("#dbhost").val(),
                             'db_name':$("#dbname").val(),
                             'db_user':$("#dbuser").val(),
                             'db_pass':$("#dbpassword").val(),
+                            'ftp_server':$("#ftpserver").val(),
+                            'ftp_account':$("#ftpusername").val(),
+                            'ftp_password':$("#ftppassword").val(),
+                            'ftp_port':$("#ftpport").val(),
                     };
-                    doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
-                        console.log(data);
-                        if (data.status == false){
-                            // test db connect error
-                            $("#connect_db_error").removeClass("d-none").text(data.message);
-                            noerror = false;
-                        } 
-                        else {
-	                        param = {
-	                                'call_action':'test_ftp_connect',
-	                                'ftp_server':$("#ftpserver").val(),
-	                                'ftp_account':$("#ftpusername").val(),
-	                                'ftp_password':$("#ftppassword").val(),
-	                                'ftp_port':$("#ftpport").val(),
-	                        };
-	                        doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
-	                            console.log(data);
-	                            if (data.status == false){
-	                                // test ftp connect error
-	                                $("#connect_ftp_error").removeClass("d-none").text(data.message);
-	                                noerror = false;
-	                            } 
-	                        });
-                        }
-                        return noerror; 
+                    $.ajax({
+                        url : 'setupapiserver.php',
+                        data : param,
+                        cache : false,
+                        type : 'GET',
+                        dataType : "json",
+                        headers : {'Ignore-Token':1},
+                        error : function() {
+                        	console.log('ajax check database/ftp connect error');
+                        	$("#smartwizard").smartWizard("next");
+                        },
+                        success : function(data) {
+                            console.log(data);
+                            if (data.status == true){
+                            	if(data.db_connect.status == true && data.ftp_connect.status ==  true){
+                            		console.log('test database/ftp connect success');
+                            		$("#smartwizard").smartWizard("next");
+                            	}
+                            	else {
+                            		ajaxInvoke = false;
+                            		if(data.db_connect.status == false) {
+                            			console.log('test database connect error');
+                            			$("#connect_db_error").removeClass("d-none").text(data.db_connect.message);
+                            			//return false;
+                            		}
+                            		if(data.ftp_connect.status == false) {
+                                        console.log('test ftp connect error');
+                                        $("#connect_ftp_error").removeClass("d-none").text(data.ftp_connect.message);
+                                        //return false;
+                                    }
+                            	}
+                            	//$("#smartwizard").smartWizard("next");
+                            }
+                            //$("#smartwizard").smartWizard("next");
+                        },
                     }); 
-                }
-                
-                //php pre check
-                if(stepDirection === 'forward' && stepNumber == 0){
-                	var noerror = true;
-                	$("#form-step-0 .chk_pre_require").each(function() {
-                		  if($(this).val() === "FALSE") {
-                			  $("#chk_pre_require_error").removeClass("d-none").text("PHP required error");
-                			  noerror = false;
-                			  return;
-                		  }
-                	})
-                    return noerror;
+                    return false;
                 }
                 
                 //backward true away
                 if(stepDirection === 'backward'){
-                	return true;
+                    return true;
                 }
-            }
+                
+            });
 			
+            
 			
+            
 			
+           
             
             
             //url value 
@@ -655,7 +672,7 @@
                 console.log(data);
                 if (data.status == true){
 	                if(data.httpasuser == false) {
-	                    $("#ftpinfo").removeClass("d-none");
+	                    $("#ftpinfo").removeClass("d-none").addClass("ftprequired");
 	                    $("#ftpserver").attr('required', 'required');
 	                    $("#ftpusername").attr('required', 'required');
 	                    $("#ftppassword").attr('required', 'required');
