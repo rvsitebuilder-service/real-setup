@@ -814,7 +814,7 @@
                                                                         param = {
                                                                         		'call_action':'artisan_call',
                                                                         		'homeuser':$('#homepath').val(),
-                                                                        		'domainname':$('#url').val(),
+                                                                        		'domainname':window.location.hostname,
                                                                         		'public_path': $('#publicpath').val(),
                                                                         		};
                                                                         doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
