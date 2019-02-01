@@ -686,19 +686,22 @@ class RVsitebuilder_Setup_API {
     
     function copyFileDefault($homeuser,$domainname,$publicpath) {
         
-        $files = new File_Handler();
-        
         //move temp to freamwork path
+        $files = scandir(dirname(__FILE__).'/tmp');
         $source = dirname(__FILE__).'/tmp/';
         $destination = $homeuser.'/rvsitebuildercms/'.$domainname.'/';
         if (!file_exists($destination)) {
             mkdir($destination, 0755, true);
         }
-        $copy = $files->copyDirectory($source, $destination);
+        foreach ($files as $file) {
+            if (in_array($file, [".",".."])) continue;
+            rename($source.$file, $destination.$file);
+        }
         
         //move framework/public to public path
         $source = $homeuser.'/rvsitebuildercms/'.$domainname.'/public';
         $destination = $publicpath;
+        $files = new File_Handler();
         $copy = $files->copyDirectory($source, $destination);
         
         
