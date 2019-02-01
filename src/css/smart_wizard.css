@@ -214,6 +214,9 @@
 #smartwizard .text-success {    
     font-size:14px;
 }
+#smartwizard .text-danger{    
+    font-size:14px;
+}
 #smartwizard .alert-info {
     color: #0c5460;
     background-color: #ebf5f7;

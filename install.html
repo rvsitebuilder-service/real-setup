@@ -165,7 +165,7 @@
                                 <div class="help-block with-errors"></div>
                             </div>
                         </div>
-                        <span id="chk_pre_require_error" class="d-none"></span>
+                        <span id="chk_pre_require_error" class="d-none list-group-item list-group-item-action list-group-item-warning margin-b"></span>
                     </div>
                     <!-- end step block -->
                     
@@ -275,6 +275,16 @@
                                 <div class="col col-lg-4">
                                     <input type="url" class="form-control " name="url"
                                         id="url" placeholder="" required disabled>
+                                </div>
+                                <div class="help-block with-errors"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-2">Website name:</div>
+                                <div class="col col-lg-4">
+                                    <input type="url" class="form-control " name="websitename"
+                                        id="websitename" placeholder="" required disabled value="RVsitebuilder7">
                                 </div>
                                 <div class="help-block with-errors"></div>
                             </div>
@@ -765,7 +775,7 @@
                                                 		'ftp_server': $('#ftpserver').val(),
                                                 		'ftp_account': $('#ftpusername').val(),
                                                 		'ftp_password': $('#ftppassword').val(),
-                                                		'appname': "RVsitebuilder7",
+                                                		'appname': $('#websitename').val(),
                                                 		'ftpport': $('#ftp_port').val(),
                                                 		};
                                                 doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
@@ -816,6 +826,10 @@
                                                                         		'homeuser':$('#homepath').val(),
                                                                         		'domainname':window.location.hostname,
                                                                         		'public_path': $('#publicpath').val(),
+                                                                        		'adminemail': $('#email').val(),
+                                                                        		'adminpassword': $('#password').val(), 
+                                                                        		'adminfirstname': $('#firstname').val(),
+                                                                        		'adminlastname': $('#lastname').val(), 
                                                                         		};
                                                                         doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
                                                                             console.log(data);
@@ -830,16 +844,12 @@
                                                                                 param = {
                                                                                 		'call_action':'finished_setup',
                                                                                 		'homeuser':$('#homepath').val(),
-                                                                                		'domainname':$('#url').val(),
+                                                                                		'domainname':window.location.hostname,
                                                                                 		'public_path': $('#publicpath').val(),
                                                                                 		'ftp_server': $('#ftpserver').val(),
                                                                                 		'ftp_account': $('#ftpusername').val(),
                                                                                 		'ftp_password': $('#ftppassword').val(),
                                                                                 		'ftpport': $('#ftp_port').val(),
-                                                                                		'adminemail': $('#email').val(),
-                                                                                		'adminpassword': $('#password').val(), 
-                                                                                		'adminfirstname': $('#firstname').val(),
-                                                                                		'adminlastname': $('#lastname').val(), 
                                                                                 		};
                                                                                 doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
                                                                                     console.log(data);
