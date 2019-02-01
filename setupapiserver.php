@@ -28,22 +28,22 @@ $ftpport                = (isset($_SESSION['ftpport'])) ? $_SESSION['ftpport'] :
 $call_action            = (isset($_GET['call_action']) ? $_GET['call_action'] : '');
 $call_responsetype      = (isset($headers['Accept'])) ? $headers['Accept'] : 'application/json';
 $ignore_token           = (isset($headers['Ignore-Token'])) ? $headers['Ignore-Token'] : 0;
-$dbhost                = ($dbhost == '' && isset($_GET['db_host']) ? $_GET['db_host'] : '');
-$dbname                = ($dbname == '' && isset($_GET['db_name']) ? $_GET['db_name'] : '');
-$dbuser                = ($dbuser == '' && isset($_GET['db_user']) ? $_GET['db_user'] : '');
-$dbpassword            = ($dbpassword == '' && isset($_GET['db_pass']) ? $_GET['db_pass'] : '');
-$ftpserver             = ($ftpserver == '' && isset($_GET['ftp_server']) ? $_GET['ftp_server'] : '');
-$ftpaccount            = ($ftpaccount == '' && isset($_GET['ftp_account']) ? $_GET['ftp_account'] : '');
-$ftppassword           = ($ftppassword ==  '' && isset($_GET['ftp_password']) ? $_GET['ftp_password'] : '');
-$ftpport               = ($ftpport == '' && isset($_GET['ftp_port']) ? $_GET['ftp_port'] : '');
-$domainname            = ($domainname == '' && isset($_GET['domainname'])) ? $_GET['domainname'] : '';
-$publicpath            = ($publicpath == '' && isset($_GET['public_path'])) ? $_GET['public_path'] : '';
-$appname               = ($appname == '' && isset($_GET['appname'])) ? $_GET['appname'] : '';
-$homeuser              = ($homeuser == '' && isset($_GET['homeuser'])) ? $_GET['homeuser'] : '';
-$adminemail            = (isset($_GET['adminemail'])) ? $_GET['adminemail'] : '';
-$adminpassword         = (isset($_GET['adminpassword'])) ? $_GET['adminpassword'] : '';
-$adminfirstname        = (isset($_GET['adminfirstname'])) ? $_GET['adminfirstname'] : '';
-$adminlastname         = (isset($_GET['adminlastname'])) ? $_GET['adminlastname'] : '';
+$dbhost                 = (isset($_GET['db_host'])) ? $_GET['db_host'] : $dbhost;
+$dbname                 = (isset($_GET['db_name'])) ? $_GET['db_name'] : $dbname;
+$dbuser                 = (isset($_GET['db_user'])) ? $_GET['db_user'] : $dbuser;
+$dbpassword             = (isset($_GET['db_pass'])) ? $_GET['db_pass'] : $dbpassword;
+$ftpserver              = (isset($_GET['ftp_server'])) ? $_GET['ftp_server'] : $ftpserver;
+$ftpaccount             = (isset($_GET['ftp_account'])) ? $_GET['ftp_account'] : $ftpaccount;
+$ftppassword            = (isset($_GET['ftp_password'])) ? $_GET['ftp_password'] : $ftppassword;
+$ftpport                = (isset($_GET['ftp_port'])) ? $_GET['ftp_port'] : $ftpport;
+$domainname             = (isset($_GET['domainname'])) ? $_GET['domainname'] : $domainname;
+$publicpath             = (isset($_GET['public_path'])) ? $_GET['public_path'] : $publicpath;
+$appname                = (isset($_GET['appname'])) ? $_GET['appname'] : $appname;
+$homeuser               = (isset($_GET['homeuser'])) ? $_GET['homeuser'] : $homeuser;
+$adminemail             = (isset($_GET['adminemail'])) ? $_GET['adminemail'] : '';
+$adminpassword          = (isset($_GET['adminpassword'])) ? $_GET['adminpassword'] : '';
+$adminfirstname         = (isset($_GET['adminfirstname'])) ? $_GET['adminfirstname'] : '';
+$adminlastname          = (isset($_GET['adminlastname'])) ? $_GET['adminlastname'] : '';
 
 
 
@@ -74,7 +74,7 @@ if($action == 'install_common_pkg' || $call_action == 'install_common_pkg'){
     $setupObj->install_common_pkg();
 }
 
-if(($action == 'install_all_pkg' && $homeuser != '' && $domainname != '' && $publicpath != '') || ($call_action == 'install_all_pkg' && $homeuser != '' && $domainname != '' && $publicpath != '')){
+if(($action == 'install_all_pkg' || $call_action == 'install_all_pkg' ) && $homeuser != '' && $domainname != '' && $publicpath != ''){
     $setupObj->install_all_pkg($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport);
 }
 

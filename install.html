@@ -853,12 +853,16 @@
                                                                                         
                                                                                     }
                                                                                     
+                                                                                    param = {'call_action':'remove_installer_api'};
+                                                                                    doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
+                                                                                        console.log(data);
+                                                                                    });
+                                                                                    
+                                                                                    window.location.href = window.location.origin + '/admin/login';
+                                                                                    
                                                                                 });
                                                                                 
-                                                                                param = {'call_action':'remove_installer_api'};
-                                                                                doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
-                                                                                    console.log(data);
-                                                                                });
+                                                                                
                                                                                 
                                                                             }
                                                                         });
