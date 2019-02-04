@@ -227,7 +227,7 @@ class RVsitebuilder_Setup_API {
             $this->response['message'] = 'Error php.ini, Must set allow_url_fopen=ON';
             return $this->print_response($this->response);
         }
-        preg_match('/[1-9]+/',ini_get('memory_limit'),$match);
+        preg_match('/([0-9]+)/',ini_get('memory_limit'),$match);
         if($match[0] < $iniconfig['memory_limit']) {
             $this->response['message'] = 'Error php.ini, Set Memory limit at least 64M.';
             return $this->print_response($this->response);
@@ -952,7 +952,7 @@ class RVsitebuilder_Setup_API {
             $this->response['check_pre_require']['allow_url_fopen']['reason'] = '';
         }
         $this->response['check_pre_require']['memory_limit']['check'] = true;
-        preg_match('/[1-9]+/',ini_get('memory_limit'),$match);
+        preg_match('/([0-9]+)/',ini_get('memory_limit'),$match);
         if($match[0] < 64) {
             $this->response['check_pre_require']['memory_limit']['check'] = false;
             $this->response['check_pre_require']['memory_limit']['reason'] = '';
