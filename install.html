@@ -166,6 +166,9 @@
                             </div>
                         </div>
                         <span id="chk_pre_require_error" class="d-none list-group-item list-group-item-action list-group-item-warning margin-b"></span>
+                        
+                        <button type="button" id="systemreg_recheck" class="btn btn-info">Recheck</button>
+                        
                     </div>
                     <!-- end step block -->
                     
@@ -177,7 +180,7 @@
                                    <div class="col col-lg-4">
                                        <input type="text" class="form-control"
                                            name="dbhost" id="dbhost"
-                                           placeholder="Write your Database Host" required value="">
+                                           placeholder="Write your Database Host" required value="localhost">
                                    </div>
                                    <div class="help-block with-errors"></div>
                                </div>
@@ -303,7 +306,7 @@
                             <div class="row">
                                 <div class="col col-lg-2">Website name:</div>
                                 <div class="col col-lg-4">
-                                    <input type="url" class="form-control " name="websitename"
+                                    <input type="text" class="form-control " name="websitename"
                                         id="websitename" placeholder="" required  value="RVsitebuilder7">
                                 </div>
                                 <div class="help-block with-errors"></div>
@@ -324,7 +327,7 @@
 								<div class="col col-lg-2">Admin firstname:</div>
 								<div class="col col-lg-4">
 									<input type="text" class="form-control"
-										pattern="^[_A-z0-9]{1,}$" name="firstname" id="firstname"
+										 name="firstname" id="firstname"
 										placeholder="Write your Firstname" >
 								</div>
 								<div class="help-block with-errors"></div>
@@ -335,7 +338,7 @@
                                 <div class="col col-lg-2">Admin lastname:</div>
                                 <div class="col col-lg-4">
                                     <input type="text" class="form-control"
-                                        pattern="^[_A-z0-9]{1,}$" name="lastname" id="lastname"
+                                         name="lastname" id="lastname"
                                         placeholder="Write your Lastname" >
                                 </div>
                                 <div class="help-block with-errors"></div>
@@ -402,55 +405,55 @@
                             <div class="row">
                                 <div class="col col-lg-4">Check License</div>
                                 <div class="col col-lg-2">
-                                    <i class="fa fa-sync fa-spin check_license"></i><span class="check_license">Loadding...</span>
+                                    <i class="fa fa-sync fa-spin check_license"></i><span class="check_license">Loading...</span>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col col-lg-4">Disk space required</div>
                                 <div class="col col-lg-2">
-                                    <i class="fa fa-sync fa-spin disk_required"></i><span class="disk_required">Loadding...</span>
+                                    <i class="fa fa-sync fa-spin disk_required"></i><span class="disk_required">Loading...</span>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col col-lg-4">Download Framework</div>
                                 <div class="col col-lg-2">
-                                    <i class="fa fa-sync fa-spin download_framework"></i><span class="download_framework">Loadding...</span>
+                                    <i class="fa fa-sync fa-spin download_framework"></i><span class="download_framework">Loading...</span>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col col-lg-4">Download Vendor</div>
                                 <div class="col col-lg-2">
-                                    <i class="fa fa-sync fa-spin download_vendor"></i><span class="download_vendor">Loadding...</span>
+                                    <i class="fa fa-sync fa-spin download_vendor"></i><span class="download_vendor">Loading...</span>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col col-lg-4">Setup ENV</div>
                                 <div class="col col-lg-2">
-                                    <i class="fa fa-sync fa-spin setup_env"></i><span class="setup_env">Loadding...</span>
+                                    <i class="fa fa-sync fa-spin setup_env"></i><span class="setup_env">Loading...</span>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col col-lg-4">Install Common Package</div>
                                 <div class="col col-lg-2">
-                                    <i class="fa fa-sync fa-spin install_common_package"></i><span class="install_common_package">Loadding...</span>
+                                    <i class="fa fa-sync fa-spin install_common_package"></i><span class="install_common_package">Loading...</span>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col col-lg-4">Install Framework</div>
                                 <div class="col col-lg-2">
-                                    <i class="fa fa-sync fa-spin install_framework"></i><span class="install_framework">Loadding...</span>
+                                    <i class="fa fa-sync fa-spin install_framework"></i><span class="install_framework">Loading...</span>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col col-lg-4">Artisan Command</div>
                                 <div class="col col-lg-2">
-                                    <i class="fa fa-sync fa-spin artisan_call"></i><span class="artisan_call">Loadding...</span>
+                                    <i class="fa fa-sync fa-spin artisan_call"></i><span class="artisan_call">Loading...</span>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col col-lg-4">Finished setup</div>
                                 <div class="col col-lg-2">
-                                    <i class="fa fa-sync fa-spin finished_setup"></i><span class="finished_setup">Loadding...</span>
+                                    <i class="fa fa-sync fa-spin finished_setup"></i><span class="finished_setup">Loading...</span>
                                 </div>
                             </div>
                         </div>
@@ -638,7 +641,10 @@
             
 			
             
-			
+			//system requrired recheck
+			$("#systemreg_recheck").on("click", function() {
+				location.reload();
+            });
            
             
             
