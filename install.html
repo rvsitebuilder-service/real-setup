@@ -166,6 +166,9 @@
                             </div>
                         </div>
                         <span id="chk_pre_require_error" class="d-none list-group-item list-group-item-action list-group-item-warning margin-b"></span>
+                        
+                        <button type="button" id="systemreg_recheck" class="btn btn-info">Recheck</button>
+                        
                     </div>
                     <!-- end step block -->
                     
@@ -177,7 +180,7 @@
                                    <div class="col col-lg-4">
                                        <input type="text" class="form-control"
                                            name="dbhost" id="dbhost"
-                                           placeholder="Write your Database Host" required value="">
+                                           placeholder="Write your Database Host" required value="localhost">
                                    </div>
                                    <div class="help-block with-errors"></div>
                                </div>
@@ -324,7 +327,7 @@
 								<div class="col col-lg-2">Admin firstname:</div>
 								<div class="col col-lg-4">
 									<input type="text" class="form-control"
-										pattern="" name="firstname" id="firstname"
+										 name="firstname" id="firstname"
 										placeholder="Write your Firstname" >
 								</div>
 								<div class="help-block with-errors"></div>
@@ -335,7 +338,7 @@
                                 <div class="col col-lg-2">Admin lastname:</div>
                                 <div class="col col-lg-4">
                                     <input type="text" class="form-control"
-                                        pattern="" name="lastname" id="lastname"
+                                         name="lastname" id="lastname"
                                         placeholder="Write your Lastname" >
                                 </div>
                                 <div class="help-block with-errors"></div>
@@ -638,7 +641,10 @@
             
 			
             
-			
+			//system requrired recheck
+			$("#systemreg_recheck").on("click", function() {
+				location.reload();
+            });
            
             
             
