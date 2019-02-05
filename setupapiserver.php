@@ -673,7 +673,23 @@ class RVsitebuilder_Setup_API {
         $src_dir = $homeuser.'/rvsitebuildercms/'.$domainname.'/public';
         $exploded = explode('/',$publicpath);
         $public_html = '/'.end($exploded);
-        $ftpHandler->ftp_copy($src_dir, $public_html);
+        $ftpHandler->ftp_copy($src_dir, $public_html , ['.htaccess']);
+        
+        
+        //write .htaccess to domain'docroot
+        $frameworkhtaccess = '';
+        if (file_exists($homeuser.'/rvsitebuildercms/'.$domainname.'/public/.htaccess')) {
+            $frameworkhtaccess = file_get_contents($homeuser.'/rvsitebuildercms/'.$domainname.'/public/.htaccess');
+        }
+        $oldhtaccess = '';
+        if (file_exists($publicpath.'/.htaccess')) {
+            $oldhtaccess = file_get_contents($publicpath.'/.htaccess');
+        }
+        $writeoldhtaccess = file_put_contents(dirname(__FILE__).'/htaccess.backup' , $oldhtaccess);
+        $writehtaccess =  file_put_contents(dirname(__FILE__).'/htaccess.tmp' , $frameworkhtaccess."\n".$oldhtaccess);
+        $result = $ftpHandler->put(dirname(__FILE__).'/htaccess.backup',$public_html.'/.htaccess.backup',FTP_BINARY);
+        $result = $ftpHandler->put(dirname(__FILE__).'/htaccess.tmp',$public_html.'/.htaccess',FTP_BINARY);
+        
         
         #chmod folder
         $ftpHandler->ftp_change_mod_r($publicpath.'/storage',$public_html.'/storage' , 0777);
@@ -716,7 +732,20 @@ class RVsitebuilder_Setup_API {
         $source = $homeuser.'/rvsitebuildercms/'.$domainname.'/public';
         $destination = $publicpath;
         $files = new File_Handler();
-        $copy = $files->copyDirectory($source, $destination);
+        $copy = $files->copyDirectory($source, $destination,['.htaccess']);
+        
+        
+        //write new .htaccess to domain'docroot
+        $frameworkhtaccess = '';
+        if (file_exists($homeuser.'/rvsitebuildercms/'.$domainname.'/public/.htaccess')) {
+            $frameworkhtaccess = file_get_contents($homeuser.'/rvsitebuildercms/'.$domainname.'/public/.htaccess');
+        }
+        $oldhtaccess = '';
+        if (file_exists($publicpath.'/.htaccess')) {
+            $oldhtaccess = file_get_contents($publicpath.'/.htaccess');
+        }
+        $writeoldhtaccess = file_put_contents($publicpath.'/.htaccess.backup' , $oldhtaccess);
+        $writehtaccess =  file_put_contents($publicpath.'/.htaccess' , $frameworkhtaccess."\n".$oldhtaccess);
         
         
         $this->response['status'] = true;
@@ -1190,7 +1219,7 @@ class FTP_Handler{
      ftp_copy(/home/amarin/public_html/source, dest)
      ftp_copy(/home/amarin/public_html/source, dest/app)
      */
-    function ftp_copy($src_dir, $dst_dir) {
+    function ftp_copy($src_dir, $dst_dir , $ignore = []) {
         $debug = false;
         $chdir = $dst_dir;
         if($debug){
@@ -1203,6 +1232,11 @@ class FTP_Handler{
             $dir = new DirectoryIterator($src_dir);
             foreach($dir as $fileinfo) {
                 $file = $fileinfo->getFilename();
+                
+                if(in_array($file , $ignore)){
+                    continue;
+                }
+                
                 if ($file != "." && $file != "..") {
                     if (is_dir($src_dir."/".$file)) {
                         if (!$this->ftp_is_dir($this->conn_id, $file)) {
@@ -1323,7 +1357,7 @@ class File_Handler{
         return is_dir($directory);
     }
     
-    public function copyDirectory($directory, $destination, $options = null)
+    public function copyDirectory($directory, $destination, $ignore = [], $options = null)
     {
         if (! $this->isDirectory($directory)) {
             return false;
@@ -1338,6 +1372,11 @@ class File_Handler{
         $items = new FilesystemIterator($directory, $options);
         
         foreach ($items as $item) {
+            
+            if(in_array($item->getBasename() , $ignore)){
+                continue;
+            }
+            
             $target = $destination.'/'.$item->getBasename();
             
             if ($item->isDir()) {
