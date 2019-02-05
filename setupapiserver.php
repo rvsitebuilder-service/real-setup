@@ -788,6 +788,76 @@ class RVsitebuilder_Setup_API {
         return true;
     }
     
+    /*
+     * updateuserinfo('1','last_name','bbbbb');
+     */
+    public function updateuserinfo($user_id,$update_key,$update_val){
+        $response = [];
+        $response['success'] = 'true';
+        $response['message'] = '';
+        $db_server_name = getEnvData('DB_HOST');
+        $db_port = getEnvData('DB_PORT');
+        $db_name = getEnvData('DB_DATABASE');
+        $db_user_name = getEnvData('DB_USERNAME');
+        $db_password = getEnvData('DB_PASSWORD');
+        
+        if($update_key == 'password'){
+            $update_val = bcrypt($update_val);
+        }
+        
+        $mysqli = new mysqli($db_server_name, $db_user_name, $db_password, $db_name);
+        if (mysqli_connect_errno()) {
+            $response['success'] = 'false';
+            $response['message'] = sprintf("Connect failed: %s\n", mysqli_connect_error());
+            return $response;
+        }
+        
+        $sql = sprintf('UPDATE `users` SET `%s` = \'%s\', `password_changed_at` = NULL, `deleted_at` = NULL WHERE `users`.`id` = ?;', $update_key, $update_val);
+        
+        if($query = $mysqli->prepare($sql)){
+            $query->bind_param('s', $user_id);
+            $query->execute();
+        } else {
+            $error = $mysqli->errno . ' ' . $mysqli->error;
+            $response['success'] = 'false';
+            $response['message'] = $error;
+            return $response;
+        }
+        return $response;
+    }
+    
+    public function getEnvData($envKey = ''){
+        
+        $valuefromkey = '';
+        
+        if($envKey != ''){
+            //set path for /home/user or /var/www
+            $envPath = self::_getUserPath();
+            
+            // Read .env-file
+            //$env = file_get_contents(base_path() . '/.env');
+            $env = file_get_contents($envPath['home'] . '/.env');
+            
+            // Split string on every " " and write into array
+            $env = preg_split('/\s+/', $env);
+            
+            // Loop through .env-data
+            foreach($env as $env_key => $env_value){
+                // Turn the value into an array and stop after the first split
+                // So it's not possible to split e.g. the App-Key by accident
+                $entry = explode("=", $env_value, 2);
+                //check for comment #KEY (#) too
+                if($entry[0] == $envKey || substr($entry[0],1) == $envKey){
+                    // If yes, get value from key
+                    $valuefromkey = $entry[1];
+                }
+            }
+            
+        }
+        
+        return $valuefromkey;
+    }
+    
     public function setEnv($env_file,$env_data = [],$force = false){
         
         if(count($env_data) > 0){
