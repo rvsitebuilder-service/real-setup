@@ -641,6 +641,9 @@ class RVsitebuilder_Setup_API {
     
     function copyFileFTP($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport) {
         
+        //TODO remove first if /home/<user>/rvsitebuildercms/$domainname
+        
+        
         $src_dir = $publicpath.'/rvsitebuilder/tmp';
         $ftp_remote_dir = '/rvsitebuildercms/'.$domainname;
         
@@ -691,6 +694,11 @@ class RVsitebuilder_Setup_API {
     }
     
     function copyFileDefault($homeuser,$domainname,$publicpath) {
+        
+        //remove first if /home/<user>/rvsitebuildercms/$domainname
+        if(file_exists($homeuser.'/rvsitebuildercms/'.$domainname)) {
+            $this->rrmdir($homeuser.'/rvsitebuildercms/'.$domainname);
+        }
         
         //move temp to freamwork path
         $files = scandir(dirname(__FILE__).'/tmp');
