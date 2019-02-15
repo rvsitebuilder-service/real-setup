@@ -6,51 +6,32 @@ use GuzzleHttp\Client;
 use splitbrain\PHPArchive\Tar;
 
 $headers                = apache_request_headers();
-$responsetype           = (isset($_SESSION['responsetype'])) ?  $_SESSION['responsetype'] : 'application/json';
-$action                 = (isset($_SESSION['action'])) ? $_SESSION['action'] : '';
-$rvsb_installing_token  = (isset($_SESSION['rvsb_installing_token'])) ? $_SESSION['rvsb_installing_token'] : '';
-$firstreg               = (isset($_SESSION['firstreg'])) ? $_SESSION['firstreg'] : false;
-$homeuser               = (isset($_SESSION['homeuser'])) ? $_SESSION['homeuser'] : '';
-$domainname             = (isset($_SESSION['domainname'])) ? $_SESSION['domainname'] : '';
-$publicpath             = (isset($_SESSION['public_path'])) ? $_SESSION['public_path'] : '';
-$dbhost                 = (isset($_SESSION['dbhost'])) ? $_SESSION['dbhost'] : '';
-$dbname                 = (isset($_SESSION['dbname'])) ? $_SESSION['dbname'] : '';
-$dbuser                 = (isset($_SESSION['dbuser'])) ? $_SESSION['dbuser'] : '';
-$dbpassword             = (isset($_SESSION['dbpassword'])) ? $_SESSION['dbpassword'] : '';
-$ftpaccount             = (isset($_SESSION['ftpaccount'])) ? $_SESSION['ftpaccount'] : '';
-$ftppassword            = (isset($_SESSION['ftppassword'])) ? $_SESSION['ftppassword'] : '';
-$appname                = (isset($_SESSION['appname'])) ? $_SESSION['appname'] : 'RVsitebuilder';
-$ftpserver              = (isset($_SESSION['ftpserver'])) ? $_SESSION['ftpserver'] : '';
-$ftpport                = (isset($_SESSION['ftpport'])) ? $_SESSION['ftpport'] : '';
-
-
-//request from installer wizard
-$call_action            = (isset($_GET['call_action']) ? $_GET['call_action'] : '');
-$call_responsetype      = (isset($headers['Accept'])) ? $headers['Accept'] : 'application/json';
-$ignore_token           = (isset($headers['Ignore-Token'])) ? $headers['Ignore-Token'] : 0;
-$dbhost                 = (isset($_GET['db_host'])) ? $_GET['db_host'] : $dbhost;
-$dbname                 = (isset($_GET['db_name'])) ? $_GET['db_name'] : $dbname;
-$dbuser                 = (isset($_GET['db_user'])) ? $_GET['db_user'] : $dbuser;
-$dbpassword             = (isset($_GET['db_pass'])) ? $_GET['db_pass'] : $dbpassword;
-$ftpserver              = (isset($_GET['ftp_server'])) ? $_GET['ftp_server'] : $ftpserver;
-$ftpaccount             = (isset($_GET['ftp_account'])) ? $_GET['ftp_account'] : $ftpaccount;
-$ftppassword            = (isset($_GET['ftp_password'])) ? $_GET['ftp_password'] : $ftppassword;
-$ftpport                = (isset($_GET['ftp_port'])) ? $_GET['ftp_port'] : $ftpport;
-$domainname             = (isset($_GET['domainname'])) ? $_GET['domainname'] : $domainname;
-$publicpath             = (isset($_GET['public_path'])) ? $_GET['public_path'] : $publicpath;
-$appname                = (isset($_GET['appname'])) ? $_GET['appname'] : $appname;
-$homeuser               = (isset($_GET['homeuser'])) ? $_GET['homeuser'] : $homeuser;
-$adminemail             = (isset($_GET['adminemail'])) ? $_GET['adminemail'] : '';
-$adminpassword          = (isset($_GET['adminpassword'])) ? $_GET['adminpassword'] : '';
-$adminfirstname         = (isset($_GET['adminfirstname'])) ? $_GET['adminfirstname'] : '';
-$adminlastname          = (isset($_GET['adminlastname'])) ? $_GET['adminlastname'] : '';
+$responsetype           = (isset($headers['Accept']))                   ? $headers['Accept']                : 'application/json';
+$action                 = (isset($headers['Ignore-Token']))             ? $headers['Ignore-Token']          : 0;
+$rvsb_installing_token  = (isset($headers['Rvsb-installing-Token']))    ? $headers['Rvsb-installing-Token'] : 0;
+$homeuser               = (isset($_GET['homeuser']))                    ? $_GET['homeuser']         : '';
+$domainname             = (isset($_GET['domainname']))                  ? $_GET['domainname']       : '';
+$publicpath             = (isset($_GET['publicpath']))                  ? $_GET['publicpath']       : '';
+$dbhost                 = (isset($_GET['dbhost']))                      ? $_GET['dbhost']           : '';
+$dbname                 = (isset($_GET['dbname']))                      ? $_GET['dbname']           : '';
+$dbuser                 = (isset($_GET['dbuser']))                      ? $_GET['dbuser']           : '';
+$dbpassword             = (isset($_GET['dbpass']))                      ? $_GET['dbpass']           : '';
+$ftpaccount             = (isset($_GET['ftpaccount']))                  ? $_GET['ftpaccount']       : '';
+$ftppassword            = (isset($_GET['ftppassword']))                 ? $_GET['ftppassword']      : '';
+$appname                = (isset($_GET['appname']))                     ? $_GET['appname']          : 'RVsitebuilder';
+$ftpserver              = (isset($_GET['ftpserver']))                   ? $_GET['ftpserver']        : '';
+$ftpport                = (isset($_GET['ftp_port']))                    ? $_GET['ftp_port']         : 21;
+$adminemail             = (isset($_GET['adminemail']))                  ? $_GET['adminemail']       : '';
+$adminpassword          = (isset($_GET['adminpassword']))               ? $_GET['adminpassword']    : '';
+$adminfirstname         = (isset($_GET['adminfirstname']))              ? $_GET['adminfirstname']   : '';
+$adminlastname          = (isset($_GET['adminlastname']))               ? $_GET['adminlastname']    : '';
 
 
 
 $setupObj = new RVsitebuilder_Setup_API($responsetype,$rvsb_installing_token,$call_responsetype,$ignore_token);
 
 
-if( ($action == '' && $firstreg) && $call_action == '') {
+if($action == '' && !file_exists(dirname(__FILE__).'/.Rvsb-Installing-Token' && $rvsb_installing_token == 0)) {
     $setupObj->send_token();
 }
 
@@ -149,7 +130,6 @@ class RVsitebuilder_Setup_API {
         $this->response['message'] = '';
         
         //verify token
-        $this->regtoken = $rvsb_installing_token;
         $this->verify_token($rvsb_installing_token,$ignore_token);
         
         $this->httpasuser = $this->gethttpasuser();
@@ -159,8 +139,6 @@ class RVsitebuilder_Setup_API {
         
         //get latest version
         $this->getlatestversion = $this->check_getlatestversion();
-        
-        
         
     }
     
@@ -181,12 +159,15 @@ class RVsitebuilder_Setup_API {
     }
     
     public function verify_token($rvsb_installing_token='',$ignore_token=0) {
-        if($ignore_token == 0) {
-            if(! file_exists(dirname(__FILE__).'/.Rvsb-Installing-Token') ) {
-                $this->response['message'] = 'Wrong!!!! token file';
-                $this->clear_session();
-                return $this->print_response($this->response);
-            }
+        if($ignore_token == 1) {
+            return true;
+        }
+        
+        if((!file_exists(dirname(__FILE__).'/.Rvsb-Installing-Token') && ($rvsb_installing_token == 0))) {
+            return true;
+        }
+        
+        if((file_exists(dirname(__FILE__).'/.Rvsb-Installing-Token') && ($rvsb_installing_token != 0)) ){
             $tokenvalue = file_get_contents(dirname(__FILE__).'/.Rvsb-Installing-Token');
             if(trim($tokenvalue) != trim($rvsb_installing_token)){
                 $this->response['message'] = 'Wrong!!!!';
@@ -194,47 +175,118 @@ class RVsitebuilder_Setup_API {
                 return $this->print_response($this->response);
             }
         }
+        return true;
     }
     
     public function send_token() {
         $this->response['status'] = true;
-        $this->response['rvsb_installing_token'] = $this->regtoken;
+        $this->response['rvsb_installing_token'] = $this->generateSecretKey(128);
+        file_put_contents(dirname(__FILE__).'/.Rvsb-Installing-Token', $this->response['rvsb_installing_token']);
         $this->clear_session();
         return $this->print_response($this->response);
     }
     
     public function pre_check_php() {
         
-        //php version
-        $phpversion = '7.1.3';
-        if (version_compare(PHP_VERSION, $phpversion) < 0) {
-            $this->response['message'] = 'System required PHP Version > = 7.1.3';
-            return $this->print_response($this->response);
-        }
-        
-        //php extension
-        $phpextension = ['mysqlnd','pdo','gd','curl','iconv','mbstring','fileinfo','exif','zip'];
-        foreach ($phpextension as $extension) {
-            if (!extension_loaded($extension)) {
-                $this->response['message'] = 'Can not load PHP Extension ('.$extension.')';
-                return $this->print_response($this->response);
-            }
-        }
-        
-        //php config
-        $iniconfig = ['allow_url_fopen' => 1,'memory_limit' => 64];
-        if(ini_get('allow_url_fopen') != $iniconfig['allow_url_fopen']){
-            $this->response['message'] = 'Error php.ini, Must set allow_url_fopen=ON';
-            return $this->print_response($this->response);
-        }
-        preg_match('/([0-9]+)/',ini_get('memory_limit'),$match);
-        if($match[0] < $iniconfig['memory_limit']) {
-            $this->response['message'] = 'Error php.ini, Set Memory limit at least 64M.';
-            return $this->print_response($this->response);
-        }
-        
         $this->response['status'] = true;
-        $this->response['message'] = 'PHP Version,Extentsion,INI OK';
+        
+        //php version
+        $this->response['check_pre_require']['phpversion']['check'] = true;
+        if (version_compare(PHP_VERSION, '7.1.3') < 0) {
+            $this->response['check_pre_require']['phpversion']['check'] = false;
+            $this->response['check_pre_require']['phpversion']['reason'] = 'System required PHP Version > = 7.1.3';
+            $this->response['message'] = 'System required PHP Version > = 7.1.3';
+            $this->response['status'] = false;
+        }
+        //php extension
+        $this->response['check_pre_require']['mysqlnd']['check'] = true;
+        if (!extension_loaded('mysqlnd')) {
+            $this->response['check_pre_require']['mysqlnd']['check'] = false;
+            $this->response['check_pre_require']['mysqlnd']['reason'] = 'Can not load PHP Extension (mysqlnd)';
+            $this->response['message'] = $this->response['message'].' / Can not load PHP Extension (mysqlnd)';
+            $this->response['status'] = false;
+        }
+        $this->response['check_pre_require']['pdo']['check'] = true;
+        if (!extension_loaded('pdo')) {
+            $this->response['check_pre_require']['pdo']['check'] = false;
+            $this->response['check_pre_require']['pdo']['reason'] = 'Can not load PHP Extension (pdo)';
+            $this->response['message'] = $this->response['message'].' / Can not load PHP Extension (pdo)';
+            $this->response['status'] = false;
+        }
+        $this->response['check_pre_require']['gd']['check'] = true;
+        if (!extension_loaded('gd')) {
+            $this->response['check_pre_require']['gd']['check'] = false;
+            $this->response['check_pre_require']['gd']['reason'] = 'Can not load PHP Extension (gd)';
+            $this->response['message'] = $this->response['message'].' / Can not load PHP Extension (gd)';
+            $this->response['status'] = false;
+        }
+        $this->response['check_pre_require']['curl']['check'] = true;
+        if (!extension_loaded('curl')) {
+            $this->response['check_pre_require']['curl']['check'] = false;
+            $this->response['check_pre_require']['curl']['reason'] = 'Can not load PHP Extension (curl)';
+            $this->response['message'] = $this->response['message'].' / Can not load PHP Extension (curl)';
+            $this->response['status'] = false;
+        }
+        $this->response['check_pre_require']['iconv']['check'] = true;
+        if (!extension_loaded('iconv')) {
+            $this->response['check_pre_require']['iconv']['check'] = false;
+            $this->response['check_pre_require']['iconv']['reason'] = 'Can not load PHP Extension (iconv)';
+            $this->response['message'] = $this->response['message'].' / Can not load PHP Extension (iconv)';
+            $this->response['status'] = false;
+        }
+        $this->response['check_pre_require']['mbstring']['check'] = true;
+        if (!extension_loaded('mbstring')) {
+            $this->response['check_pre_require']['mbstring']['check'] = false;
+            $this->response['check_pre_require']['mbstring']['reason'] = 'Can not load PHP Extension (mbstring)';
+            $this->response['message'] = $this->response['message'].' / Can not load PHP Extension (mbstring)';
+            $this->response['status'] = false;
+        }
+        $this->response['check_pre_require']['fileinfo']['check'] = true;
+        if (!extension_loaded('fileinfo')) {
+            $this->response['check_pre_require']['fileinfo']['check'] = false;
+            $this->response['check_pre_require']['fileinfo']['reason'] = '';
+            $this->response['message'] = $this->response['message'].' / Can not load PHP Extension (fileinfo)';
+            $this->response['status'] = false;
+        }
+        $this->response['check_pre_require']['exif']['check'] = true;
+        if (!extension_loaded('exif')) {
+            $this->response['check_pre_require']['exif']['check'] = false;
+            $this->response['check_pre_require']['exif']['reason'] = 'Can not load PHP Extension (exif)';
+            $this->response['message'] = $this->response['message'].' / Can not load PHP Extension (exif)';
+            $this->response['status'] = false;
+        }
+        $this->response['check_pre_require']['zip']['check'] = true;
+        if (!extension_loaded('zip')) {
+            $this->response['check_pre_require']['zip']['check'] = false;
+            $this->response['check_pre_require']['zip']['reason'] = 'Can not load PHP Extension (zip)';
+            $this->response['message'] = $this->response['message'].' / Can not load PHP Extension (zip)';
+            $this->response['status'] = false;
+        }
+        //php config
+        $this->response['check_pre_require']['allow_url_fopen']['check'] = true;
+        if (ini_get('allow_url_fopen') != 1) {
+            $this->response['check_pre_require']['allow_url_fopen']['check'] = false;
+            $this->response['check_pre_require']['allow_url_fopen']['reason'] = 'php.ini, Must set allow_url_fopen=ON';
+            $this->response['message'] = $this->response['message'].' / php.ini, Must set allow_url_fopen=ON';
+            $this->response['status'] = false;
+        }
+        $this->response['check_pre_require']['memory_limit']['check'] = true;
+        preg_match('/([0-9]+)/',ini_get('memory_limit'),$match);
+        if($match[0] < 64) {
+            $this->response['check_pre_require']['memory_limit']['check'] = false;
+            $this->response['check_pre_require']['memory_limit']['reason'] = 'php.ini, Set Memory limit at least 64M.';
+            $this->response['message'] = $this->response['message'].' / php.ini, Set Memory limit at least 64M.';
+            $this->response['status'] = false;
+        }
+        
+        
+        if($this->response['status'] == true) {
+            $this->response['message'] = "PHP Version,Extentsion,INI OK";
+        }
+        
+        //http as user
+        $this->response['httpasuser'] = $this->httpasuser;
+        
         $this->clear_session();
         return $this->print_response($this->response);
         
@@ -687,7 +739,9 @@ class RVsitebuilder_Setup_API {
         }
         $writeoldhtaccess = file_put_contents(dirname(__FILE__).'/htaccess.backup' , $oldhtaccess);
         $writehtaccess =  file_put_contents(dirname(__FILE__).'/htaccess.tmp' , $frameworkhtaccess."\n".$oldhtaccess);
-        $result = $ftpHandler->put(dirname(__FILE__).'/htaccess.backup',$public_html.'/.htaccess.backup',FTP_BINARY);
+        if(trim($oldhtaccess) != ''){
+            $result = $ftpHandler->put(dirname(__FILE__).'/htaccess.backup',$public_html.'/.htaccess.backup',FTP_BINARY);
+        }
         $result = $ftpHandler->put(dirname(__FILE__).'/htaccess.tmp',$public_html.'/.htaccess',FTP_BINARY);
         
         
@@ -744,7 +798,9 @@ class RVsitebuilder_Setup_API {
         if (file_exists($publicpath.'/.htaccess')) {
             $oldhtaccess = file_get_contents($publicpath.'/.htaccess');
         }
-        $writeoldhtaccess = file_put_contents($publicpath.'/.htaccess.backup' , $oldhtaccess);
+        if(trim($oldhtaccess) != ''){
+            $writeoldhtaccess = file_put_contents($publicpath.'/.htaccess.backup' , $oldhtaccess);
+        }
         $writehtaccess =  file_put_contents($publicpath.'/.htaccess' , $frameworkhtaccess."\n".$oldhtaccess);
         
         
@@ -1065,6 +1121,13 @@ class RVsitebuilder_Setup_API {
             $this->response['check_pre_require']['memory_limit']['reason'] = '';
         }
         
+        //php function
+        $this->response['check_pre_require']['proc_open']['check'] = true;
+        if (!function_exists('proc_open')) {
+            $this->response['check_pre_require']['proc_open']['check'] = false;
+            $this->response['check_pre_require']['proc_open']['reason'] = '';
+        }
+        
         $this->response['status'] = true;
         return $this->print_response($this->response);
     }
@@ -1382,7 +1445,7 @@ class File_Handler{
             if ($item->isDir()) {
                 $path = $item->getPathname();
                 
-                if (! $this->copyDirectory($path, $target, $options)) {
+                if (! $this->copyDirectory($path, $target, $ignore, $options)) {
                     return false;
                 }
             }
