@@ -39,62 +39,62 @@ if($action == 'pre_check_php'){
     $setupObj->pre_check_php();
 }
 
-if($action == 'download_framework' || $call_action == 'download_framework'){
+if($action == 'download_framework'){
     $setupObj->download_framework();
 }
 
-if($action == 'download_vendor' || $call_action == 'download_vendor'){
+if($action == 'download_vendor'){
     $setupObj->download_vendor();
 }
 
-if($action == 'setup_env' || $call_action == 'setup_env'){
+if($action == 'setup_env'){
     $setupObj->setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname,$ftpserver,$ftpport);
 }
 
-if($action == 'install_common_pkg' || $call_action == 'install_common_pkg'){
+if($action == 'install_common_pkg'){
     $setupObj->install_common_pkg();
 }
 
-if(($action == 'install_all_pkg' || $call_action == 'install_all_pkg' ) && $homeuser != '' && $domainname != '' && $publicpath != ''){
+if($action == 'install_all_pkg' && $homeuser != '' && $domainname != '' && $publicpath != ''){
     $setupObj->install_all_pkg($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport);
 }
 
-if($action == 'artisan_call' || $call_action == 'artisan_call'){
+if($action == 'artisan_call'){
     $setupObj->artisan_call($homeuser,$domainname,$publicpath,$adminemail,$adminpassword,$adminfirstname,$adminlastname);
 }
 
-if($action == 'finished_setup' || $call_action == 'finished_setup'){
+if($action == 'finished_setup'){
     $setupObj->finished_setup($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport);
 }
 
-if($action == 'remove_installer_api' || $call_action == 'remove_installer_api'){
+if($action == 'remove_installer_api'){
     $setupObj->remove_installer_api();
 }
 
 
 //call from wizard
-if($call_action == 'get_user_path'){
+if($action == 'get_user_path'){
     $setupObj->get_user_path();
 }
-if($call_action == 'test_database_connect') {
+if($action == 'test_database_connect') {
     $setupObj->test_database_connect($dbhost,$dbname,$dbuser,$dbpassword);
 }
-if($call_action == 'check_pre_require') {
+if($action == 'check_pre_require') {
     $setupObj->check_pre_require();
 }
-if($call_action == 'check_http_as_user') {
+if($action == 'check_http_as_user') {
     $setupObj->check_http_as_user();
 }
-if($call_action == 'test_ftp_connect') {
+if($action == 'test_ftp_connect') {
     $setupObj->test_ftp_connect($ftpserver,$ftpaccount,$ftppassword,$ftpport);
 }
-if($call_action == 'check_license') {
+if($action == 'check_license') {
     $setupObj->check_license();
 }
-if($call_action == 'disk_required') {
+if($action == 'disk_required') {
     $setupObj->disk_required();
 }
-if($call_action == 'test_database_ftp_connect') {
+if($action == 'test_database_ftp_connect') {
     $setupObj->test_database_ftp_connect($dbhost,$dbname,$dbuser,$dbpassword,$ftpserver,$ftpaccount,$ftppassword,$ftpport);
 }
 
@@ -113,13 +113,12 @@ class RVsitebuilder_Setup_API {
     protected $downloadurl;
     protected $debug;
     protected $httpasuser;
-    protected $getlatestversion;
+    protected $getversion;
     protected $call_responsetype;
+    protected $removeinstallerpath;
     
     public function __construct($responsetype,$rvsb_installing_token,$call_responsetype,$ignore_token)
     {   
-        //debug var
-        $this->debug = false;
         
         //response type
         $this->responseType = $responsetype;
@@ -134,31 +133,50 @@ class RVsitebuilder_Setup_API {
         
         $this->httpasuser = $this->gethttpasuser();
         
-        //download url
-        $this->downloadurl = 'https://files.mirror1.rvsitebuilder.com/download';
+        //get installation configfunction getInstallerConfig() {
+        $installconfig =  $this->getInstallerConfig();
         
         //get latest version
-        $this->getlatestversion = $this->check_getlatestversion();
-        
+        $this->getversion = $installconfig['getversion'];
+        //download url
+        $this->downloadurl = $installconfig['mirror'];
+        //debug var
+        $this->debug = $installconfig['debug'];
+        //install_log
+        $this->install_log =  $installconfig['install_log'];
+        //remove installer path
+        $this->removeinstallerpath = $installconfig['removeinstallerpath'];
     }
     
-    public function check_getlatestversion(){
-        if(file_exists(dirname(__FILE__).'/.getlatestversion')) {
-            return true;
+    public function getInstallerConfig() {
+        //defaultconfig
+        $defconfig = parse_ini_file(dirname(__FILE__).'/rvsitebuilderinstallerconfig_dist/config.ini');
+        
+        //overwrite installer config by user (in public path /home/user/public_html/)
+        $userconfig = [];
+        if(file_exists(__DIR__.'/../.rvsitebuilderinstallerconfig/config.ini')) {
+            $userconfig = parse_ini_file(__DIR__.'/../.rvsitebuilderinstallerconfig/config.ini');
         }
-        return false;
+        return array_merge($defconfig,$userconfig);
     }
+    
     
     public function gethttpasuser() {
-        $homepath_owner = posix_getpwuid(fileowner($_SERVER["DOCUMENT_ROOT"]))['name'];
-        $site_run_as = posix_getpwuid(posix_geteuid())['name'];
-        if($homepath_owner == $site_run_as){
-            return true;
+        $this->print_debug_log(__METHOD__);
+        
+        if(function_exists('posix_getpwuid')){
+            $homepath_owner = posix_getpwuid(fileowner($_SERVER["DOCUMENT_ROOT"]))['name'];
+            $site_run_as = posix_getpwuid(posix_geteuid())['name'];
+            if($homepath_owner == $site_run_as){
+                return true;
+            }
         }
         return false;
     }
     
     public function verify_token($rvsb_installing_token='',$ignore_token=0) {
+        $this->print_debug_log(__METHOD__);
+        
         if($ignore_token == 1) {
             return true;
         }
@@ -179,6 +197,8 @@ class RVsitebuilder_Setup_API {
     }
     
     public function send_token() {
+        $this->print_debug_log(__METHOD__);
+        
         $this->response['status'] = true;
         $this->response['rvsb_installing_token'] = $this->generateSecretKey(128);
         file_put_contents(dirname(__FILE__).'/.Rvsb-Installing-Token', $this->response['rvsb_installing_token']);
@@ -187,6 +207,7 @@ class RVsitebuilder_Setup_API {
     }
     
     public function pre_check_php() {
+        $this->print_debug_log(__METHOD__);
         
         $this->response['status'] = true;
         
@@ -278,6 +299,15 @@ class RVsitebuilder_Setup_API {
             $this->response['message'] = $this->response['message'].' / php.ini, Set Memory limit at least 64M.';
             $this->response['status'] = false;
         }
+        //php function posix_getpwuid
+        $this->response['check_pre_require']['posix_getpwuid']['check'] = true;
+        if(! function_exists('posix_getpwuid')){
+            $this->response['check_pre_require']['posix_getpwuid']['check'] = false;
+            $this->response['check_pre_require']['posix_getpwuid']['reason'] = 'Can not load PHP Function (posix_getpwuid)';
+            $this->response['message'] = $this->response['message'].' / Can not load PHP Function (posix_getpwuid)';
+            $this->response['status'] = false;
+        }
+        
         
         
         if($this->response['status'] == true) {
@@ -293,10 +323,13 @@ class RVsitebuilder_Setup_API {
     }
     
     public function download_framework() {
+        $this->print_debug_log(__METHOD__);
         
         //download framework
-        $downloadurl = ($this->getlatestversion) ? $this->downloadurl.'/rvsitebuilder/framework/tier/latest' 
-                                                 : $this->downloadurl.'/rvsitebuilder/framework' ;
+        $downloadurl =  $this->downloadurl.'/rvsitebuilder/framework';
+        if($this->getversion == 'latest') { $downloadurl = $this->downloadurl.'/rvsitebuilder/framework/tier/latest'; }
+        elseif(preg_match('/[0-9]+\.[0-9]+\.[0-9]+)/',$this->getversion)) { $downloadurl = $this->downloadurl.'/rvsitebuilder/framework/version/'.$this->getversion; }
+       
         $downloadframework = $this->download('GET' , $downloadurl , dirname(__FILE__).'/framework.tar.gz');
         if(! $downloadframework){
             $this->response['message'] = 'Can not download framework';
@@ -317,6 +350,7 @@ class RVsitebuilder_Setup_API {
     } 
     
     public function download_vendor() {
+        $this->print_debug_log(__METHOD__);
         
         //check rvsitebuilder.json
         if(! file_exists(dirname(__FILE__).'/tmp/rvsitebuilder.json')){
@@ -402,6 +436,7 @@ class RVsitebuilder_Setup_API {
     
     
     public function setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname,$ftpserver,$ftpport) {
+        $this->print_debug_log(__METHOD__);
         
         //TODO clear whitespace
         if (preg_match('/\s/',$appname)) $appname = '"'.$appname.'"';
@@ -420,7 +455,7 @@ class RVsitebuilder_Setup_API {
         $env_data['DOCUMENT_ROOT'] = $publicpath;
         
         if($this->setEnv(dirname(__FILE__).'/tmp/env.example',$env_data,true)) {
-            rename(dirname(__FILE__).'/tmp/env.example',dirname(__FILE__).'/tmp/.env');
+            //rename(dirname(__FILE__).'/tmp/env.example',dirname(__FILE__).'/tmp/.env');
             $this->response['status'] = true;
             $this->response['message'] = 'Setup .env Success';
             $this->clear_session();
@@ -434,6 +469,8 @@ class RVsitebuilder_Setup_API {
     
     
     public function install_common_pkg() {
+        $this->print_debug_log(__METHOD__);
+        
         $commonpkg = [  'blog',
                         'core',
                         'email',
@@ -444,8 +481,9 @@ class RVsitebuilder_Setup_API {
                     ];
         
         foreach ($commonpkg as $pkg) {
-            $downloadurl = ($this->getlatestversion) ? $this->downloadurl.'/rvsitebuilder/'.$pkg.'/tier/latest' 
-                                                     : $this->downloadurl.'/rvsitebuilder/'.$pkg ;
+            $downloadurl = $this->downloadurl.'/rvsitebuilder/'.$pkg ;
+            if($this->getversion == 'latest') { $downloadurl = $this->downloadurl.'/rvsitebuilder/'.$pkg.'/tier/latest'; } 
+
             $downloadpkg = $this->download('GET' , $downloadurl , dirname(__FILE__).'/'.$pkg.'.tar.gz');
             if(! $downloadpkg){
                 $this->response['message'] = 'Can not download package '.$pkg;
@@ -504,6 +542,7 @@ class RVsitebuilder_Setup_API {
     
     
     public function artisan_call($homeuser,$domainname,$publicpath,$adminemail,$adminpassword,$adminfirstname,$adminlastname) {
+        $this->print_debug_log(__METHOD__);
         
         //loader
         // /home/arnut/rvsitebuildercms/arnut.cpdev1.rvglobalsoft.net/vendor/autoload.php
@@ -533,35 +572,26 @@ class RVsitebuilder_Setup_API {
         
         //Common
         $kernel->call('key:generate', []);
-        $this->print_debug($kernel->output());
-        $this->install_log($kernel->output());
+        $this->print_install_log($kernel->output());
         $kernel->call('migrate', ['--force'=>true]);
-        $this->print_debug($kernel->output());
-        $this->install_log($kernel->output());
+        $this->print_install_log($kernel->output());
         $kernel->call('db:seed', ['--force'=>true]);
-        $this->print_debug($kernel->output());
-        $this->install_log($kernel->output());
+        $this->print_install_log($kernel->output());
         //user secret key
         $kernel->call('rvsitebuilder:updateenduserdb-run', ['secretkey' => $this->generateSecretKey()]);
-        $this->print_debug($kernel->output());
-        $this->install_log($kernel->output());
+        $this->print_install_log($kernel->output());
         //vendor publish
         $kernel->call('vendor:publish', ['--tag'=> 'public','--force' => true]);
-        $this->print_debug($kernel->output());
-        $this->install_log($kernel->output());
+        $this->print_install_log($kernel->output());
         //clear cache
         $kernel->call('cache:clear', []);
-        $this->print_debug($kernel->output());
-        $this->install_log($kernel->output());
+        $this->print_install_log($kernel->output());
         $kernel->call('config:clear', []);
-        $this->print_debug($kernel->output());
-        $this->install_log($kernel->output());
+        $this->print_install_log($kernel->output());
         $kernel->call('route:clear', []);
-        $this->print_debug($kernel->output());
-        $this->install_log($kernel->output());
+        $this->print_install_log($kernel->output());
         $kernel->call('view:clear', []);
-        $this->print_debug($kernel->output());
-        $this->install_log($kernel->output());
+        $this->print_install_log($kernel->output());
         //update admin info from wizard request
         if($adminemail != '' && $adminpassword != '') {
             $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'email', 'update_val' => $adminemail]);
@@ -571,22 +601,15 @@ class RVsitebuilder_Setup_API {
         }
         
         
-        
-        
         $this->response['status'] = true;
         $this->response['message'] = 'Artisan Command Success';
         $this->clear_session();
         return $this->print_response($this->response);
     }
     
-    public function install_log($output) {
-        $logfile = fopen(dirname(__FILE__)."/install_log","a");
-        fwrite($logfile , "\n".$output);
-        fclose($logfile);
-        return true;
-    }
-    
     public function finished_setup($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport) {
+        $this->print_debug_log(__METHOD__);
+        
         //touch install completed
         if($this->httpasuser){
             file_put_contents($homeuser.'/rvsitebuildercms/'.$domainname.'/INSTALL_COMPLETED', '');
@@ -619,8 +642,10 @@ class RVsitebuilder_Setup_API {
     
     
     public function remove_installer_api() {
+        $this->print_debug_log(__METHOD__);
+        
         //remove file
-        if(! file_exists(dirname(__FILE__).'/.rvsitebuilderinstallerdebug')) {
+        if(! $this->removeinstallerpath == true) {
             if ( file_exists(dirname(__FILE__).'/.Rvsb-Installing-Token') ) unlink(dirname(__FILE__).'/.Rvsb-Installing-Token');
             if ( file_exists(dirname(__FILE__).'/framework.tar.gz') ) unlink(dirname(__FILE__).'/framework.tar.gz');
             if ( file_exists(dirname(__FILE__).'/bundle_vendor.tar.gz') ) unlink(dirname(__FILE__).'/bundle_vendor.tar.gz');
@@ -635,8 +660,6 @@ class RVsitebuilder_Setup_API {
             if ( file_exists(dirname(__FILE__).'/wysiwyg.tar.gz') ) unlink(dirname(__FILE__).'/wysiwyg.tar.gz');
             if ( file_exists(dirname(__FILE__).'/composer.json') ) unlink(dirname(__FILE__).'/composer.json');
             if ( file_exists(dirname(__FILE__).'/composer.lock') ) unlink(dirname(__FILE__).'/composer.lock');
-            if ( file_exists(dirname(__FILE__).'/error_log') ) unlink(dirname(__FILE__).'/error_log');
-            if ( file_exists(dirname(__FILE__).'/install_log') ) unlink(dirname(__FILE__).'/install_log');
             if ( file_exists(dirname(__FILE__).'/INSTALL_COMPLETED') ) unlink(dirname(__FILE__).'/INSTALL_COMPLETED');
             if ( file_exists(dirname(__FILE__).'/install.html') ) unlink(dirname(__FILE__).'/install.html');
             if ( file_exists(dirname(__FILE__).'/install.php') ) unlink(dirname(__FILE__).'/install.php');
@@ -659,6 +682,8 @@ class RVsitebuilder_Setup_API {
     
     
     public function generateSecretKey($length = 64) {
+        $this->print_debug_log(__METHOD__);
+        
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $charactersLength = strlen($characters);
         $randstring = '';
@@ -669,17 +694,11 @@ class RVsitebuilder_Setup_API {
     }
     
     
-    public function print_debug($data) {
-        if($this->debug) {
-            echo '<pre>';
-            print_r($data);
-            echo '</pre>';
-        }
-        return true;
-    }
+   
     
     
     public function install_all_pkg($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport) {
+        $this->print_debug_log(__METHOD__);
         
         if($this->httpasuser == true) {
             $this->copyFileDefault($homeuser,$domainname,$publicpath);
@@ -692,6 +711,7 @@ class RVsitebuilder_Setup_API {
     }
     
     function copyFileFTP($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport) {
+        $this->print_debug_log(__METHOD__);
         
         //TODO remove first if /home/<user>/rvsitebuildercms/$domainname
         
@@ -764,6 +784,7 @@ class RVsitebuilder_Setup_API {
     }
     
     function copyFileDefault($homeuser,$domainname,$publicpath) {
+        $this->print_debug_log(__METHOD__);
         
         //remove first if /home/<user>/rvsitebuildercms/$domainname
         if(file_exists($homeuser.'/rvsitebuildercms/'.$domainname)) {
@@ -811,6 +832,8 @@ class RVsitebuilder_Setup_API {
     
     
     function chmod_r($path,$perm) {
+        $this->print_debug_log(__METHOD__);
+        
         if(!is_dir($path)) {
             return true;
         }
@@ -826,6 +849,8 @@ class RVsitebuilder_Setup_API {
     
     
     public function download($type, $url, $sink) {
+        $this->print_debug_log(__METHOD__);
+        
         $client = new Client([
                                 'curl'            => [CURLOPT_SSL_VERIFYPEER => false, CURLOPT_SSL_VERIFYHOST => false],
                                 'allow_redirects' => false,
@@ -840,6 +865,8 @@ class RVsitebuilder_Setup_API {
     }
     
     public function extract($file,$path) {
+        $this->print_debug_log(__METHOD__);
+        
         $tar = new Tar();
         $tar->open($file);
         $tar->extract($path);
@@ -848,6 +875,8 @@ class RVsitebuilder_Setup_API {
     
     
     public function print_response($data) {
+        $this->print_debug_log(__METHOD__);
+        
         if($this->responseType == 'application/json' || $this->call_responsetype == 'application/json') {
             header('Content-type: application/json');
         }
@@ -857,6 +886,8 @@ class RVsitebuilder_Setup_API {
     
     
     public function clear_session() {
+        $this->print_debug_log(__METHOD__);
+        
         if(isset($_SESSION)){
             session_destroy();
             $_SESSION = [];
@@ -866,6 +897,8 @@ class RVsitebuilder_Setup_API {
     
     
     public function rrmdir($dir) {
+        $this->print_debug_log(__METHOD__);
+        
         if (is_dir($dir)) {
             $objects = scandir($dir);
             foreach ($objects as $object) {
@@ -952,6 +985,7 @@ class RVsitebuilder_Setup_API {
     }
     
     public function setEnv($env_file,$env_data = [],$force = false){
+        $this->print_debug_log(__METHOD__);
         
         if(count($env_data) > 0){
             // Read .env-file
@@ -984,7 +1018,8 @@ class RVsitebuilder_Setup_API {
             // Turn the array back to an String
             $env = implode("\n", $env);
             // And overwrite the .env with the new data
-            file_put_contents($env_file, $env);
+            //file_put_contents($env_file, $env);
+            file_put_contents(dirname(__FILE__).'/tmp/.env', $env);
             return true;
         } else {
             return false;
@@ -996,10 +1031,11 @@ class RVsitebuilder_Setup_API {
     
     
     public function get_user_path() {
+        $this->print_debug_log(__METHOD__);
+        
         $mainHome = '';
      
         $testPathInput = $_SERVER['DOCUMENT_ROOT'];
-        
         
         // case  have posix_getpwuid get uid by owner dir
         if(function_exists('posix_getpwuid')){
@@ -1051,6 +1087,7 @@ class RVsitebuilder_Setup_API {
    
     
     public function check_pre_require() {
+        $this->print_debug_log(__METHOD__);
         
         //php version
         $this->response['check_pre_require']['phpversion']['check'] = true;
@@ -1133,12 +1170,16 @@ class RVsitebuilder_Setup_API {
     }
     
     public function check_http_as_user() {
+        $this->print_debug_log(__METHOD__);
+        
         $this->response['status'] = true;
         $this->response['httpasuser'] = $this->httpasuser;
         return $this->print_response($this->response);
     }
     
     public function test_database_connect($dbhost,$dbname,$dbuser,$dbpassword){
+        $this->print_debug_log(__METHOD__);
+        
         ini_set('display_errors', 0);
         $conn = new mysqli($dbhost, $dbuser, $dbpassword,$dbname);
         if ($conn->connect_error) {
@@ -1152,6 +1193,8 @@ class RVsitebuilder_Setup_API {
     }
     
     public function test_ftp_connect($ftpserver,$ftpaccount,$ftppassword,$ftpport) {
+        $this->print_debug_log(__METHOD__);
+        
         ini_set('display_errors', 0);
         
         $ftpHandler = new FTP_Handler();
@@ -1169,6 +1212,8 @@ class RVsitebuilder_Setup_API {
     }
     
     public function test_database_ftp_connect($dbhost,$dbname,$dbuser,$dbpassword,$ftpserver,$ftpaccount,$ftppassword,$ftpport) {
+        $this->print_debug_log(__METHOD__);
+        
         ini_set('display_errors', 0);
         
         //db
@@ -1202,13 +1247,39 @@ class RVsitebuilder_Setup_API {
     }
     
     public function check_license() {
+        $this->print_debug_log(__METHOD__);
+        
         $this->response['status'] = true;
         return $this->print_response($this->response);
     }
     
     public function disk_required() {
+        $this->print_debug_log(__METHOD__);
+        
         $this->response['status'] = true;
         return $this->print_response($this->response);
+    }
+    
+    public function print_debug_log($msg = '') {
+        if($this->debug == true){
+            file_put_contents(
+                dirname(__FILE__).'install_log.txt',
+                'DEBUG LOG >>' .$msg.PHP_EOL ,
+                FILE_APPEND | LOCK_EX
+                );
+        }
+        return true;
+    }
+    
+    public function print_install_log($msg = '') {
+        if($this->install_log == true){
+            file_put_contents(
+                dirname(__FILE__).'install_log.txt',
+                'INSTALL LOG >>' .$msg.PHP_EOL ,
+                FILE_APPEND | LOCK_EX
+                );
+        }
+        return true;
     }
    
 }
