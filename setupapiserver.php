@@ -1411,8 +1411,8 @@ class RVsitebuilder_Setup_API {
     public function print_debug_log($msg = '') {
         if($this->debug_log == true){
             file_put_contents(
-                dirname(__FILE__).'install_log.txt',
-                'DEBUG LOG >>' .$msg.PHP_EOL ,
+                dirname(__FILE__).'/install_log.txt',
+                'DEBUG LOG >> ' .$msg.PHP_EOL ,
                 FILE_APPEND | LOCK_EX
                 );
         }
@@ -1422,8 +1422,8 @@ class RVsitebuilder_Setup_API {
     public function print_install_log($msg = '') {
         if($this->install_log == true){
             file_put_contents(
-                dirname(__FILE__).'install_log.txt',
-                'INSTALL LOG >>' .$msg.PHP_EOL ,
+                dirname(__FILE__).'/install_log.txt',
+                'INSTALL LOG >> ' .$msg.PHP_EOL ,
                 FILE_APPEND | LOCK_EX
                 );
         }
