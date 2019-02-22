@@ -460,15 +460,15 @@
                             <div class="row">
                                 <div class="col col-lg-4">Install Common Package</div>
                                 <div class="col col-lg-2">
-                                    <i class="fa fa-sync fa-spin install_common_package"></i><span class="install_common_package">Loading...</span>
-                                    <a class="install_common_package" title="" style="opacity:0;width:30px">tu</a>
+                                    <i class="fa fa-sync fa-spin download_common_pkg"></i><span class="download_common_pkg">Loading...</span>
+                                    <a class="download_common_pkg" title="" style="opacity:0;width:30px">tu</a>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col col-lg-4">Install Framework</div>
                                 <div class="col col-lg-2">
-                                    <i class="fa fa-sync fa-spin install_framework"></i><span class="install_framework">Loading...</span>
-                                    <a class="install_framework" title="" style="opacity:0;width:30px">tu</a>
+                                    <i class="fa fa-sync fa-spin install_all_pkg"></i><span class="install_all_pkg">Loading...</span>
+                                    <a class="install_all_pkg" title="" style="opacity:0;width:30px">tu</a>
                                 </div>
                             </div>
                             <div class="row">
@@ -842,17 +842,17 @@
                                                         $('a.setup_env').attr('title', (typeof data.exectime == 'undefined') ? '0' + ' s' : data.exectime.toString() + ' s');
                                                         $('#exectime').text((typeof data.exectime == 'undefined') ? parseFloat(exectime) + 0 : parseFloat(exectime) + parseFloat(data.exectime));
                                                         
-                                                        param = {'action':'install_common_pkg'};
+                                                        param = {'action':'download_common_pkg'};
                                                         doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
                                                             console.log(data);
                                                             if (data === null  || data.status == false){
-                                                                $('span.install_common_package').text((typeof data.message == 'undefined') ? 'ERROR' : data.message);
-                                                                $('i.install_common_package').removeClass("fa fa-sync fa-spin").addClass("fa fa-exclamation-circle")
+                                                                $('span.download_common_pkg').text((typeof data.message == 'undefined') ? 'ERROR' : data.message);
+                                                                $('i.download_common_pkg').removeClass("fa fa-sync fa-spin").addClass("fa fa-exclamation-circle")
                                                             }
                                                             else {
-                                                                $('span.install_common_package').text('');
-                                                                $('i.install_common_package').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
-                                                                $('a.install_common_package').attr('title', (typeof data.exectime == 'undefined') ? '0' + ' s' : data.exectime.toString() + ' s');
+                                                                $('span.download_common_pkg').text('');
+                                                                $('i.download_common_pkg').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
+                                                                $('a.download_common_pkg').attr('title', (typeof data.exectime == 'undefined') ? '0' + ' s' : data.exectime.toString() + ' s');
                                                                 $('#exectime').text((typeof data.exectime == 'undefined') ? parseFloat(exectime) + 0 : parseFloat(exectime) + parseFloat(data.exectime));
                                                                 
                                                                 
@@ -870,13 +870,13 @@
                                                                 doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
                                                                     console.log(data);
                                                                     if (data === null  || data.status == false){
-                                                                        $('span.install_framework').text((typeof data.message == 'undefined') ? 'ERROR' : data.message);
-                                                                        $('i.install_framework').removeClass("fa fa-sync fa-spin").addClass("fa fa-exclamation-circle")
+                                                                        $('span.install_all_pkg').text((typeof data.message == 'undefined') ? 'ERROR' : data.message);
+                                                                        $('i.install_all_pkg').removeClass("fa fa-sync fa-spin").addClass("fa fa-exclamation-circle")
                                                                     }
                                                                     else {
-                                                                        $('span.install_framework').text('');
-                                                                        $('i.install_framework').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
-                                                                        $('a.install_framework').attr('title', (typeof data.exectime == 'undefined') ? '0' + ' s' : data.exectime.toString() + ' s');
+                                                                        $('span.install_all_pkg').text('');
+                                                                        $('i.install_all_pkg').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
+                                                                        $('a.install_all_pkg').attr('title', (typeof data.exectime == 'undefined') ? '0' + ' s' : data.exectime.toString() + ' s');
                                                                         $('#exectime').text((typeof data.exectime == 'undefined') ? parseFloat(exectime) + 0 : parseFloat(exectime) + parseFloat(data.exectime));
                                                                         
                                                                         param = {

@@ -52,8 +52,8 @@ if($action == 'setup_env'){
     $setupObj->setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname,$ftpserver,$ftpport);
 }
 
-if($action == 'install_common_pkg'){
-    $setupObj->install_common_pkg();
+if($action == 'download_common_pkg'){
+    $setupObj->download_common_pkg();
 }
 
 if($action == 'install_all_pkg' && $homeuser != '' && $domainname != '' && $publicpath != ''){
@@ -357,9 +357,11 @@ class RVsitebuilder_Setup_API {
         $this->print_debug_log(__METHOD__);
         
         //download framework
-        $downloadurl =  $this->mirror.'/rvsitebuilder/framework';
-        if(isset($this->installerconfig['framework']['getversion']) && $this->installerconfig['framework']['getversion'] == 'latest') { $downloadurl = $this->mirror.'/rvsitebuilder/framework/tier/latest'; }
-        if(isset($this->installerconfig['framework']['getversion']) && preg_match('/[0-9]+\.[0-9]+\.[0-9]+)/',$this->installerconfig['framework']['getversion'])) { $downloadurl = $this->mirror.'/rvsitebuilder/framework/version/'.$this->installerconfig['framework']['getversion']; }
+        $downloadurl =  $this->mirror.'/download/rvsitebuilder/framework';
+        if(isset($this->installerconfig['framework']['getversion']) && $this->installerconfig['framework']['getversion'] == 'latest') 
+        { $downloadurl = $this->mirror.'/download/rvsitebuilder/framework/tier/latest'; }
+        if(isset($this->installerconfig['framework']['getversion']) && preg_match('/[0-9]+\.[0-9]+\.[0-9]+)/',$this->installerconfig['framework']['getversion'])) 
+        { $downloadurl = $this->mirror.'/download/rvsitebuilder/framework/version/'.$this->installerconfig['framework']['getversion']; }
         
         $this->print_debug_log("Download Framework URL ".$downloadurl);
         
@@ -412,7 +414,7 @@ class RVsitebuilder_Setup_API {
             list($product_name, $app_name) = preg_split('/\//', $vendorkey, 2);
             $package_name_encoded = '/'.$product_name.'/'.urlencode($app_name);
             $version = '/version/'.$rvsbjson['version'];
-            $downloadvendorurl = $this->mirror.$package_name_encoded.$version;
+            $downloadvendorurl = $this->mirror.'/download'.$package_name_encoded.$version;
             $this->print_debug_log("Vendor URL download ".$downloadvendorurl);
             $downloadvendor = $this->download('GET' , $downloadvendorurl , dirname(__FILE__).'/bundle_vendor.tar.gz');
             if(! $downloadvendor) {
@@ -445,7 +447,7 @@ class RVsitebuilder_Setup_API {
                     $update_package_version = '/version/' . $update_package_version;
                 }
                 
-                $downloadvendorurl = $this->mirror.'/'.$product_name.'/'.urlencode($app_name).$update_package_version;
+                $downloadvendorurl = $this->mirror.'/download/'.$product_name.'/'.urlencode($app_name).$update_package_version;
                 $this->print_debug_log("Package URL Download ".$downloadvendorurl);
                 $downloadvendor = $this->download('GET' , $downloadvendorurl , dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
                 if(! $downloadvendor) {
@@ -530,7 +532,7 @@ class RVsitebuilder_Setup_API {
     }
     
     
-    public function install_common_pkg() {
+    public function download_common_pkg() {
         $time_start = microtime(true);
         $this->print_debug_log(__METHOD__);
         
@@ -547,11 +549,11 @@ class RVsitebuilder_Setup_API {
         
         foreach ($commonpkg as $pkg) {
             
-            $downloadurl = $this->mirror.'/rvsitebuilder/'.$pkg ;
+            $downloadurl = $this->mirror.'/download/rvsitebuilder/'.$pkg ;
             if(isset($this->installerconfig[$pkg]['getversion']) && $this->installerconfig[$pkg]['getversion'] == 'latest') 
-            { $downloadurl = $this->mirror.'/rvsitebuilder/'.$pkg.'/tier/latest'; }
+            { $downloadurl = $this->mirror.'/download/rvsitebuilder/'.$pkg.'/tier/latest'; }
             if(isset($this->installerconfig[$pkg]['getversion']) && preg_match('/[0-9]+\.[0-9]+\.[0-9]+)/',$this->installerconfig[$pkg]['getversion'])) 
-            { $downloadurl = $this->mirror.'/rvsitebuilder/'.$pkg.'/version/'.$this->installerconfig[$pkg]['getversion']; }
+            { $downloadurl = $this->mirror.'/download/rvsitebuilder/'.$pkg.'/version/'.$this->installerconfig[$pkg]['getversion']; }
             
 
             $downloadpkg = $this->download('GET' , $downloadurl , dirname(__FILE__).'/'.$pkg.'.tar.gz');
@@ -592,7 +594,7 @@ class RVsitebuilder_Setup_API {
                     $update_package_version = '/version/' . $update_package_version;
                 }
                 
-                $downloadvendorurl = $this->mirror.'/'.$product_name.'/'.urlencode($app_name).$update_package_version;
+                $downloadvendorurl = $this->mirror.'/download/'.$product_name.'/'.urlencode($app_name).$update_package_version;
                 
                 $this->print_debug_log("Download vendor URL ".$downloadvendorurl);
                 
@@ -705,18 +707,25 @@ class RVsitebuilder_Setup_API {
         $time_start = microtime(true);
         $this->print_debug_log(__METHOD__);
         
-        //touch install completed
+        //default 
         if($this->httpasuser){
+            //touch install completed
             $this->print_debug_log("TOUCH INSTALL_COMPLETED");
             file_put_contents($homeuser.'/rvsitebuildercms/'.$domainname.'/INSTALL_COMPLETED', '');
+            
+            //install_log , error_log
+            copy($publicpath.'/rvsitebuilder/install_log.txt', $publicpath.'/rvsitebuilder_install_log.txt');
+            copy($publicpath.'/rvsitebuilder/error_log', $publicpath.'/rvsitebuilder_install_error_log.txt');
+            
             $this->response['status'] = true;
             $this->response['message'] = 'Finished Setup (Default)';
             $this->response['exectime'] = (microtime(true) - $time_start);
             $this->print_install_log(__METHOD__.' TRUE'.' timeusage '.$this->response['exectime']);
             return $this->print_response($this->response);
         } 
-        //ftp install completed
+        //ftp 
         else {
+            //install completed
             $this->print_debug_log("FTP INSTALL_COMPLETED");
             $ftpHandler = new FTP_Handler();
             $result = $ftpHandler->connect($ftpserver);
@@ -732,6 +741,13 @@ class RVsitebuilder_Setup_API {
                 return $this->print_response($this->response);
             }
             $result = $ftpHandler->put($publicpath.'/rvsitebuilder/INSTALL_COMPLETED','/rvsitebuildercms/'.$domainname.'/INSTALL_COMPLETED',FTP_BINARY);
+            
+            //install_log , error_log
+            $exploded = explode('/',$publicpath);
+            $public_html = '/'.end($exploded);
+            $result = $ftpHandler->put($publicpath.'/rvsitebuilder/install_log.txt' , '/'.$public_html.'/rvsitebuilder_install_log.txt',FTP_BINARY);
+            $result = $ftpHandler->put($publicpath.'/rvsitebuilder/error_log' , '/'.$public_html.'/rvsitebuilder_install_error_log.txt' ,FTP_BINARY);
+            
             $ftpHandler->close();
             
             $this->response['status'] = true;
@@ -771,10 +787,16 @@ class RVsitebuilder_Setup_API {
             if ( file_exists(dirname(__FILE__).'/install.tar.gz') ) unlink(dirname(__FILE__).'/install.tar.gz');
             if ( file_exists(dirname(__FILE__).'/logo_rvsitebuilder.png') ) unlink(dirname(__FILE__).'/logo_rvsitebuilder.png');
             if ( file_exists(dirname(__FILE__).'/logorvsitebuilder.png') ) unlink(dirname(__FILE__).'/logorvsitebuilder.png');
+            if ( file_exists(dirname(__FILE__).'/install_log.txt') ) unlink(dirname(__FILE__).'/install_log.txt');
+            if ( file_exists(dirname(__FILE__).'/error_log') ) unlink(dirname(__FILE__).'/error_log');
+            if ( file_exists(dirname(__FILE__).'/setup.php') ) unlink(dirname(__FILE__).'/setup.php');
+            //if ( file_exists(dirname(__FILE__).'/setupapiserver.php') ) unlink(dirname(__FILE__).'/setupapiserver.php');
+            
             //remove dir
             $this->rrmdir(dirname(__FILE__).'/tmp');
             $this->rrmdir(dirname(__FILE__).'/vendor');
             $this->rrmdir(dirname(__FILE__).'/src');
+            //$this->rrmdir(__DIR__.'/../rvsitebuilder');
             
             $this->print_debug_log("Removed Installer Path");
         }
