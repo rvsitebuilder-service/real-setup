@@ -406,54 +406,69 @@
                                 <div class="col col-lg-4">Check License</div>
                                 <div class="col col-lg-2">
                                     <i class="fa fa-sync fa-spin check_license"></i><span class="check_license">Loading...</span>
+                                    <a class="check_license" title="" style="opacity:0;width:30px">tu</a>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col col-lg-4">Disk space required</div>
                                 <div class="col col-lg-2">
                                     <i class="fa fa-sync fa-spin disk_required"></i><span class="disk_required">Loading...</span>
+                                    <a class="disk_required" title="" style="opacity:0;width:30px">tu</a>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col col-lg-4">Download Framework</div>
                                 <div class="col col-lg-2">
                                     <i class="fa fa-sync fa-spin download_framework"></i><span class="download_framework">Loading...</span>
+                                    <a class="download_framework" title="" style="opacity:0;width:30px">tu</a>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col col-lg-4">Download Vendor</div>
                                 <div class="col col-lg-2">
                                     <i class="fa fa-sync fa-spin download_vendor"></i><span class="download_vendor">Loading...</span>
+                                    <a class="download_vendor" title="" style="opacity:0;width:30px">tu</a>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col col-lg-4">Setup ENV</div>
                                 <div class="col col-lg-2">
                                     <i class="fa fa-sync fa-spin setup_env"></i><span class="setup_env">Loading...</span>
+                                    <a class="setup_env" title="" style="opacity:0;width:30px">tu</a>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col col-lg-4">Install Common Package</div>
                                 <div class="col col-lg-2">
                                     <i class="fa fa-sync fa-spin install_common_package"></i><span class="install_common_package">Loading...</span>
+                                    <a class="install_common_package" title="" style="opacity:0;width:30px">tu</a>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col col-lg-4">Install Framework</div>
                                 <div class="col col-lg-2">
                                     <i class="fa fa-sync fa-spin install_framework"></i><span class="install_framework">Loading...</span>
+                                    <a class="install_framework" title="" style="opacity:0;width:30px">tu</a>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col col-lg-4">Artisan Command</div>
                                 <div class="col col-lg-2">
                                     <i class="fa fa-sync fa-spin artisan_call"></i><span class="artisan_call">Loading...</span>
+                                    <a class="artisan_call" title="" style="opacity:0;width:30px">tu</a>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col col-lg-4">Finished setup</div>
                                 <div class="col col-lg-2">
                                     <i class="fa fa-sync fa-spin finished_setup"></i><span class="finished_setup">Loading...</span>
+                                    <a class="finished_setup" title="" style="opacity:0;width:30px">tu</a>
+                                </div>
+                            </div>
+                            <div class="row" class="hidden">
+                                <div class="col col-lg-4">Total execution time</div>
+                                <div class="col col-lg-2">
+                                    <span class="" id="exectime"></span><span> Second</span>
                                 </div>
                             </div>
                         </div>
@@ -725,7 +740,7 @@
             $('#buttoninstall').click(function() {
             	$('#confirmation').hide();
             	$('#doinstall').removeClass("d-none");
-            	
+            	var exectime = 0 ;
             	param = {'action':'check_license' };
                 doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
                     console.log(data);
@@ -736,6 +751,8 @@
                     else {
                     	$('span.check_license').text('');
                         $('i.check_license').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
+                        $('a.check_license').attr('title', (typeof data.exectime == 'undefined') ? '0' + ' s' : data.exectime.toString() + ' s');
+                        $('#exectime').text((typeof data.exectime == 'undefined') ? parseFloat(exectime) + 0 : parseFloat(exectime) + parseFloat(data.exectime));
                         
                     	param = {'action':'disk_required' };
                     	doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
@@ -747,6 +764,9 @@
                             else {
                             	$('span.disk_required').text('');
                                 $('i.disk_required').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
+                                $('a.disk_required').attr('title', (typeof data.exectime == 'undefined') ? '0' + ' s' : data.exectime.toString() + ' s');
+                                $('#exectime').text((typeof data.exectime == 'undefined') ? parseFloat(exectime) + 0 : parseFloat(exectime) + parseFloat(data.exectime));
+                                
                                 
                                 param = {'action':'download_framework' };
                                 doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
@@ -758,6 +778,9 @@
                                     else {
                                         $('span.download_framework').text('');
                                         $('i.download_framework').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
+                                        $('a.download_framework').attr('title', (typeof data.exectime == 'undefined') ? '0' + ' s' : data.exectime.toString() + ' s');
+                                        $('#exectime').text((typeof data.exectime == 'undefined') ? parseFloat(exectime) + 0 : parseFloat(exectime) + parseFloat(data.exectime));
+                                        
                                         
                                         param = {'action':'download_vendor' };
                                         doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
@@ -769,6 +792,9 @@
                                             else {
                                                 $('span.download_vendor').text('');
                                                 $('i.download_vendor').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
+                                                $('a.download_vendor').attr('title', (typeof data.exectime == 'undefined') ? '0' + ' s' : data.exectime.toString() + ' s');
+                                                $('#exectime').text((typeof data.exectime == 'undefined') ? parseFloat(exectime) + 0 : parseFloat(exectime) + parseFloat(data.exectime));
+                                                
                                                 
                                                 param = {
                                                 		'action':'setup_env',
@@ -793,6 +819,9 @@
                                                     else {
                                                         $('span.setup_env').text('');
                                                         $('i.setup_env').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
+                                                        $('a.setup_env').attr('title', (typeof data.exectime == 'undefined') ? '0' + ' s' : data.exectime.toString() + ' s');
+                                                        $('#exectime').text((typeof data.exectime == 'undefined') ? parseFloat(exectime) + 0 : parseFloat(exectime) + parseFloat(data.exectime));
+                                                        
                                                         param = {'action':'install_common_pkg'};
                                                         doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
                                                             console.log(data);
@@ -803,6 +832,9 @@
                                                             else {
                                                                 $('span.install_common_package').text('');
                                                                 $('i.install_common_package').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
+                                                                $('a.install_common_package').attr('title', (typeof data.exectime == 'undefined') ? '0' + ' s' : data.exectime.toString() + ' s');
+                                                                $('#exectime').text((typeof data.exectime == 'undefined') ? parseFloat(exectime) + 0 : parseFloat(exectime) + parseFloat(data.exectime));
+                                                                
                                                                 
                                                                 param = {
                                                                 		'action':'install_all_pkg',
@@ -824,6 +856,8 @@
                                                                     else {
                                                                         $('span.install_framework').text('');
                                                                         $('i.install_framework').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
+                                                                        $('a.install_framework').attr('title', (typeof data.exectime == 'undefined') ? '0' + ' s' : data.exectime.toString() + ' s');
+                                                                        $('#exectime').text((typeof data.exectime == 'undefined') ? parseFloat(exectime) + 0 : parseFloat(exectime) + parseFloat(data.exectime));
                                                                         
                                                                         param = {
                                                                         		'action':'artisan_call',
@@ -844,6 +878,9 @@
                                                                             else {
                                                                                 $('span.artisan_call').text('');
                                                                                 $('i.artisan_call').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
+                                                                                $('a.artisan_call').attr('title', (typeof data.exectime == 'undefined') ? '0' + ' s' : data.exectime.toString() + ' s');
+                                                                                $('#exectime').text((typeof data.exectime == 'undefined') ? parseFloat(exectime) + 0 : parseFloat(exectime) + parseFloat(data.exectime));
+                                                                                
                                                                                 
                                                                                 param = {
                                                                                 		'action':'finished_setup',
@@ -864,6 +901,9 @@
                                                                                     else {
                                                                                         $('span.finished_setup').text('');
                                                                                         $('i.finished_setup').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
+                                                                                        $('a.finished_setup').attr('title', (typeof data.exectime == 'undefined') ? '0' + ' s' : data.exectime.toString() + ' s');
+                                                                                        $('#exectime').text((typeof data.exectime == 'undefined') ? parseFloat(exectime) + 0 : parseFloat(exectime) + parseFloat(data.exectime));
+                                                                                        
                                                                                         
                                                                                     }
                                                                                     
