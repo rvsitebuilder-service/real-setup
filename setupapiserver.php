@@ -105,7 +105,7 @@ class RVsitebuilder_Setup_API {
     protected $downloadurl;
     protected $debug;
     protected $httpasuser;
-    protected $getversion;
+    protected $installerconfig;
     protected $call_responsetype;
     protected $removeinstallerpath;
     
@@ -122,17 +122,15 @@ class RVsitebuilder_Setup_API {
         $this->verify_token($rvsb_installing_token,$ignore_token);
         $this->httpasuser = $this->gethttpasuser();
         //get installation configfunction getInstallerConfig() {
-        $installconfig =  $this->getInstallerConfig();
-        //get latest version
-        $this->getversion = $installconfig['getversion'];
-        //download url
-        $this->downloadurl = $installconfig['mirror'];
+        $this->installerconfig = $this->getInstallerConfig();
+        //mirror url
+        $this->mirror = $this->installerconfig['mirror'];
         //debug var
-        $this->debug = $installconfig['debug_log'];
+        $this->debug_log = $this->installerconfig['debug_log'];
         //install_log
-        $this->install_log =  $installconfig['install_log'];
+        $this->install_log =  $this->installerconfig['install_log'];
         //remove installer path
-        $this->removeinstallerpath = $installconfig['removeinstallerpath'];
+        $this->removeinstallerpath = $this->installerconfig['removeinstallerpath'];
     }
     
     public function getInstallerConfig() {
@@ -326,6 +324,15 @@ class RVsitebuilder_Setup_API {
             $this->response['status'] = false;
             $this->print_debug_log("PHP posix_getpwuid false");
         }
+        //php function json
+        $this->response['check_pre_require']['json']['check'] = true;
+        if(! extension_loaded('json')){
+            $this->response['check_pre_require']['json']['check'] = false;
+            $this->response['check_pre_require']['json']['reason'] = 'Can not load PHP Function (json)';
+            $this->response['message'] = $this->response['message'].' / Can not load PHP Function (json)';
+            $this->response['status'] = false;
+            $this->print_debug_log("PHP json false");
+        }
         
         //http as user
         $this->response['httpasuser'] = $this->httpasuser;
@@ -350,9 +357,9 @@ class RVsitebuilder_Setup_API {
         $this->print_debug_log(__METHOD__);
         
         //download framework
-        $downloadurl =  $this->downloadurl.'/rvsitebuilder/framework';
-        if($this->getversion == 'latest') { $downloadurl = $this->downloadurl.'/rvsitebuilder/framework/tier/latest'; }
-        elseif(preg_match('/[0-9]+\.[0-9]+\.[0-9]+)/',$this->getversion)) { $downloadurl = $this->downloadurl.'/rvsitebuilder/framework/version/'.$this->getversion; }
+        $downloadurl =  $this->mirror.'/rvsitebuilder/framework';
+        if(isset($this->installerconfig['framework']['getversion']) && $this->installerconfig['framework']['getversion'] == 'latest') { $downloadurl = $this->mirror.'/rvsitebuilder/framework/tier/latest'; }
+        if(isset($this->installerconfig['framework']['getversion']) && preg_match('/[0-9]+\.[0-9]+\.[0-9]+)/',$this->installerconfig['framework']['getversion'])) { $downloadurl = $this->mirror.'/rvsitebuilder/framework/version/'.$this->installerconfig['framework']['getversion']; }
         
         $this->print_debug_log("Download Framework URL ".$downloadurl);
         
@@ -405,7 +412,7 @@ class RVsitebuilder_Setup_API {
             list($product_name, $app_name) = preg_split('/\//', $vendorkey, 2);
             $package_name_encoded = '/'.$product_name.'/'.urlencode($app_name);
             $version = '/version/'.$rvsbjson['version'];
-            $downloadvendorurl = $this->downloadurl.$package_name_encoded.$version;
+            $downloadvendorurl = $this->mirror.$package_name_encoded.$version;
             $this->print_debug_log("Vendor URL download ".$downloadvendorurl);
             $downloadvendor = $this->download('GET' , $downloadvendorurl , dirname(__FILE__).'/bundle_vendor.tar.gz');
             if(! $downloadvendor) {
@@ -438,7 +445,7 @@ class RVsitebuilder_Setup_API {
                     $update_package_version = '/version/' . $update_package_version;
                 }
                 
-                $downloadvendorurl = $this->downloadurl.'/'.$product_name.'/'.urlencode($app_name).$update_package_version;
+                $downloadvendorurl = $this->mirror.'/'.$product_name.'/'.urlencode($app_name).$update_package_version;
                 $this->print_debug_log("Package URL Download ".$downloadvendorurl);
                 $downloadvendor = $this->download('GET' , $downloadvendorurl , dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
                 if(! $downloadvendor) {
@@ -539,9 +546,13 @@ class RVsitebuilder_Setup_API {
         $this->print_debug_log("Common Package ".join(', ', $commonpkg));
         
         foreach ($commonpkg as $pkg) {
-            $downloadurl = $this->downloadurl.'/rvsitebuilder/'.$pkg ;
             
-            if($this->getversion == 'latest') { $downloadurl = $this->downloadurl.'/rvsitebuilder/'.$pkg.'/tier/latest'; } 
+            $downloadurl = $this->mirror.'/rvsitebuilder/'.$pkg ;
+            if(isset($this->installerconfig[$pkg]['getversion']) && $this->installerconfig[$pkg]['getversion'] == 'latest') 
+            { $downloadurl = $this->mirror.'/rvsitebuilder/'.$pkg.'/tier/latest'; }
+            if(isset($this->installerconfig[$pkg]['getversion']) && preg_match('/[0-9]+\.[0-9]+\.[0-9]+)/',$this->installerconfig[$pkg]['getversion'])) 
+            { $downloadurl = $this->mirror.'/rvsitebuilder/'.$pkg.'/version/'.$this->installerconfig[$pkg]['getversion']; }
+            
 
             $downloadpkg = $this->download('GET' , $downloadurl , dirname(__FILE__).'/'.$pkg.'.tar.gz');
             
@@ -581,7 +592,7 @@ class RVsitebuilder_Setup_API {
                     $update_package_version = '/version/' . $update_package_version;
                 }
                 
-                $downloadvendorurl = $this->downloadurl.'/'.$product_name.'/'.urlencode($app_name).$update_package_version;
+                $downloadvendorurl = $this->mirror.'/'.$product_name.'/'.urlencode($app_name).$update_package_version;
                 
                 $this->print_debug_log("Download vendor URL ".$downloadvendorurl);
                 
@@ -1398,7 +1409,7 @@ class RVsitebuilder_Setup_API {
     }
     
     public function print_debug_log($msg = '') {
-        if($this->debug == true){
+        if($this->debug_log == true){
             file_put_contents(
                 dirname(__FILE__).'install_log.txt',
                 'DEBUG LOG >>' .$msg.PHP_EOL ,
