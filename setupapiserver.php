@@ -137,13 +137,13 @@ class RVsitebuilder_Setup_API {
         $this->print_debug_log(__METHOD__);
         
         //defaultconfig
-        $defconfig = parse_ini_file(dirname(__FILE__).'/rvsitebuilderinstallerconfig_dist/config.ini');
+        $defconfig = parse_ini_file(dirname(__FILE__).'/rvsitebuilderinstallerconfig_dist/config.ini',true);
         $this->print_debug_log("Installer config ".join(',',$defconfig));
         
         //overwrite installer config by user (in public path /home/user/public_html/)
         $userconfig = [];
         if(file_exists(__DIR__.'/../.rvsitebuilderinstallerconfig/config.ini')) {
-            $userconfig = parse_ini_file(__DIR__.'/../.rvsitebuilderinstallerconfig/config.ini');
+            $userconfig = parse_ini_file(__DIR__.'/../.rvsitebuilderinstallerconfig/config.ini',true);
             $this->print_debug_log("Installer config by user".join(',',array_merge($defconfig,$userconfig)));
         }
         
