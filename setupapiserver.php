@@ -714,8 +714,12 @@ class RVsitebuilder_Setup_API {
             file_put_contents($homeuser.'/rvsitebuildercms/'.$domainname.'/INSTALL_COMPLETED', '');
             
             //install_log , error_log
-            copy($publicpath.'/rvsitebuilder/install_log.txt', $publicpath.'/rvsitebuilder_install_log.txt');
-            copy($publicpath.'/rvsitebuilder/error_log', $publicpath.'/rvsitebuilder_install_error_log.txt');
+            if(file_exists($publicpath.'/rvsitebuilder/install_log.txt')){
+                copy($publicpath.'/rvsitebuilder/install_log.txt', $publicpath.'/rvsitebuilder_install_log.txt');
+            }
+            if(file_exists($publicpath.'/rvsitebuilder/error_log')){
+                copy($publicpath.'/rvsitebuilder/error_log', $publicpath.'/rvsitebuilder_install_error_log.txt');
+            }
             
             $this->response['status'] = true;
             $this->response['message'] = 'Finished Setup (Default)';
@@ -745,8 +749,12 @@ class RVsitebuilder_Setup_API {
             //install_log , error_log
             $exploded = explode('/',$publicpath);
             $public_html = '/'.end($exploded);
-            $result = $ftpHandler->put($publicpath.'/rvsitebuilder/install_log.txt' , '/'.$public_html.'/rvsitebuilder_install_log.txt',FTP_BINARY);
-            $result = $ftpHandler->put($publicpath.'/rvsitebuilder/error_log' , '/'.$public_html.'/rvsitebuilder_install_error_log.txt' ,FTP_BINARY);
+            if(file_exists($publicpath.'/rvsitebuilder/install_log.txt')){
+                $result = $ftpHandler->put($publicpath.'/rvsitebuilder/install_log.txt' , '/'.$public_html.'/rvsitebuilder_install_log.txt',FTP_BINARY);
+            }
+            if(file_exists($publicpath.'/rvsitebuilder/error_log')){
+                $result = $ftpHandler->put($publicpath.'/rvsitebuilder/error_log' , '/'.$public_html.'/rvsitebuilder_install_error_log.txt' ,FTP_BINARY);
+            }
             
             $ftpHandler->close();
             
