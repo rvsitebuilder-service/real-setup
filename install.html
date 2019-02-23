@@ -23,7 +23,21 @@
 
 <body>
 <div class="logo">
-   <div class="container"><img src="logorvsitebuilder.png" height="50"></div>
+   <div class="container">
+   		<img src="logorvsitebuilder.png" height="50">
+		<a id="rvdebug" class="" href="rvdebug.php" target="_blank" style="opacity: 0;">
+			rvdebug(phpinfo) </a>
+		<a id="installlog" class="" href="install_log.txt" target="_blank" style="opacity: 0;">
+			rvstall_log.txt </a>
+		<a id="errorlog" class="" href="error_log" target="_blank" style="opacity: 0;">
+			phperrorlog </a>
+		<a id="installlogpublic" class=""
+			href="../rvsitebuilder_install_log.txt" target="_blank" style="opacity: 0;">
+			install_log(public path) </a>
+		<a id="errorlogpublic" class=""
+			href="../rvsitebuilder_install_error_log" target="_blank" style="opacity: 0;">
+			error_log(public_path]) </a>
+	</div>
 </div>
 	<div class="container">
 		<form action="#" id="myForm" role="form" data-toggle="validator" method="post" accept-charset="utf-8">
@@ -485,12 +499,13 @@
                                     <a class="finished_setup" title="" style="opacity:0;width:30px">tu</a>
                                 </div>
                             </div>
-                            <div class="row" class="hidden">
+                            <div class="row" style="opacity:0;">
                                 <div class="col col-lg-4">Total execution time</div>
                                 <div class="col col-lg-2">
-                                    <span class="" id="exectime"></span><span> Second</span>
+                                    <span class="" id="exectime">0</span><span> Second</span>
                                 </div>
                             </div>
+                            
                         </div>
                     </div>
                     <!-- end step block -->
@@ -686,6 +701,10 @@
             //url value 
             $("#url").val(window.location.origin);
             
+            
+            
+            
+            
             //home path value
             param = {'action':'get_user_path'};
             doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
@@ -760,7 +779,6 @@
             $('#buttoninstall').click(function() {
             	$('#confirmation').hide();
             	$('#doinstall').removeClass("d-none");
-            	var exectime = 0 ;
             	param = {'action':'check_license' };
                 doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
                     console.log(data);
@@ -772,7 +790,7 @@
                     	$('span.check_license').text('');
                         $('i.check_license').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
                         $('a.check_license').attr('title', (typeof data.exectime == 'undefined') ? '0' + ' s' : data.exectime.toString() + ' s');
-                        $('#exectime').text((typeof data.exectime == 'undefined') ? parseFloat(exectime) + 0 : parseFloat(exectime) + parseFloat(data.exectime));
+                        $('#exectime').text(parseFloat($('#exectime').text()) + parseFloat((typeof data.exectime == 'undefined') ? 0 : data.exectime));
                         
                     	param = {'action':'disk_required' };
                     	doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
@@ -785,7 +803,7 @@
                             	$('span.disk_required').text('');
                                 $('i.disk_required').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
                                 $('a.disk_required').attr('title', (typeof data.exectime == 'undefined') ? '0' + ' s' : data.exectime.toString() + ' s');
-                                $('#exectime').text((typeof data.exectime == 'undefined') ? parseFloat(exectime) + 0 : parseFloat(exectime) + parseFloat(data.exectime));
+                                $('#exectime').text(parseFloat($('#exectime').text()) + parseFloat((typeof data.exectime == 'undefined') ? 0 : data.exectime));
                                 
                                 
                                 param = {'action':'download_framework' };
@@ -799,7 +817,7 @@
                                         $('span.download_framework').text('');
                                         $('i.download_framework').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
                                         $('a.download_framework').attr('title', (typeof data.exectime == 'undefined') ? '0' + ' s' : data.exectime.toString() + ' s');
-                                        $('#exectime').text((typeof data.exectime == 'undefined') ? parseFloat(exectime) + 0 : parseFloat(exectime) + parseFloat(data.exectime));
+                                        $('#exectime').text(parseFloat($('#exectime').text()) + parseFloat((typeof data.exectime == 'undefined') ? 0 : data.exectime));
                                         
                                         
                                         param = {'action':'download_vendor' };
@@ -813,7 +831,7 @@
                                                 $('span.download_vendor').text('');
                                                 $('i.download_vendor').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
                                                 $('a.download_vendor').attr('title', (typeof data.exectime == 'undefined') ? '0' + ' s' : data.exectime.toString() + ' s');
-                                                $('#exectime').text((typeof data.exectime == 'undefined') ? parseFloat(exectime) + 0 : parseFloat(exectime) + parseFloat(data.exectime));
+                                                $('#exectime').text(parseFloat($('#exectime').text()) + parseFloat((typeof data.exectime == 'undefined') ? 0 : data.exectime));
                                                 
                                                 
                                                 param = {
@@ -840,7 +858,8 @@
                                                         $('span.setup_env').text('');
                                                         $('i.setup_env').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
                                                         $('a.setup_env').attr('title', (typeof data.exectime == 'undefined') ? '0' + ' s' : data.exectime.toString() + ' s');
-                                                        $('#exectime').text((typeof data.exectime == 'undefined') ? parseFloat(exectime) + 0 : parseFloat(exectime) + parseFloat(data.exectime));
+                                                        $('#exectime').text(parseFloat($('#exectime').text()) + parseFloat((typeof data.exectime == 'undefined') ? 0 : data.exectime));
+                                                        
                                                         
                                                         param = {'action':'download_common_pkg'};
                                                         doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
@@ -853,7 +872,7 @@
                                                                 $('span.download_common_pkg').text('');
                                                                 $('i.download_common_pkg').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
                                                                 $('a.download_common_pkg').attr('title', (typeof data.exectime == 'undefined') ? '0' + ' s' : data.exectime.toString() + ' s');
-                                                                $('#exectime').text((typeof data.exectime == 'undefined') ? parseFloat(exectime) + 0 : parseFloat(exectime) + parseFloat(data.exectime));
+                                                                $('#exectime').text(parseFloat($('#exectime').text()) + parseFloat((typeof data.exectime == 'undefined') ? 0 : data.exectime));
                                                                 
                                                                 
                                                                 param = {
@@ -877,7 +896,8 @@
                                                                         $('span.install_all_pkg').text('');
                                                                         $('i.install_all_pkg').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
                                                                         $('a.install_all_pkg').attr('title', (typeof data.exectime == 'undefined') ? '0' + ' s' : data.exectime.toString() + ' s');
-                                                                        $('#exectime').text((typeof data.exectime == 'undefined') ? parseFloat(exectime) + 0 : parseFloat(exectime) + parseFloat(data.exectime));
+                                                                        $('#exectime').text(parseFloat($('#exectime').text()) + parseFloat((typeof data.exectime == 'undefined') ? 0 : data.exectime));
+                                                                        
                                                                         
                                                                         param = {
                                                                         		'action':'artisan_call',
@@ -899,7 +919,7 @@
                                                                                 $('span.artisan_call').text('');
                                                                                 $('i.artisan_call').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
                                                                                 $('a.artisan_call').attr('title', (typeof data.exectime == 'undefined') ? '0' + ' s' : data.exectime.toString() + ' s');
-                                                                                $('#exectime').text((typeof data.exectime == 'undefined') ? parseFloat(exectime) + 0 : parseFloat(exectime) + parseFloat(data.exectime));
+                                                                                $('#exectime').text(parseFloat($('#exectime').text()) + parseFloat((typeof data.exectime == 'undefined') ? 0 : data.exectime));
                                                                                 
                                                                                 
                                                                                 param = {
@@ -922,7 +942,7 @@
                                                                                         $('span.finished_setup').text('');
                                                                                         $('i.finished_setup').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
                                                                                         $('a.finished_setup').attr('title', (typeof data.exectime == 'undefined') ? '0' + ' s' : data.exectime.toString() + ' s');
-                                                                                        $('#exectime').text((typeof data.exectime == 'undefined') ? parseFloat(exectime) + 0 : parseFloat(exectime) + parseFloat(data.exectime));
+                                                                                        $('#exectime').text(parseFloat($('#exectime').text()) + parseFloat((typeof data.exectime == 'undefined') ? 0 : data.exectime));
                                                                                         
                                                                                         
                                                                                     }
@@ -930,6 +950,8 @@
                                                                                     param = {'action':'remove_installer_api'};
                                                                                     doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
                                                                                         console.log(data);
+                                                                                        $('#exectime').text(parseFloat($('#exectime').text()) + parseFloat((typeof data.exectime == 'undefined') ? 0 : data.exectime));
+                                                                                        
                                                                                     });
                                                                                     
                                                                                     window.location.href = window.location.origin + '/admin/login';
