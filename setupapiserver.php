@@ -791,12 +791,13 @@ class RVsitebuilder_Setup_API {
             if ( file_exists(dirname(__FILE__).'/error_log') ) unlink(dirname(__FILE__).'/error_log');
             if ( file_exists(dirname(__FILE__).'/setup.php') ) unlink(dirname(__FILE__).'/setup.php');
             //if ( file_exists(dirname(__FILE__).'/setupapiserver.php') ) unlink(dirname(__FILE__).'/setupapiserver.php');
+            if ( file_exists(dirname(__FILE__).'/../domainready.png') ) unlink(dirname(__FILE__).'/../domainready.png');
             
             //remove dir
             $this->rrmdir(dirname(__FILE__).'/tmp');
             $this->rrmdir(dirname(__FILE__).'/vendor');
             $this->rrmdir(dirname(__FILE__).'/src');
-            //$this->rrmdir(__DIR__.'/../rvsitebuilder');
+            //$this->rrmdir(dirname(__FILE__).'/../rvsitebuilder');
             
             $this->print_debug_log("Removed Installer Path");
         }
