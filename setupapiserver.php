@@ -360,7 +360,7 @@ class RVsitebuilder_Setup_API {
         $downloadurl =  $this->mirror.'/download/rvsitebuilder/framework';
         if(isset($this->installerconfig['framework']['getversion']) && $this->installerconfig['framework']['getversion'] == 'latest') 
         { $downloadurl = $this->mirror.'/download/rvsitebuilder/framework/tier/latest'; }
-        if(isset($this->installerconfig['framework']['getversion']) && preg_match('/[0-9]+\.[0-9]+\.[0-9]+)/',$this->installerconfig['framework']['getversion'])) 
+        if(isset($this->installerconfig['framework']['getversion']) && preg_match('/[0-9]+\.[0-9]+\.[0-9]+/',$this->installerconfig['framework']['getversion'])) 
         { $downloadurl = $this->mirror.'/download/rvsitebuilder/framework/version/'.$this->installerconfig['framework']['getversion']; }
         
         $this->print_debug_log("Download Framework URL ".$downloadurl);
@@ -552,7 +552,7 @@ class RVsitebuilder_Setup_API {
             $downloadurl = $this->mirror.'/download/rvsitebuilder/'.$pkg ;
             if(isset($this->installerconfig[$pkg]['getversion']) && $this->installerconfig[$pkg]['getversion'] == 'latest') 
             { $downloadurl = $this->mirror.'/download/rvsitebuilder/'.$pkg.'/tier/latest'; }
-            if(isset($this->installerconfig[$pkg]['getversion']) && preg_match('/[0-9]+\.[0-9]+\.[0-9]+)/',$this->installerconfig[$pkg]['getversion'])) 
+            if(isset($this->installerconfig[$pkg]['getversion']) && preg_match('/[0-9]+\.[0-9]+\.[0-9]+/',$this->installerconfig[$pkg]['getversion'])) 
             { $downloadurl = $this->mirror.'/download/rvsitebuilder/'.$pkg.'/version/'.$this->installerconfig[$pkg]['getversion']; }
             
 
@@ -657,7 +657,7 @@ class RVsitebuilder_Setup_API {
         
         //call artisan
         $app = require_once  $homeuser.'/rvsitebuildercms/'.$domainname.'/bootstrap/app.php';
-        $this->print_debug_log("require  ".$app);
+        $this->print_debug_log('require_one '.$homeuser.'/rvsitebuildercms/'.$domainname.'/bootstrap/app.php');
         $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
         
         
