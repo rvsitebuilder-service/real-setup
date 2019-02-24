@@ -134,7 +134,7 @@ class RVsitebuilder_Setup_API {
     }
     
     public function getInstallerConfig() {
-        $this->print_debug_log(__METHOD__);
+        $this->print_debug_log('======'.__METHOD__.'======');
         
         //defaultconfig
         $defconfig = parse_ini_file(dirname(__FILE__).'/rvsitebuilderinstallerconfig_dist/config.ini',true);
@@ -152,7 +152,7 @@ class RVsitebuilder_Setup_API {
     
     
     public function gethttpasuser() {
-        $this->print_debug_log(__METHOD__);
+        $this->print_debug_log('======'.__METHOD__.'======');
         
         if(function_exists('posix_getpwuid')){
             $homepath_owner = posix_getpwuid(fileowner($_SERVER["DOCUMENT_ROOT"]))['name'];
@@ -162,12 +162,12 @@ class RVsitebuilder_Setup_API {
                 return true;
             }
         }
-        $this->print_debug_log("HTTP AS USER   FALSE");
+        $this->print_debug_log("HTTP AS USER FALSE");
         return false;
     }
     
     public function verify_token($rvsb_installing_token='',$ignore_token=0) {
-        $this->print_debug_log(__METHOD__);
+        $this->print_debug_log('======'.__METHOD__.'======');
         
         if($ignore_token == 1) {
             $this->print_debug_log("Ignore Token");
@@ -185,18 +185,18 @@ class RVsitebuilder_Setup_API {
             $tokenvalue = file_get_contents(dirname(__FILE__).'/.Rvsb-Installing-Token');
             if(trim($tokenvalue) != trim($rvsb_installing_token)){
                 $this->print_debug_log("Token Wrong");
-                $this->print_install_log(__METHOD__.' FALSE (Token Wrong)');
+                $this->print_install_log(__METHOD__.' status FALSE (Token Wrong)');
                 $this->response['message'] = 'Wrong!!!!';
                 return $this->print_response($this->response);
             }
         }
-        $this->print_install_log(__METHOD__.' FALSE (Token pass)');
+        $this->print_install_log(__METHOD__.' __METHOD__.' status TRUE' (Token pass)');
         return true;
     }
     
     public function send_token() {
         $time_start = microtime(true);
-        $this->print_debug_log(__METHOD__);
+        $this->print_debug_log('======'.__METHOD__.'======');
         
         $this->response['status'] = true;
         $this->response['rvsb_installing_token'] = $this->generateSecretKey(128);
@@ -211,7 +211,7 @@ class RVsitebuilder_Setup_API {
     
     public function pre_check_php() {
         $time_start = microtime(true);
-        $this->print_debug_log(__METHOD__);
+        $this->print_debug_log('======'.__METHOD__.'======');
         
         $this->response['status'] = true;
         
@@ -345,7 +345,7 @@ class RVsitebuilder_Setup_API {
             $this->print_install_log(__METHOD__.' TRUE '.' timeusage '.$this->response['exectime']);
             $this->response['message'] = "PHP Version,Extentsion,INI OK";
         } else {
-            $this->print_install_log(__METHOD__.' FALSE '.$this->response['message'].' timeusage '.$this->response['exectime'] .' timeusage '.$this->response['exectime']);
+            $this->print_install_log(__METHOD__.' status FALSE '.$this->response['message'].' timeusage '.$this->response['exectime'] .' timeusage '.$this->response['exectime']);
         }
         
         return $this->print_response($this->response);
@@ -354,7 +354,7 @@ class RVsitebuilder_Setup_API {
     
     public function download_framework() {
         $time_start = microtime(true);
-        $this->print_debug_log(__METHOD__);
+        $this->print_debug_log('======'.__METHOD__.'======');
         
         //download framework
         $downloadurl =  $this->mirror.'/download/rvsitebuilder/framework';
@@ -369,7 +369,7 @@ class RVsitebuilder_Setup_API {
         if(! $downloadframework){
             $this->response['message'] = 'Can not download framework';
             $this->response['exectime'] = (microtime(true) - $time_start);
-            $this->print_install_log(__METHOD__.' FALSE (Download Framework  Failed)'.$downloadurl.' timeusage '.$this->response['exectime']);
+            $this->print_install_log(__METHOD__.' status FALSE (Download Framework  Failed)'.$downloadurl.' timeusage '.$this->response['exectime']);
             $this->print_debug_log("Download Framework  Failed");
             return $this->print_response($this->response);
         }
@@ -378,7 +378,7 @@ class RVsitebuilder_Setup_API {
         if(! $extractframework) {
             $this->response['message'] = 'Can not extract framework.tar.gz';
             $this->response['exectime'] = (microtime(true) - $time_start);
-            $this->print_install_log(__METHOD__.' FALSE (Extract Framework Failed)'.' timeusage '.$this->response['exectime']);
+            $this->print_install_log(__METHOD__.' status FALSE (Extract Framework Failed)'.' timeusage '.$this->response['exectime']);
             $this->print_debug_log("Extract Framework Failed");
             return $this->print_response($this->response);
         }
@@ -386,19 +386,19 @@ class RVsitebuilder_Setup_API {
         $this->response['exectime'] = (microtime(true) - $time_start);
         $this->response['status'] = true;
         $this->response['message'] = 'Download Framework Success';
-        $this->print_install_log(__METHOD__.' TRUE'.' timeusage '.$this->response['exectime']);
+        $this->print_install_log(__METHOD__.' status TRUE'.' timeusage '.$this->response['exectime']);
         return $this->print_response($this->response);
     } 
     
     public function download_vendor() {
         $time_start = microtime(true);
-        $this->print_debug_log(__METHOD__);
+        $this->print_debug_log('======'.__METHOD__.'======');
         
         //check rvsitebuilder.json
         if(! file_exists(dirname(__FILE__).'/tmp/rvsitebuilder.json')){
             $this->response['message'] = 'Can not open file rvsitebuilder.json';
             $this->response['exectime'] = (microtime(true) - $time_start);
-            $this->print_install_log(__METHOD__.' FALSE'."Not found ".dirname(__FILE__).'/tmp/rvsitebuilder.json'.' timeusage '.$this->response['exectime']);
+            $this->print_install_log(__METHOD__.' status FALSE'."Not found ".dirname(__FILE__).'/tmp/rvsitebuilder.json'.' timeusage '.$this->response['exectime']);
             return $this->print_response($this->response);
         }
         
@@ -420,7 +420,7 @@ class RVsitebuilder_Setup_API {
             if(! $downloadvendor) {
                 $this->response['message'] = 'Can not download vendor';
                 $this->response['exectime'] = (microtime(true) - $time_start);
-                $this->print_install_log(__METHOD__.' FALSE (Can not download vendor) '.$downloadvendorurl.' timeusage '.$this->response['exectime']);
+                $this->print_install_log(__METHOD__.' status FALSE (Can not download vendor) '.$downloadvendorurl.' timeusage '.$this->response['exectime']);
                 $this->print_debug_log("Can not download ".$downloadvendorurl);
                 return $this->print_response($this->response);
             }
@@ -428,7 +428,7 @@ class RVsitebuilder_Setup_API {
             if(! $extractvendor) {
                 $this->response['message'] = 'Can not extract vendor.tar.gz';
                 $this->response['exectime'] = (microtime(true) - $time_start);
-                $this->print_install_log(__METHOD__.' FALSE (Can not extract vendor.tar.gz) '.' timeusage '.$this->response['exectime']);
+                $this->print_install_log(__METHOD__.' status FALSE (Can not extract vendor.tar.gz) '.' timeusage '.$this->response['exectime']);
                 $this->print_debug_log("Can not extract ".dirname(__FILE__).'/bundle_vendor.tar.gz');
                 return $this->print_response($this->response);
             }
@@ -453,7 +453,7 @@ class RVsitebuilder_Setup_API {
                 if(! $downloadvendor) {
                     $this->response['message'] = 'Can not download vendor '.$downloadvendorurl;
                     $this->response['exectime'] = (microtime(true) - $time_start);
-                    $this->print_install_log(__METHOD__.' FALSE (Can not download vendor) '.$downloadvendorurl.' timeusage '.$this->response['exectime']);
+                    $this->print_install_log(__METHOD__.' status FALSE (Can not download vendor) '.$downloadvendorurl.' timeusage '.$this->response['exectime']);
                     $this->print_debug_log("Can not download ".$downloadvendorurl);
                     return $this->print_response($this->response);
                 }
@@ -461,7 +461,7 @@ class RVsitebuilder_Setup_API {
                 if(! $extractvendor) {
                     $this->response['message'] = 'Can not extract vendor '.$package_name_encoded;
                     $this->response['exectime'] = (microtime(true) - $time_start);
-                    $this->print_install_log(__METHOD__.' FALSE (Can not extract vendor) '.$package_name_encoded.' timeusage '.$this->response['exectime']);
+                    $this->print_install_log(__METHOD__.' status FALSE (Can not extract vendor) '.$package_name_encoded.' timeusage '.$this->response['exectime']);
                     $this->print_debug_log("Can not extract ".dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
                     return $this->print_response($this->response);
                 }
@@ -487,7 +487,7 @@ class RVsitebuilder_Setup_API {
         $this->response['status'] = true;
         $this->response['message'] = 'Download Vendor Success';
         $this->response['exectime'] = (microtime(true) - $time_start);
-        $this->print_install_log(__METHOD__.' TRUE'.' timeusage '.$this->response['exectime']);
+        $this->print_install_log(__METHOD__.' status TRUE'.' timeusage '.$this->response['exectime']);
         return $this->print_response($this->response);
         
         
@@ -496,7 +496,7 @@ class RVsitebuilder_Setup_API {
     
     public function setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname,$ftpserver,$ftpport) {
         $time_start = microtime(true);
-        $this->print_debug_log(__METHOD__);
+        $this->print_debug_log('======'.__METHOD__.'======');
         
         //TODO clear whitespace
         if (preg_match('/\s/',$appname)) $appname = '"'.$appname.'"';
@@ -521,20 +521,20 @@ class RVsitebuilder_Setup_API {
             $this->response['status'] = true;
             $this->response['message'] = 'Setup .env Success';
             $this->response['exectime'] = (microtime(true) - $time_start);
-            $this->print_install_log(__METHOD__.' TRUE'.' timeusage '.$this->response['exectime']);
+            $this->print_install_log(__METHOD__.' status TRUE'.' timeusage '.$this->response['exectime']);
             return $this->print_response($this->response);
         }
         
         $this->response['message'] = 'Setup .env Failed';
         $this->response['exectime'] = (microtime(true) - $time_start);
-        $this->print_install_log(__METHOD__.' FALSE (Can not setup env)'.' timeusage '.$this->response['exectime']);
+        $this->print_install_log(__METHOD__.' status FALSE (Can not setup env)'.' timeusage '.$this->response['exectime']);
         return $this->print_response($this->response);
     }
     
     
     public function download_common_pkg() {
         $time_start = microtime(true);
-        $this->print_debug_log(__METHOD__);
+        $this->print_debug_log('======'.__METHOD__.'======');
         
         $commonpkg = [  'blog',
                         'core',
@@ -563,7 +563,7 @@ class RVsitebuilder_Setup_API {
             if(! $downloadpkg){
                 $this->response['message'] = 'Can not download package '.$pkg;
                 $this->response['exectime'] = (microtime(true) - $time_start);
-                $this->print_install_log(__METHOD__.' FALSE (Can not download package) '.$pkg.' timeusage '.$this->response['exectime']);
+                $this->print_install_log(__METHOD__.' status FALSE (Can not download package) '.$pkg.' timeusage '.$this->response['exectime']);
                 $this->print_debug_log("Can not download package ".$pkg);
                 return $this->print_response($this->response);
             }
@@ -572,7 +572,7 @@ class RVsitebuilder_Setup_API {
             if(! $extractpkg) {
                 $this->response['message'] = 'Can not extract package '.$pkg;
                 $this->response['exectime'] = (microtime(true) - $time_start);
-                $this->print_install_log(__METHOD__.' FALSE (Can not extract package) '.$pkg.' timeusage '.$this->response['exectime']);
+                $this->print_install_log(__METHOD__.' status FALSE (Can not extract package) '.$pkg.' timeusage '.$this->response['exectime']);
                 $this->print_debug_log("Can not extract package ".$pkg);
                 return $this->print_response($this->response);
             }
@@ -602,7 +602,7 @@ class RVsitebuilder_Setup_API {
                 if(! $downloadvendor) {
                     $this->response['message'] = 'Can not download vendor '.$downloadvendorurl;
                     $this->response['exectime'] = (microtime(true) - $time_start);
-                    $this->print_install_log(__METHOD__.' FALSE (Can not download vendor) '.$downloadvendorurl.' timeusage '.$this->response['exectime']);
+                    $this->print_install_log(__METHOD__.' status FALSE (Can not download vendor) '.$downloadvendorurl.' timeusage '.$this->response['exectime']);
                     $this->print_debug_log("Can not download vendor URL ".$downloadvendorurl);
                     return $this->print_response($this->response);
                 }
@@ -610,7 +610,7 @@ class RVsitebuilder_Setup_API {
                 if(! $extractvendor) {
                     $this->response['message'] = 'Can not extract vendor '.$package_name_encoded;
                     $this->response['exectime'] = (microtime(true) - $time_start);
-                    $this->print_install_log(__METHOD__.' FALSE (Can not extract vendor) '.$package_name_encoded.' timeusage '.$this->response['exectime']);
+                    $this->print_install_log(__METHOD__.' status FALSE (Can not extract vendor) '.$package_name_encoded.' timeusage '.$this->response['exectime']);
                     $this->print_debug_log("Can not extract ".dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
                     return $this->print_response($this->response);
                 }
@@ -623,7 +623,7 @@ class RVsitebuilder_Setup_API {
         $this->response['status'] = true;
         $this->response['message'] = 'Install Common Package(s) Success';
         $this->response['exectime'] = (microtime(true) - $time_start);
-        $this->print_install_log(__METHOD__.' TRUE'.' timeusage '.$this->response['exectime']);
+        $this->print_install_log(__METHOD__.' status TRUE'.' timeusage '.$this->response['exectime']);
         return $this->print_response($this->response);
         
     }
@@ -631,7 +631,7 @@ class RVsitebuilder_Setup_API {
     
     public function artisan_call($homeuser,$domainname,$publicpath,$adminemail,$adminpassword,$adminfirstname,$adminlastname) {
         $time_start = microtime(true);
-        $this->print_debug_log(__METHOD__);
+        $this->print_debug_log('======'.__METHOD__.'======');
         
         //loader
         // /home/arnut/rvsitebuildercms/arnut.cpdev1.rvglobalsoft.net/vendor/autoload.php
@@ -699,13 +699,13 @@ class RVsitebuilder_Setup_API {
         $this->response['status'] = true;
         $this->response['message'] = 'Artisan Command Success';
         $this->response['exectime'] = (microtime(true) - $time_start);
-        $this->print_install_log(__METHOD__.' TRUE'.' timeusage '.$this->response['exectime']);
+        $this->print_install_log(__METHOD__.' status TRUE'.' timeusage '.$this->response['exectime']);
         return $this->print_response($this->response);
     }
     
     public function finished_setup($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport) {
         $time_start = microtime(true);
-        $this->print_debug_log(__METHOD__);
+        $this->print_debug_log('======'.__METHOD__.'======');
         
         //default 
         if($this->httpasuser){
@@ -724,7 +724,7 @@ class RVsitebuilder_Setup_API {
             $this->response['status'] = true;
             $this->response['message'] = 'Finished Setup (Default)';
             $this->response['exectime'] = (microtime(true) - $time_start);
-            $this->print_install_log(__METHOD__.' TRUE'.' timeusage '.$this->response['exectime']);
+            $this->print_install_log(__METHOD__.' status TRUE'.' timeusage '.$this->response['exectime']);
             return $this->print_response($this->response);
         } 
         //ftp 
@@ -735,13 +735,13 @@ class RVsitebuilder_Setup_API {
             $result = $ftpHandler->connect($ftpserver);
             if(!$result['success']){
                 $this->response['message'] = 'Error '.$result['msg'];
-                $this->print_install_log(__METHOD__.' FALSE (FTP connect ) '.$result['msg']);
+                $this->print_install_log(__METHOD__.' status FALSE (FTP connect ) '.$result['msg']);
                 return $this->print_response($this->response);
             }
             $result = $ftpHandler->login($ftpaccount, $ftppassword);
             if(!$result['success']){
                 $this->response['message'] = 'Error '.$result['msg'];
-                $this->print_install_log(__METHOD__.' FALSE (FTP login ) '.$result['msg']);
+                $this->print_install_log(__METHOD__.' status FALSE (FTP login ) '.$result['msg']);
                 return $this->print_response($this->response);
             }
             $result = $ftpHandler->put($publicpath.'/rvsitebuilder/INSTALL_COMPLETED','/rvsitebuildercms/'.$domainname.'/INSTALL_COMPLETED',FTP_BINARY);
@@ -761,7 +761,7 @@ class RVsitebuilder_Setup_API {
             $this->response['status'] = true;
             $this->response['message'] = 'Finished Setup (FTP)';
             $this->response['exectime'] = (microtime(true) - $time_start);
-            $this->print_install_log(__METHOD__.' TRUE'.' timeusage '.$this->response['exectime']);
+            $this->print_install_log(__METHOD__.' status TRUE'.' timeusage '.$this->response['exectime']);
             return $this->print_response($this->response);
         }
         
@@ -770,7 +770,7 @@ class RVsitebuilder_Setup_API {
     
     public function remove_installer_api() {
         $time_start = microtime(true);
-        $this->print_debug_log(__METHOD__);
+        $this->print_debug_log('======'.__METHOD__.'======');
         
         //remove file
         if(! $this->removeinstallerpath == true) {
@@ -814,14 +814,14 @@ class RVsitebuilder_Setup_API {
         $this->response['status'] = true;
         $this->response['message'] = 'Remove Installer';
         $this->response['exectime'] = (microtime(true) - $time_start);
-        $this->print_install_log(__METHOD__.' TRUE'.' timeusage '.$this->response['exectime']);
+        $this->print_install_log(__METHOD__.' status TRUE'.' timeusage '.$this->response['exectime']);
         return $this->print_response($this->response);
         
     }
     
     
     public function generateSecretKey($length = 64) {
-        $this->print_debug_log(__METHOD__);
+        $this->print_debug_log('======'.__METHOD__.'======');
         
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $charactersLength = strlen($characters);
@@ -837,7 +837,7 @@ class RVsitebuilder_Setup_API {
     
     
     public function install_all_pkg($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport) {
-        $this->print_debug_log(__METHOD__);
+        $this->print_debug_log('======'.__METHOD__.'======');
         
         if($this->httpasuser == true) {
             $this->print_debug_log("Copy Framework Default");
@@ -853,7 +853,7 @@ class RVsitebuilder_Setup_API {
     
     function copyFileFTP($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport) {
         $time_start = microtime(true);
-        $this->print_debug_log(__METHOD__);
+        $this->print_debug_log('======'.__METHOD__.'======');
         
         //TODO remove first if /home/<user>/rvsitebuildercms/$domainname
         
@@ -868,7 +868,7 @@ class RVsitebuilder_Setup_API {
             $this->response['message'] = 'Error '.$result['msg'];
             $this->response['exectime'] = (microtime(true) - $time_start);
             $this->print_debug_log("Can not connect FTP ".$result['msg']);
-            $this->print_install_log(__METHOD__.' FALSE (Can not connect FTP) '.$result['msg'].' timeusage '.$this->response['exectime']);
+            $this->print_install_log(__METHOD__.' status FALSE (Can not connect FTP) '.$result['msg'].' timeusage '.$this->response['exectime']);
             return $this->print_response($this->response);
         }
         $result = $ftpHandler->login($ftpaccount, $ftppassword);
@@ -876,7 +876,7 @@ class RVsitebuilder_Setup_API {
             $this->response['message'] = 'Error '.$result['msg'];
             $this->response['exectime'] = (microtime(true) - $time_start);
             $this->print_debug_log("Can not login FTP ".$result['msg']);
-            $this->print_install_log(__METHOD__.' FALSE (Can not login FTP) '.$result['msg'].' timeusage '.$this->response['exectime']);
+            $this->print_install_log(__METHOD__.' status FALSE (Can not login FTP) '.$result['msg'].' timeusage '.$this->response['exectime']);
             return $this->print_response($this->response);
         }
         if(!file_exists($ftp_remote_dir)){
@@ -885,7 +885,7 @@ class RVsitebuilder_Setup_API {
                 $this->response['message'] = 'Error '.$result['msg'];
                 $this->response['exectime'] = (microtime(true) - $time_start);
                 $this->print_debug_log("Can make dir  FTP $homeuser , $ftp_remote_dir ".$result['msg']);
-                $this->print_install_log(__METHOD__.' FALSE (Can not make dir FTP) '.$result['msg'].' timeusage '.$this->response['exectime']);
+                $this->print_install_log(__METHOD__.' status FALSE (Can not make dir FTP) '.$result['msg'].' timeusage '.$this->response['exectime']);
                 return $this->print_response($this->response);
             }
         }
@@ -949,7 +949,7 @@ class RVsitebuilder_Setup_API {
     
     function copyFileDefault($homeuser,$domainname,$publicpath) {
         $time_start = microtime(true);
-        $this->print_debug_log(__METHOD__);
+        $this->print_debug_log('======'.__METHOD__.'======');
         
         //remove first if /home/<user>/rvsitebuildercms/$domainname
         if(file_exists($homeuser.'/rvsitebuildercms/'.$domainname)) {
@@ -1003,7 +1003,7 @@ class RVsitebuilder_Setup_API {
     
     
     function chmod_r($path,$perm) {
-        $this->print_debug_log(__METHOD__);
+        $this->print_debug_log('======'.__METHOD__.'======');
         
         if(!is_dir($path)) {
             return true;
@@ -1020,7 +1020,7 @@ class RVsitebuilder_Setup_API {
     
     
     public function download($type, $url, $sink) {
-        $this->print_debug_log(__METHOD__);
+        $this->print_debug_log('======'.__METHOD__.'======');
         
         $client = new Client([
                                 'curl'            => [CURLOPT_SSL_VERIFYPEER => false, CURLOPT_SSL_VERIFYHOST => false],
@@ -1039,7 +1039,7 @@ class RVsitebuilder_Setup_API {
     }
     
     public function extract($file,$path) {
-        $this->print_debug_log(__METHOD__);
+        $this->print_debug_log('======'.__METHOD__.'======');
         
         $this->print_debug_log("Do Extract $file $path");
         $tar = new Tar();
@@ -1051,7 +1051,7 @@ class RVsitebuilder_Setup_API {
     
     
     public function print_response($data) {
-        $this->print_debug_log(__METHOD__);
+        $this->print_debug_log('======'.__METHOD__.'======');
         
         if($this->responseType == 'application/json' || $this->call_responsetype == 'application/json') {
             header('Content-type: application/json');
@@ -1065,7 +1065,7 @@ class RVsitebuilder_Setup_API {
     
     
     public function rrmdir($dir) {
-        $this->print_debug_log(__METHOD__);
+        $this->print_debug_log('======'.__METHOD__.'======');
         
         if (is_dir($dir)) {
             $objects = scandir($dir);
@@ -1086,7 +1086,7 @@ class RVsitebuilder_Setup_API {
      * updateuserinfo('1','last_name','bbbbb');
      */
     public function updateuserinfo($user_id,$update_key,$update_val){
-        $this->print_debug_log(__METHOD__);
+        $this->print_debug_log('======'.__METHOD__.'======');
         
         $response = [];
         $response['success'] = 'true';
@@ -1128,7 +1128,7 @@ class RVsitebuilder_Setup_API {
     }
     
     public function getEnvData($envKey = ''){
-        $this->print_debug_log(__METHOD__);
+        $this->print_debug_log('======'.__METHOD__.'======');
         
         $this->print_debug_log("env key $envKey");
         
@@ -1163,7 +1163,7 @@ class RVsitebuilder_Setup_API {
     }
     
     public function setEnv($env_file,$env_data = [],$force = false){
-        $this->print_debug_log(__METHOD__);
+        $this->print_debug_log('======'.__METHOD__.'======');
         
         $this->print_debug_log("ENV File=$env_file Data=".join(',',$env_data)." Force=$force");
         
@@ -1213,7 +1213,7 @@ class RVsitebuilder_Setup_API {
     
     public function get_user_path() {
         $time_start = microtime(true);
-        $this->print_debug_log(__METHOD__);
+        $this->print_debug_log('======'.__METHOD__.'======');
         
         $mainHome = '';
      
@@ -1278,7 +1278,7 @@ class RVsitebuilder_Setup_API {
    
     
 //     public function check_pre_require() {
-//         $this->print_debug_log(__METHOD__);
+//         $this->print_debug_log('======'.__METHOD__.'======');
         
 //         //php version
 //         $this->response['check_pre_require']['phpversion']['check'] = true;
@@ -1362,7 +1362,7 @@ class RVsitebuilder_Setup_API {
     
     public function check_http_as_user() {
         $time_start = microtime(true);
-        $this->print_debug_log(__METHOD__);
+        $this->print_debug_log('======'.__METHOD__.'======');
         
         $this->response['status'] = true;
         $this->response['httpasuser'] = $this->httpasuser;
@@ -1377,7 +1377,7 @@ class RVsitebuilder_Setup_API {
     
     public function test_database_ftp_connect($dbhost,$dbname,$dbuser,$dbpassword,$ftpserver,$ftpaccount,$ftppassword,$ftpport) {
         $time_start = microtime(true);
-        $this->print_debug_log(__METHOD__);
+        $this->print_debug_log('======'.__METHOD__.'======');
         
         ini_set('display_errors', 0);
         
@@ -1421,7 +1421,7 @@ class RVsitebuilder_Setup_API {
     
     public function check_license() {
         $time_start = microtime(true);
-        $this->print_debug_log(__METHOD__);
+        $this->print_debug_log('======'.__METHOD__.'======');
         
         $this->response['status'] = true;
         $this->response['exectime'] = (microtime(true) - $time_start);
@@ -1431,7 +1431,7 @@ class RVsitebuilder_Setup_API {
     
     public function disk_required() {
         $time_start = microtime(true);
-        $this->print_debug_log(__METHOD__);
+        $this->print_debug_log('======'.__METHOD__.'======');
         
         $this->response['status'] = true;
         $this->response['exectime'] = (microtime(true) - $time_start);
