@@ -1009,7 +1009,7 @@ class RVsitebuilder_Setup_API {
             $this->print_debug_log("Has Old .htaccess $publicpath/.htaccess");
             $writeoldhtaccess = file_put_contents($publicpath.'/.htaccess.backup' , $oldhtaccess);
             $this->print_debug_log("file put backup .htaccess ".$publicpath.'/.htaccess.backup');
-            if (! preg_match('/^#Start Rvsitebuilder7 htaccess$/', $oldhtaccess)) {
+            if (! preg_match('/^#Start Rvsitebuilder7 htaccess$/im', $oldhtaccess)) {
                 $writehtaccess =  file_put_contents($publicpath.'/.htaccess' , $frameworkhtaccess."\n".$oldhtaccess);
                 $this->print_debug_log("file put prepend .htaccess ".$publicpath.'/.htaccess');
             }
