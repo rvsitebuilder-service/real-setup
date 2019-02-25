@@ -190,7 +190,7 @@ class RVsitebuilder_Setup_API {
                 return $this->print_response($this->response);
             }
         }
-        $this->print_install_log(__METHOD__.' __METHOD__.' status TRUE' (Token pass)');
+        $this->print_install_log(__METHOD__.' __METHOD__'.' status TRUE (Token pass)');
         return true;
     }
     
@@ -713,12 +713,15 @@ class RVsitebuilder_Setup_API {
             $this->print_debug_log("TOUCH INSTALL_COMPLETED");
             file_put_contents($homeuser.'/rvsitebuildercms/'.$domainname.'/INSTALL_COMPLETED', '');
             
-            //install_log , error_log
+            //install_log , error_log , rvdebug
             if(file_exists($publicpath.'/rvsitebuilder/install_log.txt')){
                 copy($publicpath.'/rvsitebuilder/install_log.txt', $publicpath.'/rvsitebuilder_install_log.txt');
             }
             if(file_exists($publicpath.'/rvsitebuilder/error_log')){
                 copy($publicpath.'/rvsitebuilder/error_log', $publicpath.'/rvsitebuilder_install_error_log.txt');
+            }
+            if(file_exists($publicpath.'/rvsitebuilder/rvdebug.php')){
+                copy($publicpath.'/rvsitebuilder/rvdebug.php', $publicpath.'/rvdebug.php');
             }
             
             $this->response['status'] = true;
@@ -754,6 +757,9 @@ class RVsitebuilder_Setup_API {
             }
             if(file_exists($publicpath.'/rvsitebuilder/error_log')){
                 $result = $ftpHandler->put($publicpath.'/rvsitebuilder/error_log' , '/'.$public_html.'/rvsitebuilder_install_error_log.txt' ,FTP_BINARY);
+            }
+            if(file_exists($publicpath.'/rvsitebuilder/rvdebug.php')){
+                $result = $ftpHandler->put($publicpath.'/rvsitebuilder/rvdebug.php' , '/'.$public_html.'/rvdebug.php' ,FTP_BINARY);
             }
             
             $ftpHandler->close();
