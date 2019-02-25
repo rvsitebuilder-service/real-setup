@@ -911,21 +911,32 @@ class RVsitebuilder_Setup_API {
         $frameworkhtaccess = '';
         if (file_exists($homeuser.'/rvsitebuildercms/'.$domainname.'/public/.htaccess')) {
             $frameworkhtaccess = file_get_contents($homeuser.'/rvsitebuildercms/'.$domainname.'/public/.htaccess');
+            $frameworkhtaccess = "#Start Rvsitebuilder7 htaccess\n".
+                                 $frameworkhtaccess."\n".
+                                 $oldhtaccess."\n".
+                                 "#End Rvsitebuilder7 htaccess\n";
         }
         $oldhtaccess = '';
         if (file_exists($publicpath.'/.htaccess')) {
             $oldhtaccess = file_get_contents($publicpath.'/.htaccess');
             $this->print_debug_log("Has Old .htaccess $publicpath/.htaccess");
+            if (! preg_match('/^#Start Rvsitebuilder7 htaccess$/im', $oldhtaccess)) {
+                $writeoldhtaccess = file_put_contents(dirname(__FILE__).'/htaccess.backup' , $oldhtaccess);
+                $this->print_debug_log("Write Old .htaccess ".dirname(__FILE__)."/htaccess.backup");
+                $writehtaccess =  file_put_contents(dirname(__FILE__).'/htaccess.tmp' , $frameworkhtaccess."\n".$oldhtaccess);
+                $this->print_debug_log("Create tmp .htaccess ".dirname(__FILE__)."/htaccess.tmp");
+                $result = $ftpHandler->put(dirname(__FILE__).'/htaccess.tmp',$public_html.'/.htaccess',FTP_BINARY);
+                $this->print_debug_log("FTP put prepend ".dirname(__FILE__).'/htaccess.tmp'.' To '.$public_html.'/.htaccess');
+                $result = $ftpHandler->put(dirname(__FILE__).'/htaccess.backup',$public_html.'/.htaccess.backup',FTP_BINARY);
+                $this->print_debug_log("FTP put ".dirname(__FILE__).'/htaccess.backup'.' To '.$public_html.'/.htaccess.backup');
+            }
+        } else {
+            $writehtaccess =  file_put_contents(dirname(__FILE__).'/htaccess.tmp' , $frameworkhtaccess);
+            $this->print_debug_log("Create tmp .htaccess ".dirname(__FILE__)."/htaccess.tmp");
+            $result = $ftpHandler->put(dirname(__FILE__).'/htaccess.tmp',$public_html.'/.htaccess',FTP_BINARY);
+            $this->print_debug_log("FTP put new ".dirname(__FILE__).'/htaccess.tmp'.' To '.$public_html.'/.htaccess');
         }
-        $writeoldhtaccess = file_put_contents(dirname(__FILE__).'/htaccess.backup' , $oldhtaccess);
-        $writehtaccess =  file_put_contents(dirname(__FILE__).'/htaccess.tmp' , $frameworkhtaccess."\n".$oldhtaccess);
-        if(trim($oldhtaccess) != ''){
-            $result = $ftpHandler->put(dirname(__FILE__).'/htaccess.backup',$public_html.'/.htaccess.backup',FTP_BINARY);
-            $this->print_debug_log("FTP put ".dirname(__FILE__).'/htaccess.backup'.' To '.$public_html.'/.htaccess.backup');
-        }
-        $result = $ftpHandler->put(dirname(__FILE__).'/htaccess.tmp',$public_html.'/.htaccess',FTP_BINARY);
-        $this->print_debug_log("FTP put ".dirname(__FILE__).'/htaccess.tmp'.' To '.$public_html.'/.htaccess');
-        
+      
         #chmod folder
         $ftpHandler->ftp_change_mod_r($publicpath.'/storage',$public_html.'/storage' , 0777);
         $this->print_debug_log("FTP change mod ".$publicpath.'/storage'.'  '.$public_html.'/storage'. '0777');
@@ -987,18 +998,27 @@ class RVsitebuilder_Setup_API {
         $frameworkhtaccess = '';
         if (file_exists($homeuser.'/rvsitebuildercms/'.$domainname.'/public/.htaccess')) {
             $frameworkhtaccess = file_get_contents($homeuser.'/rvsitebuildercms/'.$domainname.'/public/.htaccess');
+            $frameworkhtaccess = "#Start Rvsitebuilder7 htaccess\n".
+                                 $frameworkhtaccess."\n".
+                                 $oldhtaccess."\n".
+                                 "#End Rvsitebuilder7 htaccess\n";
         }
         $oldhtaccess = '';
         if (file_exists($publicpath.'/.htaccess')) {
             $oldhtaccess = file_get_contents($publicpath.'/.htaccess');
             $this->print_debug_log("Has Old .htaccess $publicpath/.htaccess");
-        }
-        if(trim($oldhtaccess) != ''){
             $writeoldhtaccess = file_put_contents($publicpath.'/.htaccess.backup' , $oldhtaccess);
             $this->print_debug_log("file put backup .htaccess ".$publicpath.'/.htaccess.backup');
+            if (! preg_match('/^#Start Rvsitebuilder7 htaccess$/', $oldhtaccess)) {
+                $writehtaccess =  file_put_contents($publicpath.'/.htaccess' , $frameworkhtaccess."\n".$oldhtaccess);
+                $this->print_debug_log("file put prepend .htaccess ".$publicpath.'/.htaccess');
+            }
+        } else {
+            $writehtaccess =  file_put_contents($publicpath.'/.htaccess' , $frameworkhtaccess);
+            $this->print_debug_log("file put new .htaccess ".$publicpath.'/.htaccess');
         }
-        $writehtaccess =  file_put_contents($publicpath.'/.htaccess' , $frameworkhtaccess."\n".$oldhtaccess);
-        $this->print_debug_log("file put new .htaccess ".$publicpath.'/.htaccess');
+        
+        
         
         $this->response['status'] = true;
         $this->response['message'] = 'Move Freamwork and Public success (default)';
@@ -1283,88 +1303,7 @@ class RVsitebuilder_Setup_API {
     
    
     
-//     public function check_pre_require() {
-//         $this->print_debug_log('======'.__METHOD__.'======');
-        
-//         //php version
-//         $this->response['check_pre_require']['phpversion']['check'] = true;
-//         if (version_compare(PHP_VERSION, '7.1.3') < 0) {
-//             $this->response['check_pre_require']['phpversion']['check'] = false;
-//             $this->response['check_pre_require']['phpversion']['reason'] = '';
-//         }
-        
-//         //php extension
-//         $this->response['check_pre_require']['mysqlnd']['check'] = true;
-//         if (!extension_loaded('mysqlnd')) {
-//             $this->response['check_pre_require']['mysqlnd']['check'] = false;
-//             $this->response['check_pre_require']['mysqlnd']['reason'] = '';
-//         }
-//         $this->response['check_pre_require']['pdo']['check'] = true;
-//         if (!extension_loaded('pdo')) {
-//             $this->response['check_pre_require']['pdo']['check'] = false;
-//             $this->response['check_pre_require']['pdo']['reason'] = '';
-//         }
-//         $this->response['check_pre_require']['gd']['check'] = true;
-//         if (!extension_loaded('gd')) {
-//             $this->response['check_pre_require']['gd']['check'] = false;
-//             $this->response['check_pre_require']['gd']['reason'] = '';
-//         }
-//         $this->response['check_pre_require']['curl']['check'] = true;
-//         if (!extension_loaded('curl')) {
-//             $this->response['check_pre_require']['curl']['check'] = false;
-//             $this->response['check_pre_require']['curl']['reason'] = '';
-//         }
-//         $this->response['check_pre_require']['iconv']['check'] = true;
-//         if (!extension_loaded('iconv')) {
-//             $this->response['check_pre_require']['iconv']['check'] = false;
-//             $this->response['check_pre_require']['iconv']['reason'] = '';
-//         }
-//         $this->response['check_pre_require']['mbstring']['check'] = true;
-//         if (!extension_loaded('mbstring')) {
-//             $this->response['check_pre_require']['mbstring']['check'] = false;
-//             $this->response['check_pre_require']['mbstring']['reason'] = '';
-//         }
-//         $this->response['check_pre_require']['fileinfo']['check'] = true;
-//         if (!extension_loaded('fileinfo')) {
-//             $this->response['check_pre_require']['fileinfo']['check'] = false;
-//             $this->response['check_pre_require']['fileinfo']['reason'] = '';
-//         }
-//         $this->response['check_pre_require']['exif']['check'] = true;
-//         if (!extension_loaded('exif')) {
-//             $this->response['check_pre_require']['exif']['check'] = false;
-//             $this->response['check_pre_require']['exif']['reason'] = '';
-//         }
-//         $this->response['check_pre_require']['zip']['check'] = true;
-//         if (!extension_loaded('zip')) {
-//             $this->response['check_pre_require']['zip']['check'] = false;
-//             $this->response['check_pre_require']['zip']['reason'] = '';
-//         }
-        
-        
-        
-//         //php config
-//         $this->response['check_pre_require']['allow_url_fopen']['check'] = true;
-//         if (ini_get('allow_url_fopen') != 1) {
-//             $this->response['check_pre_require']['allow_url_fopen']['check'] = false;
-//             $this->response['check_pre_require']['allow_url_fopen']['reason'] = '';
-//         }
-//         $this->response['check_pre_require']['memory_limit']['check'] = true;
-//         preg_match('/([0-9]+)/',ini_get('memory_limit'),$match);
-//         if($match[0] < 64) {
-//             $this->response['check_pre_require']['memory_limit']['check'] = false;
-//             $this->response['check_pre_require']['memory_limit']['reason'] = '';
-//         }
-        
-//         //php function
-//         $this->response['check_pre_require']['proc_open']['check'] = true;
-//         if (!function_exists('proc_open')) {
-//             $this->response['check_pre_require']['proc_open']['check'] = false;
-//             $this->response['check_pre_require']['proc_open']['reason'] = '';
-//         }
-        
-//         $this->response['status'] = true;
-//         return $this->print_response($this->response);
-//     }
+
     
     public function check_http_as_user() {
         $time_start = microtime(true);
