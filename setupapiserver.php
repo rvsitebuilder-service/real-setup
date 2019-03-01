@@ -29,7 +29,7 @@ $adminlastname          = (isset($_GET['adminlastname']))               ? $_GET[
 
 
 
-$setupObj = new RVsitebuilder_Setup_API($responsetype,$rvsb_installing_token,$call_responsetype,$ignore_token);
+$setupObj = new RVsitebuilder_Setup_API($responsetype,$rvsb_installing_token,$responsetype,$ignore_token);
 
 
 if($action == '' && !file_exists(dirname(__FILE__).'/.Rvsb-Installing-Token' && $rvsb_installing_token == 0)) {
@@ -103,7 +103,8 @@ class RVsitebuilder_Setup_API {
     protected $response;
     protected $serverconf;
     protected $downloadurl;
-    protected $debug;
+    protected $debug_log;
+    protected $install_log;
     protected $httpasuser;
     protected $installerconfig;
     protected $call_responsetype;
@@ -138,13 +139,13 @@ class RVsitebuilder_Setup_API {
         
         //defaultconfig
         $defconfig = parse_ini_file(dirname(__FILE__).'/rvsitebuilderinstallerconfig_dist/config.ini',true);
-        $this->print_debug_log("Installer config ".join(',',$defconfig));
+        $this->print_debug_log("Installer config ".var_export($defconfig)); 
         
         //overwrite installer config by user (in public path /home/user/public_html/)
         $userconfig = [];
         if(file_exists(__DIR__.'/../.rvsitebuilderinstallerconfig/config.ini')) {
             $userconfig = parse_ini_file(__DIR__.'/../.rvsitebuilderinstallerconfig/config.ini',true);
-            $this->print_debug_log("Installer config by user".join(',',array_merge($defconfig,$userconfig)));
+            $this->print_debug_log("Installer config by user ".var_export(array_merge($defconfig,$userconfig)));
         }
         
         return array_merge($defconfig,$userconfig);
@@ -1054,6 +1055,16 @@ class RVsitebuilder_Setup_API {
                                 'cookies'         => true,
                                 'verify'          => false
                             ]);
+        //TODO add header
+//         $headers = array(
+//             'Referer: http://rvskin.com',
+//             'Allow-GATracking: true',
+//             'RV-Product: rvsitebuilder',
+//             'RV-License-Code: ' . getLicenseCode(),
+//             'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36',
+//             'RV-Forword-REMOTE-ADDR: 14.207.197.36'
+//         );
+
         $this->print_debug_log("Do Download Type=$type URL=$url Synk=$sink");
         $client->request($type, $url, ['sink' => $sink]);
         if(file_exists($sink)) {
