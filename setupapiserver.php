@@ -5,7 +5,7 @@ require 'vendor/autoload.php';
 use GuzzleHttp\Client;
 use splitbrain\PHPArchive\Tar;
 
-$headers                = apache_request_headers();
+$headers = (function_exists('apache_request_headers') || is_callable('apache_request_headers'))  ? apache_request_headers() : rv_apache_request_headers();
 $responsetype           = (isset($headers['Accept']))                   ? $headers['Accept']                : 'application/json';
 $ignore_token           = (isset($headers['Ignore-Token']))             ? $headers['Ignore-Token']          : 0;
 $rvsb_installing_token  = (isset($headers['Rvsb-installing-Token']))    ? $headers['Rvsb-installing-Token'] : 0;
@@ -139,13 +139,13 @@ class RVsitebuilder_Setup_API {
         
         //defaultconfig
         $defconfig = parse_ini_file(dirname(__FILE__).'/rvsitebuilderinstallerconfig_dist/config.ini',true);
-        $this->print_debug_log("Installer config ".var_export($defconfig)); 
+        $this->print_debug_log("Installer config ".json_encode($defconfig)); 
         
         //overwrite installer config by user (in public path /home/user/public_html/)
         $userconfig = [];
         if(file_exists(__DIR__.'/../.rvsitebuilderinstallerconfig/config.ini')) {
             $userconfig = parse_ini_file(__DIR__.'/../.rvsitebuilderinstallerconfig/config.ini',true);
-            $this->print_debug_log("Installer config by user ".var_export(array_merge($defconfig,$userconfig)));
+            $this->print_debug_log("Installer config by user ".json_encode(array_merge($defconfig,$userconfig)));
         }
         
         return array_merge($defconfig,$userconfig);
@@ -515,7 +515,7 @@ class RVsitebuilder_Setup_API {
         $env_data['FTP_PORT'] = $ftpport;
         $env_data['DOCUMENT_ROOT'] = $publicpath;
         
-        $this->print_debug_log("ENV data ".join(', ', $env_data));
+        $this->print_debug_log("ENV data ".json_encode($env_data));
         
         if($this->setEnv(dirname(__FILE__).'/tmp/env.example',$env_data,true)) {
             //rename(dirname(__FILE__).'/tmp/env.example',dirname(__FILE__).'/tmp/.env');
@@ -546,7 +546,7 @@ class RVsitebuilder_Setup_API {
                         'wysiwyg',
                     ];
         
-        $this->print_debug_log("Common Package ".join(', ', $commonpkg));
+        $this->print_debug_log("Common Package ".json_encode($commonpkg));
         
         foreach ($commonpkg as $pkg) {
             
@@ -1202,7 +1202,7 @@ class RVsitebuilder_Setup_API {
     public function setEnv($env_file,$env_data = [],$force = false){
         $this->print_debug_log('======'.__METHOD__.'======');
         
-        $this->print_debug_log("ENV File=$env_file Data=".join(',',$env_data)." Force=$force");
+        $this->print_debug_log("ENV File=$env_file Data=".json_encode($env_data)." Force=$force");
         
         if(count($env_data) > 0){
             // Read .env-file
@@ -1266,8 +1266,8 @@ class RVsitebuilder_Setup_API {
                 $this->response['homepath'] = $userinfo['dir'];
                 $this->response['publicpath'] = $_SERVER['DOCUMENT_ROOT'];
                 $this->response['exectime'] = (microtime(true) - $time_start);
-                $this->print_debug_log("Case posix_getpwuid ".join(',',$userinfo));
-                $this->print_install_log(__METHOD__." TRUE ".join(',',$userinfo).' timeusage '.$this->response['exectime']);
+                $this->print_debug_log("Case posix_getpwuid ".json_encode($userinfo));
+                $this->print_install_log(__METHOD__." TRUE ".json_encode($userinfo).' timeusage '.$this->response['exectime']);
                 return $this->print_response($this->response);
             }
         }
@@ -1289,8 +1289,8 @@ class RVsitebuilder_Setup_API {
             $this->response['homepath'] = $mainHome;
             $this->response['publicpath'] = $_SERVER['DOCUMENT_ROOT'];
             $this->response['exectime'] = (microtime(true) - $time_start);
-            $this->print_debug_log("Case look rvsitebuildercms".join(',',$userinfo));
-            $this->print_install_log(__METHOD__." TRUE ".join(',',$userinfo).' timeusage '.$this->response['exectime']);
+            $this->print_debug_log("Case look rvsitebuildercms".json_encode($userinfo));
+            $this->print_install_log(__METHOD__." TRUE ".json_encode($userinfo).' timeusage '.$this->response['exectime']);
             
             return $this->print_response($this->response);
         }
@@ -1306,8 +1306,8 @@ class RVsitebuilder_Setup_API {
         $this->response['homepath'] = $mainHome;
         $this->response['publicpath'] = $_SERVER['DOCUMENT_ROOT'];
         $this->response['exectime'] = (microtime(true) - $time_start);
-        $this->print_debug_log("Case recursive path".join(',',$userinfo));
-        $this->print_install_log(__METHOD__." TRUE ".join(',',$userinfo).' timeusage '.$this->response['exectime']);
+        $this->print_debug_log("Case recursive path".json_encode($userinfo));
+        $this->print_install_log(__METHOD__." TRUE ".json_encode($userinfo).' timeusage '.$this->response['exectime']);
         return $this->print_response($this->response);
         
     }
@@ -1370,7 +1370,7 @@ class RVsitebuilder_Setup_API {
         
         $this->response['status'] = true;
         $this->response['exectime'] = (microtime(true) - $time_start);
-        $this->print_install_log(__METHOD__." TRUE ".join(',',$this->response).' timeusage '.$this->response['exectime']);
+        $this->print_install_log(__METHOD__." TRUE ".json_encode($this->response).' timeusage '.$this->response['exectime']);
         
         return $this->print_response($this->response);
     }
@@ -1691,6 +1691,29 @@ function getFrameworkVendorPath($filePath = ''){
 function getPackageBaseDir($filePath = ''){
     $baseDir = realpath(dirname($filePath) . '/../../');
     return $baseDir;
+}
+
+function rv_apache_request_headers() {
+    $arh = array();
+    $rx_http = '/\AHTTP_/';
+    foreach($_SERVER as $key => $val) {
+        if( preg_match($rx_http, $key) ) {
+            $arh_key = preg_replace($rx_http, '', $key);
+            $rx_matches = array();
+            // do some nasty string manipulations to restore the original letter case
+            // this should work in most cases
+            $rx_matches = explode('_', $arh_key);
+            if( count($rx_matches) > 0 and strlen($arh_key) > 2 ) {
+                foreach($rx_matches as $ak_key => $ak_val) {
+                    $rx_matches[$ak_key] = ucfirst($ak_val);
+                    $arh_key = implode('-', $rx_matches);
+                    $arh_key =  ucfirst(strtolower($arh_key));
+                }
+            }
+            $arh[$arh_key] = $val;
+        }
+    }
+    return( $arh );
 }
 
 ?>
