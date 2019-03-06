@@ -6,11 +6,12 @@ use GuzzleHttp\Client;
 use splitbrain\PHPArchive\Tar;
 
 $headers = (function_exists('apache_request_headers') || is_callable('apache_request_headers'))  ? apache_request_headers() : rv_apache_request_headers();
-$responsetype           = (isset($headers['Accept']))                   ? $headers['Accept']                : 'application/json';
-$ignore_token           = (isset($headers['Ignore-Token']))             ? $headers['Ignore-Token']          : 0;
-$rvsb_installing_token  = (isset($headers['Rvsb-installing-Token']))    ? $headers['Rvsb-installing-Token'] : 0;
-$rvlicensecode          = (isset($headers['RV-License-Code']))          ? $headers['RV-License-Code'] : '';
-$action                 = (isset($_GET['action']))                      ? $_GET['action']         : '';
+$headers = array_change_key_case($headers,CASE_UPPER);
+$responsetype           = (isset($headers['ACCEPT']))                   ? $headers['ACCEPT']                : 'application/json';
+$ignore_token           = (isset($headers['IGNORE-TOKEN']))             ? $headers['IGNORE-TOKEN']          : 0;
+$rvsb_installing_token  = (isset($headers['RVSB-INSTALLING-TOKEN']))    ? $headers['RVSB-INSTALLING-TOKEN'] : 0;
+$rvlicensecode          = (isset($headers['RV-LICENSE-CODE']))          ? $headers['RV-LICENSE-CODE']       : '';
+$action                 = (isset($_GET['action']))                      ? $_GET['action']           : '';
 $homeuser               = (isset($_GET['homeuser']))                    ? $_GET['homeuser']         : '';
 $domainname             = (isset($_GET['domainname']))                  ? $_GET['domainname']       : '';
 $publicpath             = (isset($_GET['publicpath']))                  ? $_GET['publicpath']       : '';
@@ -548,7 +549,7 @@ class RVsitebuilder_Setup_API {
                         'queuesharedhost',
                         'scheduler',
                         'wysiwyg',
-                        ''
+                        'marketing'
                     ];
         
         $this->print_debug_log("Common Package ".json_encode($commonpkg));
@@ -1079,7 +1080,8 @@ class RVsitebuilder_Setup_API {
             /// ส่ง IP ของ user ให้ด้วย เพราะที่ server เราจะเห็นแค่ IP ของ server ไม่ใช่ IP ของผู้ใช้งานจริงๆ
             'RV-Forword-REMOTE-ADDR' => $this->get_client_ip()
         ];
-
+        
+        $this->print_debug_log('Header request to server '.json_encode($headers));
         $this->print_debug_log("Do Download Type=$type URL=$url Synk=$sink LicenseCode=$this->rvlicensecode");
         
         $res = $client->request(
@@ -1090,6 +1092,9 @@ class RVsitebuilder_Setup_API {
                                         'sink'      => $sink
                                     ]
                                 );
+        
+        $this->print_debug_log('Server Response Status '.$res->getStatusCode());
+        $this->print_debug_log('Server Response Header '.json_encode((array) $res->getHeaders()));
         
         if($res->getHeaderLine('RV-DOWNLOAD-RESPONSE') != 'ok') {
             $this->print_debug_log("Download Error, Server Header Response : ".$res->getHeaderLine('RV-DOWNLOAD-RESPONSE-MESSAGE'));
@@ -1776,7 +1781,6 @@ function rv_apache_request_headers() {
                 foreach($rx_matches as $ak_key => $ak_val) {
                     $rx_matches[$ak_key] = ucfirst($ak_val);
                     $arh_key = implode('-', $rx_matches);
-                    $arh_key =  ucfirst(strtolower($arh_key));
                 }
             }
             $arh[$arh_key] = $val;
