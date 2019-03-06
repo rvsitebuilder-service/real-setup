@@ -548,6 +548,7 @@ class RVsitebuilder_Setup_API {
                         'queuesharedhost',
                         'scheduler',
                         'wysiwyg',
+                        'marketing'
                     ];
         
         $this->print_debug_log("Common Package ".json_encode($commonpkg));
