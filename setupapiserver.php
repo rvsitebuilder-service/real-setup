@@ -548,7 +548,7 @@ class RVsitebuilder_Setup_API {
                         'queuesharedhost',
                         'scheduler',
                         'wysiwyg',
-                        'marketing'
+                        ''
                     ];
         
         $this->print_debug_log("Common Package ".json_encode($commonpkg));
@@ -1120,11 +1120,10 @@ class RVsitebuilder_Setup_API {
     
     public function get_current_domain() {
         $this->print_debug_log('======'.__METHOD__.'======');
-        
-        $protocal = 'http://';
-        if(!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') { $protocal = 'https://';}
-        $this->print_debug_log("Current domain ".$protocal.$_SERVER['SERVER_NAME']);
-        return $protocal.$_SERVER['SERVER_NAME'];
+        $domainname = $_SERVER['SERVER_NAME'];
+        $domainname = str_replace("www.","",$domainname);
+        $this->print_debug_log("Current domain ".$domainname);
+        return $domainname;
     }
     
     public function get_client_ip() {
