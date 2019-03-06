@@ -1081,7 +1081,15 @@ class RVsitebuilder_Setup_API {
         ];
 
         $this->print_debug_log("Do Download Type=$type URL=$url Synk=$sink LicenseCode=$this->rvlicensecode");
-        $res = $client->request($type, $url, ['headers' => $headers], ['sink' => $sink]);
+        
+        $res = $client->request(
+                                    $type,
+                                    $url,
+                                    [
+                                        'headers'   => $headers,
+                                        'sink'      => $sink
+                                    ]
+                                );
         
         if($res->getHeaderLine('RV-DOWNLOAD-RESPONSE') != 'ok') {
             $this->print_debug_log("Download Error, Server Header Response : ".$res->getHeaderLine('RV-DOWNLOAD-RESPONSE-MESSAGE'));
