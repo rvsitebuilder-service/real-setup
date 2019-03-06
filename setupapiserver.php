@@ -9,6 +9,7 @@ $headers = (function_exists('apache_request_headers') || is_callable('apache_req
 $responsetype           = (isset($headers['Accept']))                   ? $headers['Accept']                : 'application/json';
 $ignore_token           = (isset($headers['Ignore-Token']))             ? $headers['Ignore-Token']          : 0;
 $rvsb_installing_token  = (isset($headers['Rvsb-installing-Token']))    ? $headers['Rvsb-installing-Token'] : 0;
+$rvlicensecode          = (isset($headers['RV-License-Code']))          ? $headers['RV-License-Code'] : '';
 $action                 = (isset($_GET['action']))                      ? $_GET['action']         : '';
 $homeuser               = (isset($_GET['homeuser']))                    ? $_GET['homeuser']         : '';
 $domainname             = (isset($_GET['domainname']))                  ? $_GET['domainname']       : '';
@@ -29,7 +30,7 @@ $adminlastname          = (isset($_GET['adminlastname']))               ? $_GET[
 
 
 
-$setupObj = new RVsitebuilder_Setup_API($responsetype,$rvsb_installing_token,$responsetype,$ignore_token);
+$setupObj = new RVsitebuilder_Setup_API($responsetype,$rvsb_installing_token,$responsetype,$ignore_token,$rvlicensecode);
 
 
 if($action == '' && !file_exists(dirname(__FILE__).'/.Rvsb-Installing-Token' && $rvsb_installing_token == 0)) {
@@ -109,8 +110,9 @@ class RVsitebuilder_Setup_API {
     protected $installerconfig;
     protected $call_responsetype;
     protected $removeinstallerpath;
+    protected $rvlicensecode;
     
-    public function __construct($responsetype,$rvsb_installing_token,$call_responsetype,$ignore_token)
+    public function __construct($responsetype,$rvsb_installing_token,$call_responsetype,$ignore_token,$rvlicensecode)
     {   
         //response type
         $this->responseType = $responsetype;
@@ -132,6 +134,8 @@ class RVsitebuilder_Setup_API {
         $this->install_log =  $this->installerconfig['install_log'];
         //remove installer path
         $this->removeinstallerpath = $this->installerconfig['removeinstallerpath'];
+        //rvlicensecode 
+        $this->rvlicensecode = $rvlicensecode;
     }
     
     public function getInstallerConfig() {
@@ -366,21 +370,21 @@ class RVsitebuilder_Setup_API {
         
         $this->print_debug_log("Download Framework URL ".$downloadurl);
         
-        $downloadframework = $this->download('GET' , $downloadurl , dirname(__FILE__).'/framework.tar.gz');
-        if(! $downloadframework){
-            $this->response['message'] = 'Can not download framework';
+        $downloadframework = $this->doDownload('GET' , $downloadurl , dirname(__FILE__).'/framework.tar.gz');
+        if($downloadframework['success'] == false){
+            $this->response['message'] = 'Can not download framework '.$downloadframework['message'];
             $this->response['exectime'] = (microtime(true) - $time_start);
-            $this->print_install_log(__METHOD__.' status FALSE (Download Framework  Failed)'.$downloadurl.' timeusage '.$this->response['exectime']);
-            $this->print_debug_log("Download Framework  Failed");
+            $this->print_install_log(__METHOD__.' status FALSE (Download Framework  Failed) '.$downloadframework['message'].' '.$downloadurl.' timeusage '.$this->response['exectime']);
+            $this->print_debug_log("Download Framework  Failed ".$downloadframework['message']);
             return $this->print_response($this->response);
         }
         //extract framework
-        $extractframework = $this->extract(dirname(__FILE__).'/framework.tar.gz',dirname(__FILE__).'/tmp/');
-        if(! $extractframework) {
-            $this->response['message'] = 'Can not extract framework.tar.gz';
+        $extractframework = $this->doExtract(dirname(__FILE__).'/framework.tar.gz',dirname(__FILE__).'/tmp/');
+        if($extractframework['success'] == false) {
+            $this->response['message'] = 'Can not extract framework.tar.gz '.$extractframework['message'];
             $this->response['exectime'] = (microtime(true) - $time_start);
-            $this->print_install_log(__METHOD__.' status FALSE (Extract Framework Failed)'.' timeusage '.$this->response['exectime']);
-            $this->print_debug_log("Extract Framework Failed");
+            $this->print_install_log(__METHOD__.' status FALSE (Extract Framework Failed) '.$extractframework['message'].' timeusage '.$this->response['exectime']);
+            $this->print_debug_log("Extract Framework Failed ".$extractframework['message']);
             return $this->print_response($this->response);
         }
         
@@ -417,19 +421,19 @@ class RVsitebuilder_Setup_API {
             $version = '/version/'.$rvsbjson['version'];
             $downloadvendorurl = $this->mirror.'/download'.$package_name_encoded.$version;
             $this->print_debug_log("Vendor URL download ".$downloadvendorurl);
-            $downloadvendor = $this->download('GET' , $downloadvendorurl , dirname(__FILE__).'/bundle_vendor.tar.gz');
-            if(! $downloadvendor) {
-                $this->response['message'] = 'Can not download vendor';
+            $downloadvendor = $this->doDownload('GET' , $downloadvendorurl , dirname(__FILE__).'/bundle_vendor.tar.gz');
+            if($downloadvendor['success'] == false) {
+                $this->response['message'] = 'Can not download vendor '.$downloadvendor['message'];
                 $this->response['exectime'] = (microtime(true) - $time_start);
-                $this->print_install_log(__METHOD__.' status FALSE (Can not download vendor) '.$downloadvendorurl.' timeusage '.$this->response['exectime']);
-                $this->print_debug_log("Can not download ".$downloadvendorurl);
+                $this->print_install_log(__METHOD__.' status FALSE (Can not download vendor) '.$downloadvendor['message'].' '.$downloadvendorurl.' timeusage '.$this->response['exectime']);
+                $this->print_debug_log("Can not download ".$downloadvendorurl.' '.$downloadvendor['message']);
                 return $this->print_response($this->response);
             }
-            $extractvendor = $this->extract(dirname(__FILE__).'/bundle_vendor.tar.gz',dirname(__FILE__).'/tmp/vendor/');
-            if(! $extractvendor) {
-                $this->response['message'] = 'Can not extract vendor.tar.gz';
+            $extractvendor = $this->doExtract(dirname(__FILE__).'/bundle_vendor.tar.gz',dirname(__FILE__).'/tmp/vendor/');
+            if($extractvendor['success'] == false) {
+                $this->response['message'] = 'Can not extract vendor.tar.gz '.$extractvendor['message'];
                 $this->response['exectime'] = (microtime(true) - $time_start);
-                $this->print_install_log(__METHOD__.' status FALSE (Can not extract vendor.tar.gz) '.' timeusage '.$this->response['exectime']);
+                $this->print_install_log(__METHOD__.' status FALSE (Can not extract vendor.tar.gz) '.$extractvendor['message'].' timeusage '.$this->response['exectime']);
                 $this->print_debug_log("Can not extract ".dirname(__FILE__).'/bundle_vendor.tar.gz');
                 return $this->print_response($this->response);
             }
@@ -450,20 +454,20 @@ class RVsitebuilder_Setup_API {
                 
                 $downloadvendorurl = $this->mirror.'/download/'.$product_name.'/'.urlencode($app_name).$update_package_version;
                 $this->print_debug_log("Package URL Download ".$downloadvendorurl);
-                $downloadvendor = $this->download('GET' , $downloadvendorurl , dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
-                if(! $downloadvendor) {
-                    $this->response['message'] = 'Can not download vendor '.$downloadvendorurl;
+                $downloadvendor = $this->doDownload('GET' , $downloadvendorurl , dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
+                if($downloadvendor['success'] == false) {
+                    $this->response['message'] = 'Can not download vendor '.$downloadvendorurl.' '.$downloadvendor['message'];
                     $this->response['exectime'] = (microtime(true) - $time_start);
-                    $this->print_install_log(__METHOD__.' status FALSE (Can not download vendor) '.$downloadvendorurl.' timeusage '.$this->response['exectime']);
-                    $this->print_debug_log("Can not download ".$downloadvendorurl);
+                    $this->print_install_log(__METHOD__.' status FALSE (Can not download vendor) '.$downloadvendor['message'].' '.$downloadvendorurl.' timeusage '.$this->response['exectime']);
+                    $this->print_debug_log("Can not download ".$downloadvendorurl.' '.$downloadvendor['message']);
                     return $this->print_response($this->response);
                 }
-                $extractvendor = $this->extract(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz',dirname(__FILE__).'/tmp/vendor/');
-                if(! $extractvendor) {
-                    $this->response['message'] = 'Can not extract vendor '.$package_name_encoded;
+                $extractvendor = $this->doExtract(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz',dirname(__FILE__).'/tmp/vendor/');
+                if($extractvendor['success'] == false) {
+                    $this->response['message'] = 'Can not extract vendor '.$package_name_encoded.' '.$extractvendor['message'];
                     $this->response['exectime'] = (microtime(true) - $time_start);
-                    $this->print_install_log(__METHOD__.' status FALSE (Can not extract vendor) '.$package_name_encoded.' timeusage '.$this->response['exectime']);
-                    $this->print_debug_log("Can not extract ".dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
+                    $this->print_install_log(__METHOD__.' status FALSE (Can not extract vendor) '.$package_name_encoded.' '.$extractvendor['message'].' timeusage '.$this->response['exectime']);
+                    $this->print_debug_log("Can not extract ".dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz '.$extractvendor['message']);
                     return $this->print_response($this->response);
                 }
                 unlink(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
@@ -557,24 +561,24 @@ class RVsitebuilder_Setup_API {
             { $downloadurl = $this->mirror.'/download/rvsitebuilder/'.$pkg.'/version/'.$this->installerconfig[$pkg]['getversion']; }
             
 
-            $downloadpkg = $this->download('GET' , $downloadurl , dirname(__FILE__).'/'.$pkg.'.tar.gz');
+            $downloadpkg = $this->doDownload('GET' , $downloadurl , dirname(__FILE__).'/'.$pkg.'.tar.gz');
             
             $this->print_debug_log("Download Common Package URL ".$downloadpkg);
             
-            if(! $downloadpkg){
-                $this->response['message'] = 'Can not download package '.$pkg;
+            if($downloadpkg['success'] == false){
+                $this->response['message'] = 'Can not download package '.$pkg.' '.$downloadpkg['message'];
                 $this->response['exectime'] = (microtime(true) - $time_start);
-                $this->print_install_log(__METHOD__.' status FALSE (Can not download package) '.$pkg.' timeusage '.$this->response['exectime']);
-                $this->print_debug_log("Can not download package ".$pkg);
+                $this->print_install_log(__METHOD__.' status FALSE (Can not download package) '.$pkg.' '.$downloadpkg['message'].' timeusage '.$this->response['exectime']);
+                $this->print_debug_log("Can not download package ".$pkg.' '.$downloadpkg['message']);
                 return $this->print_response($this->response);
             }
             //extract package
-            $extractpkg = $this->extract(dirname(__FILE__).'/'.$pkg.'.tar.gz',dirname(__FILE__).'/tmp/packages/');
-            if(! $extractpkg) {
-                $this->response['message'] = 'Can not extract package '.$pkg;
+            $extractpkg = $this->doExtract(dirname(__FILE__).'/'.$pkg.'.tar.gz',dirname(__FILE__).'/tmp/packages/');
+            if($extractpkg['success'] == false) {
+                $this->response['message'] = 'Can not extract package '.$pkg.' '.$extractpkg['message'];
                 $this->response['exectime'] = (microtime(true) - $time_start);
-                $this->print_install_log(__METHOD__.' status FALSE (Can not extract package) '.$pkg.' timeusage '.$this->response['exectime']);
-                $this->print_debug_log("Can not extract package ".$pkg);
+                $this->print_install_log(__METHOD__.' status FALSE (Can not extract package) '.$pkg.' '.$extractpkg['message'].' timeusage '.$this->response['exectime']);
+                $this->print_debug_log("Can not extract package ".$pkg.' '.$extractpkg['message']);
                 return $this->print_response($this->response);
             }
             
@@ -599,20 +603,20 @@ class RVsitebuilder_Setup_API {
                 
                 $this->print_debug_log("Download vendor URL ".$downloadvendorurl);
                 
-                $downloadvendor = $this->download('GET' , $downloadvendorurl , dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
-                if(! $downloadvendor) {
-                    $this->response['message'] = 'Can not download vendor '.$downloadvendorurl;
+                $downloadvendor = $this->doDownload('GET' , $downloadvendorurl , dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
+                if($downloadvendor['success'] == false) {
+                    $this->response['message'] = 'Can not download vendor '.$downloadvendorurl.' '.$downloadvendor['message'];
                     $this->response['exectime'] = (microtime(true) - $time_start);
-                    $this->print_install_log(__METHOD__.' status FALSE (Can not download vendor) '.$downloadvendorurl.' timeusage '.$this->response['exectime']);
-                    $this->print_debug_log("Can not download vendor URL ".$downloadvendorurl);
+                    $this->print_install_log(__METHOD__.' status FALSE (Can not download vendor) '.$downloadvendorurl.' '.$downloadvendor['message'].' timeusage '.$this->response['exectime']);
+                    $this->print_debug_log("Can not download vendor URL ".$downloadvendorurl.' '.$downloadvendor['message']);
                     return $this->print_response($this->response);
                 }
-                $extractvendor = $this->extract(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz',dirname(__FILE__).'/tmp/');
-                if(! $extractvendor) {
-                    $this->response['message'] = 'Can not extract vendor '.$package_name_encoded;
+                $extractvendor = $this->doExtract(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz',dirname(__FILE__).'/tmp/');
+                if($extractvendor['success'] == false) {
+                    $this->response['message'] = 'Can not extract vendor '.$package_name_encoded.' '.$extractvendor['message'];
                     $this->response['exectime'] = (microtime(true) - $time_start);
-                    $this->print_install_log(__METHOD__.' status FALSE (Can not extract vendor) '.$package_name_encoded.' timeusage '.$this->response['exectime']);
-                    $this->print_debug_log("Can not extract ".dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
+                    $this->print_install_log(__METHOD__.' status FALSE (Can not extract vendor) '.$package_name_encoded.' '.$extractvendor['message'].' timeusage '.$this->response['exectime']);
+                    $this->print_debug_log("Can not extract ".dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz '.$extractvendor['message']);
                     return $this->print_response($this->response);
                 }
                 $this->print_debug_log("Removed ".dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
@@ -1046,8 +1050,13 @@ class RVsitebuilder_Setup_API {
     }
     
     
-    public function download($type, $url, $sink) {
+    public function doDownload($type, $url, $sink) {
         $this->print_debug_log('======'.__METHOD__.'======');
+        
+        $response = [
+            'message' => '',
+            'success' => false
+        ];
         
         $client = new Client([
                                 'curl'            => [CURLOPT_SSL_VERIFYPEER => false, CURLOPT_SSL_VERIFYHOST => false],
@@ -1055,37 +1064,89 @@ class RVsitebuilder_Setup_API {
                                 'cookies'         => true,
                                 'verify'          => false
                             ]);
-        //TODO add header
-//         $headers = array(
-//             'Referer: http://rvskin.com',
-//             'Allow-GATracking: true',
-//             'RV-Product: rvsitebuilder',
-//             'RV-License-Code: ' . getLicenseCode(),
-//             'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36',
-//             'RV-Forword-REMOTE-ADDR: 14.207.197.36'
-//         );
+        $headers = [
+            /// Domain user
+            'RV-Referer' => $this->get_current_domain(),
+            /// บอกให้ทำ GATracking
+            'Allow-GATracking' => 'true',
+            /// RVGlobalsoft Product
+            'RV-Product' => 'rvsitebuilder',
+            /// ทำ License-Code ดูตาม function เลย
+            'RV-License-Code' => $this->rvlicensecode,
+            /// Browser ของ user
+            'User-Agent' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36',
+            /// ส่ง IP ของ user ให้ด้วย เพราะที่ server เราจะเห็นแค่ IP ของ server ไม่ใช่ IP ของผู้ใช้งานจริงๆ
+            'RV-Forword-REMOTE-ADDR' => $this->get_client_ip()
+        ];
 
-        $this->print_debug_log("Do Download Type=$type URL=$url Synk=$sink");
-        $client->request($type, $url, ['sink' => $sink]);
-        if(file_exists($sink)) {
-            $this->print_debug_log("Do Download Completed $url");
-            return true;
+        $this->print_debug_log("Do Download Type=$type URL=$url Synk=$sink LicenseCode=$this->rvlicensecode");
+        $res = $client->request($type, $url, ['headers' => $headers], ['sink' => $sink]);
+        
+        if($res->getHeaderLine('RV-DOWNLOAD-RESPONSE') != 'ok') {
+            $this->print_debug_log("Download Error, Server Header Response : ".$res->getHeaderLine('RV-DOWNLOAD-RESPONSE-MESSAGE'));
+            $response['message'] = $res->getHeaderLine('RV-DOWNLOAD-RESPONSE-MESSAGE');
+        }else if(!file_exists($sink)) {
+            $this->print_debug_log('Download Error ,file '.$sink.' not exists');
+            $response['message'] = 'Download Error ,file '.$sink.' not exists';
+        }else {
+            $this->print_debug_log('Download Success ,file '.$sink);
+            $response['success'] = true;
         }
-        $this->print_debug_log("Do Download failed $url");
-        return false;
+        return $response;
     }
     
-    public function extract($file,$path) {
+    public function doExtract($file,$path) {
         $this->print_debug_log('======'.__METHOD__.'======');
         
+        $response['message'] = '';
+        $response['success'] = false;
         $this->print_debug_log("Do Extract $file $path");
-        $tar = new Tar();
-        $tar->open($file);
-        $tar->extract($path);
-        $this->print_debug_log("Do Extract Completed $file $path");
-        return true;
+        
+        try {
+            $tar = new Tar();
+            $tar->open($file);
+            $tar->extract($path);
+            $this->print_debug_log("Do Extract Success $file $path");
+            $response['success'] = true;
+            return $response;
+        } catch (Exception $e) {
+            $this->print_debug_log("Do Extract Error ".$e->getMessage());
+            $response['message'] = $e->getMessage();
+            return $response;
+        }
+        
     }
     
+    public function get_current_domain() {
+        $this->print_debug_log('======'.__METHOD__.'======');
+        
+        $protocal = 'http://';
+        if(!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') { $protocal = 'https://';}
+        $this->print_debug_log("Current domain ".$protocal.$_SERVER['SERVER_NAME']);
+        return $protocal.$_SERVER['SERVER_NAME'];
+    }
+    
+    public function get_client_ip() {
+        $this->print_debug_log('======'.__METHOD__.'======');
+        
+        $ipaddress = '';
+        if (isset($_SERVER['HTTP_CLIENT_IP']))
+        {    $ipaddress = $_SERVER['HTTP_CLIENT_IP']; }
+        else if(isset($_SERVER['HTTP_X_FORWARDED_FOR']))
+        {    $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR']; }
+        else if(isset($_SERVER['HTTP_X_FORWARDED']))
+        {    $ipaddress = $_SERVER['HTTP_X_FORWARDED']; }
+        else if(isset($_SERVER['HTTP_FORWARDED_FOR']))
+        {    $ipaddress = $_SERVER['HTTP_FORWARDED_FOR']; }
+        else if(isset($_SERVER['HTTP_FORWARDED']))
+        {    $ipaddress = $_SERVER['HTTP_FORWARDED']; }
+        else if(isset($_SERVER['REMOTE_ADDR']))
+        {    $ipaddress = $_SERVER['REMOTE_ADDR']; }
+        else
+        {    $ipaddress = 'UNKNOWN'; }
+        $this->print_debug_log("Remote IP Address ".$ipaddress);
+        return $ipaddress;
+    }
     
     public function print_response($data) {
         $this->print_debug_log('======'.__METHOD__.'======');
