@@ -16,7 +16,7 @@ LOGS (
 
 $action = isset($_GET['action']) ? $_GET['action'] : 'show_debug_dashboard';
 
-$rvdebugObj = new RVDebug($app);
+$rvdebugObj = new RVDebug();
 
 if(method_exists($rvdebugObj,$action)){
     echo "<h2>Action $action</h2>";
