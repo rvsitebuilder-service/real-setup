@@ -818,6 +818,7 @@ class RVsitebuilder_Setup_API {
             $this->rrmdir(dirname(__FILE__).'/tmp');
             $this->rrmdir(dirname(__FILE__).'/vendor');
             $this->rrmdir(dirname(__FILE__).'/src');
+            $this->rrmdir(dirname(__FILE__).'/rvsitebuilderinstallerconfig_dist');
             //$this->rrmdir(dirname(__FILE__).'/../rvsitebuilder');
             
             $this->print_debug_log("Removed Installer Path");
