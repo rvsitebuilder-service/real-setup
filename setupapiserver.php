@@ -562,10 +562,9 @@ class RVsitebuilder_Setup_API {
             if(isset($this->installerconfig[$pkg]['getversion']) && preg_match('/[0-9]+\.[0-9]+\.[0-9]+/',$this->installerconfig[$pkg]['getversion'])) 
             { $downloadurl = $this->mirror.'/download/rvsitebuilder/'.$pkg.'/version/'.$this->installerconfig[$pkg]['getversion']; }
             
-
-            $downloadpkg = $this->doDownload('GET' , $downloadurl , dirname(__FILE__).'/'.$pkg.'.tar.gz');
+            $this->print_debug_log("Download Common Package URL ".$downloadurl);
             
-            $this->print_debug_log("Download Common Package URL ".$downloadpkg);
+            $downloadpkg = $this->doDownload('GET' , $downloadurl , dirname(__FILE__).'/'.$pkg.'.tar.gz');
             
             if($downloadpkg['success'] == false){
                 $this->response['message'] = 'Can not download package '.$pkg.' '.$downloadpkg['message'];
@@ -1090,7 +1089,8 @@ class RVsitebuilder_Setup_API {
                                     $url,
                                     [
                                         'headers'   => $headers,
-                                        'sink'      => $sink
+                                        'sink'      => $sink,
+                                        'timeout'   => 180
                                     ]
                                 );
         
