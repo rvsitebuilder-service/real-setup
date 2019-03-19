@@ -389,6 +389,12 @@ class RVsitebuilder_Setup_API {
             return $this->print_response($this->response);
         }
         
+        //delete appsconfig.json
+        if(file_exists(dirname(__FILE__).'/tmp/storage/appsconfig.json')){
+            unlink(dirname(__FILE__).'/tmp/storage/appsconfig.json');
+            $this->print_debug_log("Removed ".dirname(__FILE__).'/tmp/storage/appsconfig.json');
+        }
+        
         $this->response['exectime'] = (microtime(true) - $time_start);
         $this->response['status'] = true;
         $this->response['message'] = 'Download Framework Success';
