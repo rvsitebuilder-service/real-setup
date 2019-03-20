@@ -104,7 +104,6 @@ class RVsitebuilder_Setup_API {
     protected $responseType;
     protected $response;
     protected $serverconf;
-    protected $downloadurl;
     protected $debug_log;
     protected $install_log;
     protected $httpasuser;
@@ -143,17 +142,34 @@ class RVsitebuilder_Setup_API {
         $this->print_debug_log('======'.__METHOD__.'======');
         
         //defaultconfig
-        $defconfig = parse_ini_file(dirname(__FILE__).'/rvsitebuilderinstallerconfig_dist/config.ini',true);
-        $this->print_debug_log("Installer config ".json_encode($defconfig)); 
-        
-        //overwrite installer config by user (in public path /home/user/public_html/)
-        $userconfig = [];
-        if(file_exists(__DIR__.'/../.rvsitebuilderinstallerconfig/config.ini')) {
-            $userconfig = parse_ini_file(__DIR__.'/../.rvsitebuilderinstallerconfig/config.ini',true);
-            $this->print_debug_log("Installer config by user ".json_encode(array_merge($defconfig,$userconfig)));
+        $defconfig = [];
+        $defconfigpath = dirname(__FILE__).'/rvsitebuilderinstallerconfig_dist/config.ini';
+        if(file_exists($defconfigpath)){
+            $defconfig = parse_ini_file($defconfigpath,true);
+            $this->print_debug_log("Default Installer config ".json_encode($defconfig)); 
         }
         
-        return array_merge($defconfig,$userconfig);
+        //overwrite installer config by root config (in public path /home/user/public_html/.rvsitebuilderinstallerconfig)
+        $rootconfig = [];
+        $rootconfigpath = dirname(__FILE__).'/../.rvsitebuilderinstallerconfig/root_config.ini';
+        if(file_exists($rootconfigpath)) {
+            $rootconfig = parse_ini_file($rootconfigpath,true);
+            $this->print_debug_log("Root Installer config ".json_encode($rootconfig));
+        }
+        $installerconfig1 = array_merge($defconfig,$rootconfig);
+        
+        //overwrite installer config by user config (in public path /home/user/public_html/.rvsitebuilderinstallerconfig)
+        $userconfig = [];
+        $userconfigpath =  dirname(__FILE__).'/../.rvsitebuilderinstallerconfig/config.ini';
+        if(file_exists($userconfigpath)) {
+            $userconfig = parse_ini_file($userconfigpath,true);
+            $this->print_debug_log("User Installer config ".json_encode($userconfig));
+        }
+        $installerconfig2 = array_merge($installerconfig1,$userconfig);
+        
+        $this->print_debug_log("Final Installer config ".json_encode($installerconfig2));
+        return $installerconfig2;
+        
     }
     
     
@@ -525,6 +541,9 @@ class RVsitebuilder_Setup_API {
         $env_data['FTP_SERVER'] = $ftpserver;
         $env_data['FTP_PORT'] = $ftpport;
         $env_data['DOCUMENT_ROOT'] = $publicpath;
+        $env_data['DOCUMENT_ROOT'] = $publicpath;
+        $env_data['RV_MIRROR']  = $this->mirror;
+        
         
         $this->print_debug_log("ENV data ".json_encode($env_data));
         
