@@ -1026,13 +1026,12 @@ class RVsitebuilder_Setup_API {
         $copy = $files->copyDirectory($source, $destination,['.htaccess']);
         $this->print_debug_log("Copy $source To $destination");
         
-        //write new .htaccess to domain'docroot
+        //write new .htaccess to docroot
         $frameworkhtaccess = '';
         if (file_exists($homeuser.'/rvsitebuildercms/'.$domainname.'/public/.htaccess')) {
             $frameworkhtaccess = file_get_contents($homeuser.'/rvsitebuildercms/'.$domainname.'/public/.htaccess');
             $frameworkhtaccess = "#Start Rvsitebuilder7 htaccess\n".
                                  $frameworkhtaccess."\n".
-                                 $oldhtaccess."\n".
                                  "#End Rvsitebuilder7 htaccess\n";
         }
         $oldhtaccess = '';
