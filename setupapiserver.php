@@ -498,18 +498,24 @@ class RVsitebuilder_Setup_API {
             
         }
         
+//removed         //move vendor package to vendor path
+//         $files = scandir(dirname(__FILE__).'/tmp/vendor/vendor');
+//         $source = dirname(__FILE__).'/tmp/vendor/vendor/';
+//         $destination = dirname(__FILE__).'/tmp/vendor/';
+//         foreach ($files as $file) {
+//             if (in_array($file, [".",".."])) continue;
+//             rename($source.$file, $destination.$file);
+//         }
+        
+        $files = new File_Handler();
         //move vendor package to vendor path
-        $files = scandir(dirname(__FILE__).'/tmp/vendor/vendor');
         $source = dirname(__FILE__).'/tmp/vendor/vendor/';
         $destination = dirname(__FILE__).'/tmp/vendor/';
-        foreach ($files as $file) {
-            if (in_array($file, [".",".."])) continue;
-            rename($source.$file, $destination.$file);
-        }
-        $this->print_debug_log("Moved vendor from $source to $destination");
+        $copy = $files->copyDirectory($source, $destination,[]);
+        $this->print_debug_log("Copy vendor from $source to $destination");
         
         // Delete all successfully-copied files
-        rmdir(dirname(__FILE__).'/tmp/vendor/vendor');
+        $this->rrmdir(dirname(__FILE__).'/tmp/vendor/vendor');
         $this->print_debug_log("Removed ".dirname(__FILE__).'/tmp/vendor/vendor');
         
         $this->response['status'] = true;
@@ -1006,25 +1012,38 @@ class RVsitebuilder_Setup_API {
             $this->print_debug_log("Removed old framwork path ".$homeuser.'/rvsitebuildercms/'.$domainname);
         }
         
-        //move temp to freamwork path
-        $files = scandir(dirname(__FILE__).'/tmp');
+//removed        //move temp to freamwork path
+//         $files = scandir(dirname(__FILE__).'/tmp');
+//         $source = dirname(__FILE__).'/tmp/';
+//         $destination = $homeuser.'/rvsitebuildercms/'.$domainname.'/';
+//         if (!file_exists($destination)) {
+//             mkdir($destination, 0755, true);
+//         }
+//         foreach ($files as $file) {
+//             if (in_array($file, [".",".."])) continue;
+//             rename($source.$file, $destination.$file);
+//             $this->print_debug_log("Moved $source$file To $destination$file");
+//         }
+        
+        $files = new File_Handler();
+        
+        //move tmp to freamwork path
         $source = dirname(__FILE__).'/tmp/';
         $destination = $homeuser.'/rvsitebuildercms/'.$domainname.'/';
         if (!file_exists($destination)) {
             mkdir($destination, 0755, true);
         }
-        foreach ($files as $file) {
-            if (in_array($file, [".",".."])) continue;
-            rename($source.$file, $destination.$file);
-            $this->print_debug_log("Moved $source$file To $destination$file");
-        }
+        $copy = $files->copyDirectory($source, $destination,[]);
+        $this->rrmdir(dirname(__FILE__).'/tmp');
+        $this->print_debug_log("Copy $source To $destination");
+        
         
         //move framework/public to public path
         $source = $homeuser.'/rvsitebuildercms/'.$domainname.'/public';
         $destination = $publicpath;
-        $files = new File_Handler();
         $copy = $files->copyDirectory($source, $destination,['.htaccess']);
         $this->print_debug_log("Copy $source To $destination");
+        
         
         //write new .htaccess to docroot
         $frameworkhtaccess = '';
