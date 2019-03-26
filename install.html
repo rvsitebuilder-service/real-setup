@@ -827,6 +827,7 @@
                                                 param = {
                                                 		'action':'setup_env',
                                                 		'domainname': window.location.hostname,
+                                                		'domainport': (window.location.port == 0 || window.location.port == '') ? '' : window.location.port,
                                                 		'publicpath': $('#publicpath').val(),
                                                 		'dbhost': $('#dbhost').val(),
                                                 		'dbname': $('#dbname').val(),

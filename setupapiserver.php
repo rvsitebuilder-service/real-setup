@@ -28,7 +28,7 @@ $adminemail             = (isset($_GET['adminemail']))                  ? $_GET[
 $adminpassword          = (isset($_GET['adminpassword']))               ? $_GET['adminpassword']    : '';
 $adminfirstname         = (isset($_GET['adminfirstname']))              ? $_GET['adminfirstname']   : '';
 $adminlastname          = (isset($_GET['adminlastname']))               ? $_GET['adminlastname']    : '';
-
+$domainport             = (isset($_GET['domainport']))                  ? $_GET['domainport']       : '';
 
 
 $setupObj = new RVsitebuilder_Setup_API($responsetype,$rvsb_installing_token,$responsetype,$ignore_token,$rvlicensecode);
@@ -51,7 +51,7 @@ if($action == 'download_vendor'){
 }
 
 if($action == 'setup_env'){
-    $setupObj->setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname,$ftpserver,$ftpport);
+    $setupObj->setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname,$ftpserver,$ftpport,$domainport);
 }
 
 if($action == 'download_common_pkg'){
@@ -528,14 +528,17 @@ class RVsitebuilder_Setup_API {
     }
     
     
-    public function setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname,$ftpserver,$ftpport) {
+    public function setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname,$ftpserver,$ftpport,$domainport) {
         $time_start = microtime(true);
         $this->print_debug_log('======'.__METHOD__.'======');
         
-        //TODO clear whitespace
+        //clear whitespace
         if (preg_match('/\s/',$appname)) $appname = '"'.$appname.'"';
+        //add domain port
+        $appurl = ($domainport != '') ?  'https://'.$domainname.':'.$domainport : 'https://'.$domainname ;
+        
         $env_data = [];
-        $env_data['APP_URL'] = 'https://'.$domainname;
+        $env_data['APP_URL'] = $appurl;
         $env_data['DB_HOST'] = $dbhost;
         $env_data['DB_DATABASE'] = $dbname;
         $env_data['DB_USERNAME'] = $dbuser;
