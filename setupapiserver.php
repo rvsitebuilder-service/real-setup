@@ -843,6 +843,7 @@ class RVsitebuilder_Setup_API {
             if ( file_exists(dirname(__FILE__).'/setup.php') ) unlink(dirname(__FILE__).'/setup.php');
             //if ( file_exists(dirname(__FILE__).'/setupapiserver.php') ) unlink(dirname(__FILE__).'/setupapiserver.php');
             if ( file_exists(dirname(__FILE__).'/../domainready.png') ) unlink(dirname(__FILE__).'/../domainready.png');
+            if ( file_exists(dirname(__FILE__).'/../setup.zip') ) unlink(dirname(__FILE__).'/../setup.zip');
             
             //remove dir
             $this->rrmdir(dirname(__FILE__).'/tmp');
@@ -1032,6 +1033,7 @@ class RVsitebuilder_Setup_API {
         $destination = $homeuser.'/rvsitebuildercms/'.$domainname.'/';
         if (!file_exists($destination)) {
             mkdir($destination, 0755, true);
+            $this->print_debug_log("Make dir $destination");
         }
         $copy = $files->copyDirectory($source, $destination,[]);
         $this->rrmdir(dirname(__FILE__).'/tmp');
