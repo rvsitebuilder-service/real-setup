@@ -11,6 +11,7 @@ $responsetype           = (isset($headers['ACCEPT']))                   ? $heade
 $ignore_token           = (isset($headers['IGNORE-TOKEN']))             ? $headers['IGNORE-TOKEN']          : 0;
 $rvsb_installing_token  = (isset($headers['RVSB-INSTALLING-TOKEN']))    ? $headers['RVSB-INSTALLING-TOKEN'] : 0;
 $rvlicensecode          = (isset($headers['RV-LICENSE-CODE']))          ? $headers['RV-LICENSE-CODE']       : '';
+//get
 $action                 = (isset($_GET['action']))                      ? $_GET['action']           : '';
 $homeuser               = (isset($_GET['homeuser']))                    ? $_GET['homeuser']         : '';
 $domainname             = (isset($_GET['domainname']))                  ? $_GET['domainname']       : '';
@@ -29,6 +30,25 @@ $adminpassword          = (isset($_GET['adminpassword']))               ? $_GET[
 $adminfirstname         = (isset($_GET['adminfirstname']))              ? $_GET['adminfirstname']   : '';
 $adminlastname          = (isset($_GET['adminlastname']))               ? $_GET['adminlastname']    : '';
 $domainport             = (isset($_GET['domainport']))                  ? $_GET['domainport']       : '';
+//post
+if (isset($_POST['action']))         $action         = $_POST['action']           ;
+if (isset($_POST['homeuser']))       $homeuser       = $_POST['homeuser']         ;
+if (isset($_POST['domainname']))     $domainname     = $_POST['domainname']       ;
+if (isset($_POST['publicpath']))     $publicpath     = $_POST['publicpath']       ;
+if (isset($_POST['dbhost']))         $dbhost         = $_POST['dbhost']           ;
+if (isset($_POST['dbname']))         $dbname         = $_POST['dbname']           ;
+if (isset($_POST['dbuser']))         $dbuser         = $_POST['dbuser']           ;
+if (isset($_POST['dbpass']))         $dbpassword     = $_POST['dbpass']           ;
+if (isset($_POST['ftpaccount']))     $ftpaccount     = $_POST['ftpaccount']       ;
+if (isset($_POST['ftppassword']))    $ftppassword    = $_POST['ftppassword']      ;
+if (isset($_POST['appname']))        $appname        = $_POST['appname']          ;
+if (isset($_POST['ftpserver']))      $ftpserver      = $_POST['ftpserver']        ;
+if (isset($_POST['ftpport']))        $ftpport        = $_POST['ftpport']          ;
+if (isset($_POST['adminemail']))     $adminemail     = $_POST['adminemail']       ;
+if (isset($_POST['adminpassword']))  $adminpassword  = $_POST['adminpassword']    ;
+if (isset($_POST['adminfirstname'])) $adminfirstname = $_POST['adminfirstname']   ;
+if (isset($_POST['adminlastname']))  $adminlastname  = $_POST['adminlastname']    ;
+if (isset($_POST['domainport']))     $domainport     = $_POST['domainport']       ;
 
 
 $setupObj = new RVsitebuilder_Setup_API($responsetype,$rvsb_installing_token,$responsetype,$ignore_token,$rvlicensecode);
