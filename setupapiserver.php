@@ -849,7 +849,7 @@ class RVsitebuilder_Setup_API {
         $this->print_install_log(__METHOD__.' status TRUE'.' timeusage '.$this->response['exectime']);
         return $this->print_response($this->response);
         
-    }
+  	}
     
     public function finished_setup($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport) {
         $time_start = microtime(true);
