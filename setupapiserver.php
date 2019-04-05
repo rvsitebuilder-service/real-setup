@@ -31,6 +31,9 @@ $adminpassword  = '';
 $adminfirstname = '';
 $adminlastname  = '';
 $domainport     = '';
+$artisancmd     = '';
+$argkey         = '';
+$argvalue       = '';
 //get 
 if (isset($_GET['action']))         $action         = $_GET['action'];
 if (isset($_GET['homeuser']))       $homeuser       = $_GET['homeuser'];
@@ -50,6 +53,10 @@ if (isset($_GET['adminpassword']))  $adminpassword  = $_GET['adminpassword'];
 if (isset($_GET['adminfirstname'])) $adminfirstname = $_GET['adminfirstname'];
 if (isset($_GET['adminlastname']))  $adminlastname  = $_GET['adminlastname'];
 if (isset($_GET['domainport']))     $domainport     = $_GET['domainport'];
+if (isset($_GET['artisancmd']))     $artisancmd     = $_GET['artisancmd'];
+if (isset($_GET['argkey']))         $argkey         = $_GET['argkey'];
+if (isset($_GET['argvalue']))       $argvalue       = $_GET['argvalue'];
+    
 //post
 if (isset($_POST['action']))         $action         = $_POST['action']           ;
 if (isset($_POST['homeuser']))       $homeuser       = $_POST['homeuser']         ;
@@ -69,7 +76,9 @@ if (isset($_POST['adminpassword']))  $adminpassword  = $_POST['adminpassword']  
 if (isset($_POST['adminfirstname'])) $adminfirstname = $_POST['adminfirstname']   ;
 if (isset($_POST['adminlastname']))  $adminlastname  = $_POST['adminlastname']    ;
 if (isset($_POST['domainport']))     $domainport     = $_POST['domainport']       ;
-
+if (isset($_POST['artisancmd']))     $artisancmd     = $_POST['artisancmd'];
+if (isset($_POST['argkey']))         $argkey         = $_POST['argkey'];
+if (isset($_POST['argvalue']))       $argvalue       = $_POST['argvalue'];
 
 $setupObj = new RVsitebuilder_Setup_API($responsetype,$rvsb_installing_token,$responsetype,$ignore_token,$rvlicensecode);
 
@@ -104,6 +113,9 @@ if($action == 'install_all_pkg' && $homeuser != '' && $domainname != '' && $publ
 
 if($action == 'artisan_call'){
     $setupObj->artisan_call($homeuser,$domainname,$publicpath,$adminemail,$adminpassword,$adminfirstname,$adminlastname);
+}
+if($action == 'artisan_cmd_run'){
+    $setupObj->artisan_cmd_run($homeuser,$domainname,$artisancmd,$argkey,$argvalue);
 }
 
 if($action == 'finished_setup'){
@@ -792,6 +804,53 @@ class RVsitebuilder_Setup_API {
         return $this->print_response($this->response);
     }
     
+    public function artisan_cmd_run($homeuser,$domainname,$artisancmd,$argkey,$argvalue){
+        //called from tryout
+        
+        $time_start = microtime(true);
+        $this->print_debug_log('======'.__METHOD__.'======');
+        
+        //loader
+        // /home/arnut/rvsitebuildercms/arnut.cpdev1.rvglobalsoft.net/vendor/autoload.php
+        $loader = require $homeuser.'/rvsitebuildercms/'.$domainname.'/vendor/autoload.php';
+        $this->print_debug_log("require  ".$homeuser.'/rvsitebuildercms/'.$domainname.'/vendor/autoload.php');
+        
+        //change path app_path/rvsitebuildercms/storage/packages to app_path/rvsitebuildercms/packages
+        $packagesPath = $homeuser.'/rvsitebuildercms/'.$domainname.'/packages';
+        
+        $vendor_names = scandir($packagesPath);
+        foreach($vendor_names as $vendor_name){
+            if($vendor_name === '.' || $vendor_name === '..') {continue;}
+            $package_names = scandir($packagesPath . '/' . $vendor_name);
+            foreach($package_names as $package_name){
+                if($package_name === '.' || $package_name === '..') {continue;}
+                $auto_load_file = $packagesPath . '/' . $vendor_name . '/' . $package_name . '/vendor/autoload.php';
+                if(is_file($auto_load_file)){
+                    require $auto_load_file;
+                    $this->print_debug_log("require  ".$auto_load_file);
+                }
+            }
+        }
+        
+        //call artisan
+        $app = require_once  $homeuser.'/rvsitebuildercms/'.$domainname.'/bootstrap/app.php';
+        $this->print_debug_log('require_one '.$homeuser.'/rvsitebuildercms/'.$domainname.'/bootstrap/app.php');
+        $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+        
+        if($artisancmd != '' && $argkey !='' && $argvalue != '') {
+            $kernel->call($artisancmd, [$argkey => $argvalue]);
+            $this->print_debug_log($kernel->output());
+        }
+       
+        
+        $this->response['status'] = true;
+        $this->response['message'] = 'Artisan Command Run Success';
+        $this->response['exectime'] = (microtime(true) - $time_start);
+        $this->print_install_log(__METHOD__.' status TRUE'.' timeusage '.$this->response['exectime']);
+        return $this->print_response($this->response);
+        
+    }
+    
     public function finished_setup($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport) {
         $time_start = microtime(true);
         $this->print_debug_log('======'.__METHOD__.'======');
@@ -951,8 +1010,6 @@ class RVsitebuilder_Setup_API {
     function copyFileFTP($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport) {
         $time_start = microtime(true);
         $this->print_debug_log('======'.__METHOD__.'======');
-        
-        //TODO remove first if /home/<user>/rvsitebuildercms/$domainname
         
         
         $src_dir = $publicpath.'/rvsitebuilder/tmp';
