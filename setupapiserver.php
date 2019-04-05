@@ -792,6 +792,10 @@ class RVsitebuilder_Setup_API {
         return $this->print_response($this->response);
     }
     
+    public function artisan_cmd_run(){
+        //called from tryout
+    }
+    
     public function finished_setup($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport) {
         $time_start = microtime(true);
         $this->print_debug_log('======'.__METHOD__.'======');
