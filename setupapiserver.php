@@ -11,25 +11,45 @@ $responsetype           = (isset($headers['ACCEPT']))                   ? $heade
 $ignore_token           = (isset($headers['IGNORE-TOKEN']))             ? $headers['IGNORE-TOKEN']          : 0;
 $rvsb_installing_token  = (isset($headers['RVSB-INSTALLING-TOKEN']))    ? $headers['RVSB-INSTALLING-TOKEN'] : 0;
 $rvlicensecode          = (isset($headers['RV-LICENSE-CODE']))          ? $headers['RV-LICENSE-CODE']       : '';
-//get
-$action                 = (isset($_GET['action']))                      ? $_GET['action']           : '';
-$homeuser               = (isset($_GET['homeuser']))                    ? $_GET['homeuser']         : '';
-$domainname             = (isset($_GET['domainname']))                  ? $_GET['domainname']       : '';
-$publicpath             = (isset($_GET['publicpath']))                  ? $_GET['publicpath']       : '';
-$dbhost                 = (isset($_GET['dbhost']))                      ? $_GET['dbhost']           : '';
-$dbname                 = (isset($_GET['dbname']))                      ? $_GET['dbname']           : '';
-$dbuser                 = (isset($_GET['dbuser']))                      ? $_GET['dbuser']           : '';
-$dbpassword             = (isset($_GET['dbpass']))                      ? $_GET['dbpass']           : '';
-$ftpaccount             = (isset($_GET['ftpaccount']))                  ? $_GET['ftpaccount']       : '';
-$ftppassword            = (isset($_GET['ftppassword']))                 ? $_GET['ftppassword']      : '';
-$appname                = (isset($_GET['appname']))                     ? $_GET['appname']          : 'RVsitebuilder';
-$ftpserver              = (isset($_GET['ftpserver']))                   ? $_GET['ftpserver']        : '';
-$ftpport                = (isset($_GET['ftpport']))                     ? $_GET['ftpport']          : 21;
-$adminemail             = (isset($_GET['adminemail']))                  ? $_GET['adminemail']       : '';
-$adminpassword          = (isset($_GET['adminpassword']))               ? $_GET['adminpassword']    : '';
-$adminfirstname         = (isset($_GET['adminfirstname']))              ? $_GET['adminfirstname']   : '';
-$adminlastname          = (isset($_GET['adminlastname']))               ? $_GET['adminlastname']    : '';
-$domainport             = (isset($_GET['domainport']))                  ? $_GET['domainport']       : '';
+
+//default 
+$action         = '';
+$homeuser       = '';
+$domainname     = '';
+$publicpath     = '';
+$dbhost         = '';
+$dbname         = '';
+$dbuser         = '';
+$dbpassword     = '';
+$ftpaccount     = '';
+$ftppassword    = '';
+$appname        = 'RVsitebuilder';
+$ftpserver      = '';
+$ftpport        = 21;
+$adminemail     = '';
+$adminpassword  = '';
+$adminfirstname = '';
+$adminlastname  = '';
+$domainport     = '';
+//get 
+if (isset($_GET['action']))         $action         = $_GET['action'];
+if (isset($_GET['homeuser']))       $homeuser       = $_GET['homeuser'];
+if (isset($_GET['domainname']))     $domainname     = $_GET['domainname'];
+if (isset($_GET['publicpath']))     $publicpath     = $_GET['publicpath'];
+if (isset($_GET['dbhost']))         $dbhost         = $_GET['dbhost'];
+if (isset($_GET['dbname']))         $dbname         = $_GET['dbname'];
+if (isset($_GET['dbuser']))         $dbuser         = $_GET['dbuser'];
+if (isset($_GET['dbpass']))         $dbpassword     = $_GET['dbpass'];
+if (isset($_GET['ftpaccount']))     $ftpaccount     = $_GET['ftpaccount'];
+if (isset($_GET['ftppassword']))    $ftppassword    = $_GET['ftppassword'];
+if (isset($_GET['appname']))        $appname        = $_GET['appname'];
+if (isset($_GET['ftpserver']))      $ftpserver      = $_GET['ftpserver'];
+if (isset($_GET['ftpport']))        $ftpport        = $_GET['ftpport'];
+if (isset($_GET['adminemail']))     $adminemail     = $_GET['adminemail'];
+if (isset($_GET['adminpassword']))  $adminpassword  = $_GET['adminpassword'];
+if (isset($_GET['adminfirstname'])) $adminfirstname = $_GET['adminfirstname'];
+if (isset($_GET['adminlastname']))  $adminlastname  = $_GET['adminlastname'];
+if (isset($_GET['domainport']))     $domainport     = $_GET['domainport'];
 //post
 if (isset($_POST['action']))         $action         = $_POST['action']           ;
 if (isset($_POST['homeuser']))       $homeuser       = $_POST['homeuser']         ;
@@ -374,6 +394,15 @@ class RVsitebuilder_Setup_API {
             $this->response['message'] = $this->response['message'].' / Can not load PHP Function (json)';
             $this->response['status'] = false;
             $this->print_debug_log("PHP json false");
+        }
+        //php function parse_ini_file
+        $this->response['check_pre_require']['parse_ini_file']['check'] = true;
+        if(! function_exists('parse_ini_file')){
+            $this->response['check_pre_require']['parse_ini_file']['check'] = false;
+            $this->response['check_pre_require']['parse_ini_file']['reason'] = 'Can not load PHP Function (parse_ini_file)';
+            $this->response['message'] = $this->response['message'].' / Can not load PHP Function (parse_ini_file)';
+            $this->response['status'] = false;
+            $this->print_debug_log("PHP parse_ini_file false");
         }
         
         //http as user
