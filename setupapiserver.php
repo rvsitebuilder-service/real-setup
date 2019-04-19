@@ -763,30 +763,68 @@ class RVsitebuilder_Setup_API {
         
         
         //Common
+        $unit_time_start = microtime(true);
         $kernel->call('key:generate', []);
         $this->print_debug_log($kernel->output());
+        $unit_exec_time = (microtime(true) - $unit_time_start);
+        $this->print_install_log('artisan key:generate timeusage '.$unit_exec_time);
+        
+        $unit_time_start = microtime(true);
         $kernel->call('migrate', ['--force'=>true]);
         $this->print_debug_log($kernel->output());
+        $unit_exec_time = (microtime(true) - $unit_time_start);
+        $this->print_install_log('artisan migrate --force timeusage '.$unit_exec_time);
+        
+        $unit_time_start = microtime(true);
         $kernel->call('db:seed', ['--force'=>true]);
         $this->print_debug_log($kernel->output());
+        $unit_exec_time = (microtime(true) - $unit_time_start);
+        $this->print_install_log('artisan db:seed --force timeusage '.$unit_exec_time);
+        
         //user secret key
+        $unit_time_start = microtime(true);
         $kernel->call('rvsitebuilder:updateenduserdb-run', ['secretkey' => $this->generateSecretKey()]);
         $this->print_debug_log($kernel->output());
+        $unit_exec_time = (microtime(true) - $unit_time_start);
+        $this->print_install_log('artisan rvsitebuilder:updateenduserdb-run timeusage '.$unit_exec_time);        
+        
         //vendor publish
+        $unit_time_start = microtime(true);
         $kernel->call('vendor:publish', ['--tag'=> 'public','--force' => true]);
         $this->print_debug_log($kernel->output());
+        $unit_exec_time = (microtime(true) - $unit_time_start);
+        $this->print_install_log('artisan vendor:publish timeusage '.$unit_exec_time);
+        
         //clear cache
+        $unit_time_start = microtime(true);
         $kernel->call('cache:clear', []);
         $this->print_debug_log($kernel->output());
+        $unit_exec_time = (microtime(true) - $unit_time_start);
+        $this->print_install_log('artisan cache:clear timeusage '.$unit_exec_time);
+        
+        $unit_time_start = microtime(true);
         $kernel->call('config:clear', []);
         $this->print_debug_log($kernel->output());
+        $unit_exec_time = (microtime(true) - $unit_time_start);
+        $this->print_install_log('artisan config:clear timeusage '.$unit_exec_time);
+        
+        $unit_time_start = microtime(true);
         $kernel->call('route:clear', []);
         $this->print_debug_log($kernel->output());
+        $unit_exec_time = (microtime(true) - $unit_time_start);
+        $this->print_install_log('artisan route:clear timeusage '.$unit_exec_time);
+        
+        $unit_time_start = microtime(true);
         $kernel->call('view:clear', []);
         $this->print_debug_log($kernel->output());
+        $unit_exec_time = (microtime(true) - $unit_time_start);
+        $this->print_install_log('artisan view:clear timeusage '.$unit_exec_time);
+        
+        
         //update admin info from wizard request
         if($adminemail != '' && $adminpassword != '') {
             $this->print_debug_log("Update user info to DB adminemail=$adminemail adminpassword=$adminpassword adminfirstname=$adminfirstname adminlastname=$adminlastname");
+            $unit_time_start = microtime(true);
             $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'email', 'update_val' => $adminemail]);
             $this->print_debug_log($kernel->output());
             $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'password', 'update_val' => $adminpassword]);
@@ -795,6 +833,8 @@ class RVsitebuilder_Setup_API {
             $this->print_debug_log($kernel->output());
             $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'last_name', 'update_val' => $adminlastname]);
             $this->print_debug_log($kernel->output());
+            $unit_exec_time = (microtime(true) - $unit_time_start);
+            $this->print_install_log('artisan rvsitebuilder:updateuserinfo-run timeusage '.$unit_exec_time);
         }
        
         $this->response['status'] = true;
@@ -1207,6 +1247,7 @@ class RVsitebuilder_Setup_API {
     
     
     public function doDownload($type, $url, $sink) {
+        $time_start = microtime(true);
         $this->print_debug_log('======'.__METHOD__.'======');
         
         $response = [
@@ -1261,6 +1302,8 @@ class RVsitebuilder_Setup_API {
             $this->print_debug_log('Download Success ,file '.$sink);
             $response['success'] = true;
         }
+        $this->response['exectime'] = (microtime(true) - $time_start);
+        $this->print_install_log(__METHOD__.' TRUE (By Default)' . $url .' timeusage '.$this->response['exectime']);
         return $response;
     }
     
