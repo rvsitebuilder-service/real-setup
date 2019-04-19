@@ -4,6 +4,7 @@
 require 'vendor/autoload.php';
 use GuzzleHttp\Client;
 use splitbrain\PHPArchive\Tar;
+use Illuminate\Filesystem\Filesystem;
 
 $headers = (function_exists('apache_request_headers') || is_callable('apache_request_headers'))  ? apache_request_headers() : rv_apache_request_headers();
 $headers = array_change_key_case($headers,CASE_UPPER);
@@ -83,7 +84,7 @@ if (isset($_POST['argvalue']))       $argvalue       = $_POST['argvalue'];
 $setupObj = new RVsitebuilder_Setup_API($responsetype,$rvsb_installing_token,$responsetype,$ignore_token,$rvlicensecode);
 
 
-if($action == '' && !file_exists(dirname(__FILE__).'/.Rvsb-Installing-Token' && $rvsb_installing_token == 0)) {
+if($action == '' && !file_exists(dirname(__FILE__).'/.Rvsb-Installing-Token') && $rvsb_installing_token == 0) {
     $setupObj->send_token();
 }
 
@@ -559,25 +560,13 @@ class RVsitebuilder_Setup_API {
             
         }
         
-//removed         //move vendor package to vendor path
-//         $files = scandir(dirname(__FILE__).'/tmp/vendor/vendor');
-//         $source = dirname(__FILE__).'/tmp/vendor/vendor/';
-//         $destination = dirname(__FILE__).'/tmp/vendor/';
-//         foreach ($files as $file) {
-//             if (in_array($file, [".",".."])) continue;
-//             rename($source.$file, $destination.$file);
-//         }
+        $files = new Filesystem();
         
-        $files = new File_Handler();
         //move vendor package to vendor path
         $source = dirname(__FILE__).'/tmp/vendor/vendor/';
         $destination = dirname(__FILE__).'/tmp/vendor/';
-        $copy = $files->copyDirectory($source, $destination,[]);
-        $this->print_debug_log("Copy vendor from $source to $destination");
-        
-        // Delete all successfully-copied files
-        $this->rrmdir(dirname(__FILE__).'/tmp/vendor/vendor');
-        $this->print_debug_log("Removed ".dirname(__FILE__).'/tmp/vendor/vendor');
+        $moved = $files->moveDirectory($source, $destination, true);
+        $this->print_debug_log("Moved vendor from $source to $destination");
         
         $this->response['status'] = true;
         $this->response['message'] = 'Download Vendor Success';
@@ -969,39 +958,40 @@ class RVsitebuilder_Setup_API {
         //remove file
         if(! $this->removeinstallerpath == true) {
             
-            if ( file_exists(dirname(__FILE__).'/.Rvsb-Installing-Token') ) unlink(dirname(__FILE__).'/.Rvsb-Installing-Token');
-            if ( file_exists(dirname(__FILE__).'/framework.tar.gz') ) unlink(dirname(__FILE__).'/framework.tar.gz');
-            if ( file_exists(dirname(__FILE__).'/bundle_vendor.tar.gz') ) unlink(dirname(__FILE__).'/bundle_vendor.tar.gz');
-            if ( file_exists(dirname(__FILE__).'/blog.tar.gz') ) unlink(dirname(__FILE__).'/blog.tar.gz');
-            if ( file_exists(dirname(__FILE__).'/core.tar.gz') ) unlink(dirname(__FILE__).'/core.tar.gz');
-            if ( file_exists(dirname(__FILE__).'/email.tar.gz') ) unlink(dirname(__FILE__).'/email.tar.gz');
-            if ( file_exists(dirname(__FILE__).'/manage.tar.gz') ) unlink(dirname(__FILE__).'/manage.tar.gz');
-            if ( file_exists(dirname(__FILE__).'/queuesharedhost.tar.gz') ) unlink(dirname(__FILE__).'/queuesharedhost.tar.gz');
-            if ( file_exists(dirname(__FILE__).'/README.md') ) unlink(dirname(__FILE__).'/README.md');
-            if ( file_exists(dirname(__FILE__).'/scheduler.tar.gz') ) unlink(dirname(__FILE__).'/scheduler.tar.gz');
-            if ( file_exists(dirname(__FILE__).'/setup.tar.gz') ) unlink(dirname(__FILE__).'/setup.tar.gz');
-            if ( file_exists(dirname(__FILE__).'/wysiwyg.tar.gz') ) unlink(dirname(__FILE__).'/wysiwyg.tar.gz');
-            if ( file_exists(dirname(__FILE__).'/composer.json') ) unlink(dirname(__FILE__).'/composer.json');
-            if ( file_exists(dirname(__FILE__).'/composer.lock') ) unlink(dirname(__FILE__).'/composer.lock');
-            if ( file_exists(dirname(__FILE__).'/INSTALL_COMPLETED') ) unlink(dirname(__FILE__).'/INSTALL_COMPLETED');
-            if ( file_exists(dirname(__FILE__).'/install.html') ) unlink(dirname(__FILE__).'/install.html');
-            if ( file_exists(dirname(__FILE__).'/install.php') ) unlink(dirname(__FILE__).'/install.php');
-            if ( file_exists(dirname(__FILE__).'/install.tar.gz') ) unlink(dirname(__FILE__).'/install.tar.gz');
-            if ( file_exists(dirname(__FILE__).'/logo_rvsitebuilder.png') ) unlink(dirname(__FILE__).'/logo_rvsitebuilder.png');
-            if ( file_exists(dirname(__FILE__).'/logorvsitebuilder.png') ) unlink(dirname(__FILE__).'/logorvsitebuilder.png');
-            if ( file_exists(dirname(__FILE__).'/install_log.txt') ) unlink(dirname(__FILE__).'/install_log.txt');
-            if ( file_exists(dirname(__FILE__).'/error_log') ) unlink(dirname(__FILE__).'/error_log');
-            if ( file_exists(dirname(__FILE__).'/setup.php') ) unlink(dirname(__FILE__).'/setup.php');
-            //if ( file_exists(dirname(__FILE__).'/setupapiserver.php') ) unlink(dirname(__FILE__).'/setupapiserver.php');
-            if ( file_exists(dirname(__FILE__).'/../domainready.png') ) unlink(dirname(__FILE__).'/../domainready.png');
-            if ( file_exists(dirname(__FILE__).'/../setup.zip') ) unlink(dirname(__FILE__).'/../setup.zip');
+//             if ( file_exists(dirname(__FILE__).'/.Rvsb-Installing-Token') ) unlink(dirname(__FILE__).'/.Rvsb-Installing-Token');
+//             if ( file_exists(dirname(__FILE__).'/framework.tar.gz') ) unlink(dirname(__FILE__).'/framework.tar.gz');
+//             if ( file_exists(dirname(__FILE__).'/bundle_vendor.tar.gz') ) unlink(dirname(__FILE__).'/bundle_vendor.tar.gz');
+//             if ( file_exists(dirname(__FILE__).'/blog.tar.gz') ) unlink(dirname(__FILE__).'/blog.tar.gz');
+//             if ( file_exists(dirname(__FILE__).'/core.tar.gz') ) unlink(dirname(__FILE__).'/core.tar.gz');
+//             if ( file_exists(dirname(__FILE__).'/email.tar.gz') ) unlink(dirname(__FILE__).'/email.tar.gz');
+//             if ( file_exists(dirname(__FILE__).'/manage.tar.gz') ) unlink(dirname(__FILE__).'/manage.tar.gz');
+//             if ( file_exists(dirname(__FILE__).'/queuesharedhost.tar.gz') ) unlink(dirname(__FILE__).'/queuesharedhost.tar.gz');
+//             if ( file_exists(dirname(__FILE__).'/README.md') ) unlink(dirname(__FILE__).'/README.md');
+//             if ( file_exists(dirname(__FILE__).'/scheduler.tar.gz') ) unlink(dirname(__FILE__).'/scheduler.tar.gz');
+//             if ( file_exists(dirname(__FILE__).'/setup.tar.gz') ) unlink(dirname(__FILE__).'/setup.tar.gz');
+//             if ( file_exists(dirname(__FILE__).'/wysiwyg.tar.gz') ) unlink(dirname(__FILE__).'/wysiwyg.tar.gz');
+//             if ( file_exists(dirname(__FILE__).'/composer.json') ) unlink(dirname(__FILE__).'/composer.json');
+//             if ( file_exists(dirname(__FILE__).'/composer.lock') ) unlink(dirname(__FILE__).'/composer.lock');
+//             if ( file_exists(dirname(__FILE__).'/INSTALL_COMPLETED') ) unlink(dirname(__FILE__).'/INSTALL_COMPLETED');
+//             if ( file_exists(dirname(__FILE__).'/install.html') ) unlink(dirname(__FILE__).'/install.html');
+//             if ( file_exists(dirname(__FILE__).'/install.php') ) unlink(dirname(__FILE__).'/install.php');
+//             if ( file_exists(dirname(__FILE__).'/install.tar.gz') ) unlink(dirname(__FILE__).'/install.tar.gz');
+//             if ( file_exists(dirname(__FILE__).'/logo_rvsitebuilder.png') ) unlink(dirname(__FILE__).'/logo_rvsitebuilder.png');
+//             if ( file_exists(dirname(__FILE__).'/logorvsitebuilder.png') ) unlink(dirname(__FILE__).'/logorvsitebuilder.png');
+//             if ( file_exists(dirname(__FILE__).'/install_log.txt') ) unlink(dirname(__FILE__).'/install_log.txt');
+//             if ( file_exists(dirname(__FILE__).'/error_log') ) unlink(dirname(__FILE__).'/error_log');
+//             if ( file_exists(dirname(__FILE__).'/setup.php') ) unlink(dirname(__FILE__).'/setup.php');
+//             //if ( file_exists(dirname(__FILE__).'/setupapiserver.php') ) unlink(dirname(__FILE__).'/setupapiserver.php');
+//             if ( file_exists(dirname(__FILE__).'/../domainready.png') ) unlink(dirname(__FILE__).'/../domainready.png');
+//             if ( file_exists(dirname(__FILE__).'/../setup.zip') ) unlink(dirname(__FILE__).'/../setup.zip');
             
-            //remove dir
-            $this->rrmdir(dirname(__FILE__).'/tmp');
-            $this->rrmdir(dirname(__FILE__).'/vendor');
-            $this->rrmdir(dirname(__FILE__).'/src');
-            $this->rrmdir(dirname(__FILE__).'/rvsitebuilderinstallerconfig_dist');
-            //$this->rrmdir(dirname(__FILE__).'/../rvsitebuilder');
+//             //remove dir
+//             $this->rrmdir(dirname(__FILE__).'/tmp');
+//             $this->rrmdir(dirname(__FILE__).'/vendor');
+//             $this->rrmdir(dirname(__FILE__).'/src');
+//             $this->rrmdir(dirname(__FILE__).'/rvsitebuilderinstallerconfig_dist');
+            $files = new Filesystem();
+            $files->deleteDirectory(dirname(__FILE__).'/../rvsitebuilder',false);
             
             $this->print_debug_log("Removed Installer Path");
         }
@@ -1162,38 +1152,30 @@ class RVsitebuilder_Setup_API {
             $this->print_debug_log("Removed old framwork path ".$homeuser.'/rvsitebuildercms/'.$domainname);
         }
         
-//removed        //move temp to freamwork path
-//         $files = scandir(dirname(__FILE__).'/tmp');
-//         $source = dirname(__FILE__).'/tmp/';
-//         $destination = $homeuser.'/rvsitebuildercms/'.$domainname.'/';
-//         if (!file_exists($destination)) {
-//             mkdir($destination, 0755, true);
-//         }
-//         foreach ($files as $file) {
-//             if (in_array($file, [".",".."])) continue;
-//             rename($source.$file, $destination.$file);
-//             $this->print_debug_log("Moved $source$file To $destination$file");
-//         }
         
-        $files = new File_Handler();
+        $files = new Filesystem();
         
         //move tmp to freamwork path
         $source = dirname(__FILE__).'/tmp/';
         $destination = $homeuser.'/rvsitebuildercms/'.$domainname.'/';
         if (!file_exists($destination)) {
-            mkdir($destination, 0755, true);
+            $file->makeDirectory($destination, 0755, true, true);
             $this->print_debug_log("Make dir $destination");
         }
-        $copy = $files->copyDirectory($source, $destination,[]);
-        $this->rrmdir(dirname(__FILE__).'/tmp');
-        $this->print_debug_log("Copy $source To $destination");
+        $moved = $files->moveDirectory($source, $destination,true);
+        $this->print_debug_log("Moved $source To $destination");
         
         
         //move framework/public to public path
+        $oldhtaccess = '';
+        if (file_exists($publicpath.'/.htaccess')) {
+            $this->print_debug_log("Has Old .htaccess $publicpath/.htaccess");
+            $oldhtaccess = file_get_contents($publicpath.'/.htaccess');
+        }
         $source = $homeuser.'/rvsitebuildercms/'.$domainname.'/public';
         $destination = $publicpath;
-        $copy = $files->copyDirectory($source, $destination,['.htaccess']);
-        $this->print_debug_log("Copy $source To $destination");
+        $moved = $files->moveDirectory($source, $destination,true);
+        $this->print_debug_log("Moved $source To $destination");
         
         
         //write new .htaccess to docroot
@@ -1204,10 +1186,8 @@ class RVsitebuilder_Setup_API {
                                  $frameworkhtaccess."\n".
                                  "#End Rvsitebuilder7 htaccess\n";
         }
-        $oldhtaccess = '';
-        if (file_exists($publicpath.'/.htaccess')) {
-            $oldhtaccess = file_get_contents($publicpath.'/.htaccess');
-            $this->print_debug_log("Has Old .htaccess $publicpath/.htaccess");
+        
+        if ($oldhtaccess != '') {
             $writeoldhtaccess = file_put_contents($publicpath.'/.htaccess.backup' , $oldhtaccess);
             $this->print_debug_log("file put backup .htaccess ".$publicpath.'/.htaccess.backup');
             if (! preg_match('/^#Start Rvsitebuilder7 htaccess$/im', $oldhtaccess)) {
@@ -1887,73 +1867,6 @@ class FTP_Handler{
 }
 
 
-
-class File_Handler{
-    
-    public function __construct( ) {
-    }
-    
-    public function isDirectory($directory)
-    {
-        return is_dir($directory);
-    }
-    
-    public function copyDirectory($directory, $destination, $ignore = [], $options = null)
-    {
-        if (! $this->isDirectory($directory)) {
-            return false;
-        }
-        
-        $options = $options ?: FilesystemIterator::SKIP_DOTS;
-        
-        if (! $this->isDirectory($destination)) {
-            $this->makeDirectory($destination, 0777, true);
-        }
-        
-        $items = new FilesystemIterator($directory, $options);
-        
-        foreach ($items as $item) {
-            
-            if(in_array($item->getBasename() , $ignore)){
-                continue;
-            }
-            
-            $target = $destination.'/'.$item->getBasename();
-            
-            if ($item->isDir()) {
-                $path = $item->getPathname();
-                
-                if (! $this->copyDirectory($path, $target, $ignore, $options)) {
-                    return false;
-                }
-            }
-            
-            else {
-                if (! $this->copy($item->getPathname(), $target)) {
-                    return false;
-                }
-            }
-        }
-        
-        return true;
-    }
-    
-    public  function makeDirectory($path, $mode = 0755, $recursive = false, $force = false)
-    {
-        if ($force) {
-            return @mkdir($path, $mode, $recursive);
-        }
-        
-        return mkdir($path, $mode, $recursive);
-    }
-    
-    public  function copy($path, $target)
-    {
-        return copy($path, $target);
-    }
-    
-    
-}
 
 function getFrameworkVendorPath($filePath = ''){
     $vendorDir = realpath(dirname($filePath) . '/../../../../../') . '/vendor';
