@@ -1159,7 +1159,7 @@ class RVsitebuilder_Setup_API {
         $source = dirname(__FILE__).'/tmp/';
         $destination = $homeuser.'/rvsitebuildercms/'.$domainname.'/';
         if (!file_exists($destination)) {
-            $file->makeDirectory($destination, 0755, true, true);
+            $files->makeDirectory($destination, 0755, true, true);
             $this->print_debug_log("Make dir $destination");
         }
         $moved = $files->moveDirectory($source, $destination,true);
