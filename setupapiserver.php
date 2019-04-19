@@ -958,40 +958,42 @@ class RVsitebuilder_Setup_API {
         //remove file
         if(! $this->removeinstallerpath == true) {
             
-//             if ( file_exists(dirname(__FILE__).'/.Rvsb-Installing-Token') ) unlink(dirname(__FILE__).'/.Rvsb-Installing-Token');
-//             if ( file_exists(dirname(__FILE__).'/framework.tar.gz') ) unlink(dirname(__FILE__).'/framework.tar.gz');
-//             if ( file_exists(dirname(__FILE__).'/bundle_vendor.tar.gz') ) unlink(dirname(__FILE__).'/bundle_vendor.tar.gz');
-//             if ( file_exists(dirname(__FILE__).'/blog.tar.gz') ) unlink(dirname(__FILE__).'/blog.tar.gz');
-//             if ( file_exists(dirname(__FILE__).'/core.tar.gz') ) unlink(dirname(__FILE__).'/core.tar.gz');
-//             if ( file_exists(dirname(__FILE__).'/email.tar.gz') ) unlink(dirname(__FILE__).'/email.tar.gz');
-//             if ( file_exists(dirname(__FILE__).'/manage.tar.gz') ) unlink(dirname(__FILE__).'/manage.tar.gz');
-//             if ( file_exists(dirname(__FILE__).'/queuesharedhost.tar.gz') ) unlink(dirname(__FILE__).'/queuesharedhost.tar.gz');
-//             if ( file_exists(dirname(__FILE__).'/README.md') ) unlink(dirname(__FILE__).'/README.md');
-//             if ( file_exists(dirname(__FILE__).'/scheduler.tar.gz') ) unlink(dirname(__FILE__).'/scheduler.tar.gz');
-//             if ( file_exists(dirname(__FILE__).'/setup.tar.gz') ) unlink(dirname(__FILE__).'/setup.tar.gz');
-//             if ( file_exists(dirname(__FILE__).'/wysiwyg.tar.gz') ) unlink(dirname(__FILE__).'/wysiwyg.tar.gz');
-//             if ( file_exists(dirname(__FILE__).'/composer.json') ) unlink(dirname(__FILE__).'/composer.json');
-//             if ( file_exists(dirname(__FILE__).'/composer.lock') ) unlink(dirname(__FILE__).'/composer.lock');
-//             if ( file_exists(dirname(__FILE__).'/INSTALL_COMPLETED') ) unlink(dirname(__FILE__).'/INSTALL_COMPLETED');
-//             if ( file_exists(dirname(__FILE__).'/install.html') ) unlink(dirname(__FILE__).'/install.html');
-//             if ( file_exists(dirname(__FILE__).'/install.php') ) unlink(dirname(__FILE__).'/install.php');
-//             if ( file_exists(dirname(__FILE__).'/install.tar.gz') ) unlink(dirname(__FILE__).'/install.tar.gz');
-//             if ( file_exists(dirname(__FILE__).'/logo_rvsitebuilder.png') ) unlink(dirname(__FILE__).'/logo_rvsitebuilder.png');
-//             if ( file_exists(dirname(__FILE__).'/logorvsitebuilder.png') ) unlink(dirname(__FILE__).'/logorvsitebuilder.png');
-//             if ( file_exists(dirname(__FILE__).'/install_log.txt') ) unlink(dirname(__FILE__).'/install_log.txt');
-//             if ( file_exists(dirname(__FILE__).'/error_log') ) unlink(dirname(__FILE__).'/error_log');
-//             if ( file_exists(dirname(__FILE__).'/setup.php') ) unlink(dirname(__FILE__).'/setup.php');
-//             //if ( file_exists(dirname(__FILE__).'/setupapiserver.php') ) unlink(dirname(__FILE__).'/setupapiserver.php');
-//             if ( file_exists(dirname(__FILE__).'/../domainready.png') ) unlink(dirname(__FILE__).'/../domainready.png');
-//             if ( file_exists(dirname(__FILE__).'/../setup.zip') ) unlink(dirname(__FILE__).'/../setup.zip');
+            if ( file_exists(dirname(__FILE__).'/.Rvsb-Installing-Token') ) unlink(dirname(__FILE__).'/.Rvsb-Installing-Token');
+            if ( file_exists(dirname(__FILE__).'/framework.tar.gz') ) unlink(dirname(__FILE__).'/framework.tar.gz');
+            if ( file_exists(dirname(__FILE__).'/bundle_vendor.tar.gz') ) unlink(dirname(__FILE__).'/bundle_vendor.tar.gz');
+            if ( file_exists(dirname(__FILE__).'/blog.tar.gz') ) unlink(dirname(__FILE__).'/blog.tar.gz');
+            if ( file_exists(dirname(__FILE__).'/core.tar.gz') ) unlink(dirname(__FILE__).'/core.tar.gz');
+            if ( file_exists(dirname(__FILE__).'/email.tar.gz') ) unlink(dirname(__FILE__).'/email.tar.gz');
+            if ( file_exists(dirname(__FILE__).'/manage.tar.gz') ) unlink(dirname(__FILE__).'/manage.tar.gz');
+            if ( file_exists(dirname(__FILE__).'/queuesharedhost.tar.gz') ) unlink(dirname(__FILE__).'/queuesharedhost.tar.gz');
+            if ( file_exists(dirname(__FILE__).'/README.md') ) unlink(dirname(__FILE__).'/README.md');
+            if ( file_exists(dirname(__FILE__).'/scheduler.tar.gz') ) unlink(dirname(__FILE__).'/scheduler.tar.gz');
+            if ( file_exists(dirname(__FILE__).'/setup.tar.gz') ) unlink(dirname(__FILE__).'/setup.tar.gz');
+            if ( file_exists(dirname(__FILE__).'/wysiwyg.tar.gz') ) unlink(dirname(__FILE__).'/wysiwyg.tar.gz');
+            if ( file_exists(dirname(__FILE__).'/composer.json') ) unlink(dirname(__FILE__).'/composer.json');
+            if ( file_exists(dirname(__FILE__).'/composer.lock') ) unlink(dirname(__FILE__).'/composer.lock');
+            if ( file_exists(dirname(__FILE__).'/INSTALL_COMPLETED') ) unlink(dirname(__FILE__).'/INSTALL_COMPLETED');
+            if ( file_exists(dirname(__FILE__).'/install.html') ) unlink(dirname(__FILE__).'/install.html');
+            if ( file_exists(dirname(__FILE__).'/install.php') ) unlink(dirname(__FILE__).'/install.php');
+            if ( file_exists(dirname(__FILE__).'/install.tar.gz') ) unlink(dirname(__FILE__).'/install.tar.gz');
+            if ( file_exists(dirname(__FILE__).'/logo_rvsitebuilder.png') ) unlink(dirname(__FILE__).'/logo_rvsitebuilder.png');
+            if ( file_exists(dirname(__FILE__).'/logorvsitebuilder.png') ) unlink(dirname(__FILE__).'/logorvsitebuilder.png');
+            if ( file_exists(dirname(__FILE__).'/install_log.txt') ) unlink(dirname(__FILE__).'/install_log.txt');
+            if ( file_exists(dirname(__FILE__).'/error_log') ) unlink(dirname(__FILE__).'/error_log');
+            if ( file_exists(dirname(__FILE__).'/setup.php') ) unlink(dirname(__FILE__).'/setup.php');
+            //if ( file_exists(dirname(__FILE__).'/setupapiserver.php') ) unlink(dirname(__FILE__).'/setupapiserver.php');
+            if ( file_exists(dirname(__FILE__).'/../domainready.png') ) unlink(dirname(__FILE__).'/../domainready.png');
+            if ( file_exists(dirname(__FILE__).'/../setup.zip') ) unlink(dirname(__FILE__).'/../setup.zip');
             
-//             //remove dir
-//             $this->rrmdir(dirname(__FILE__).'/tmp');
-//             $this->rrmdir(dirname(__FILE__).'/vendor');
-//             $this->rrmdir(dirname(__FILE__).'/src');
-//             $this->rrmdir(dirname(__FILE__).'/rvsitebuilderinstallerconfig_dist');
-            $files = new Filesystem();
-            $files->deleteDirectory(dirname(__FILE__).'/../rvsitebuilder',false);
+            //remove dir
+            $this->rrmdir(dirname(__FILE__).'/tmp');
+            $this->rrmdir(dirname(__FILE__).'/vendor');
+            $this->rrmdir(dirname(__FILE__).'/src');
+            $this->rrmdir(dirname(__FILE__).'/rvsitebuilderinstallerconfig_dist');
+            $this->rrmdir(dirname(__FILE__).'/../rvsitebuilder');
+               
+            //$files = new Filesystem();
+            //$files->deleteDirectory(dirname(__FILE__).'/../rvsitebuilder',false);
             
             $this->print_debug_log("Removed Installer Path");
         }
