@@ -565,7 +565,8 @@ class RVsitebuilder_Setup_API {
         //move vendor package to vendor path
         $source = dirname(__FILE__).'/tmp/vendor/vendor/';
         $destination = dirname(__FILE__).'/tmp/vendor/';
-        $moved = $files->moveDirectory($source, $destination, true);
+        $moved = $files->copyDirectory($source, $destination);
+        $files->deleteDirectory($source);
         $this->print_debug_log("Moved vendor from $source to $destination");
         
         $this->response['status'] = true;
@@ -1164,7 +1165,8 @@ class RVsitebuilder_Setup_API {
             $files->makeDirectory($destination, 0755, true, true);
             $this->print_debug_log("Make dir $destination");
         }
-        $moved = $files->moveDirectory($source, $destination,true);
+        $moved = $files->copyDirectory($source, $destination);
+        $files->deleteDirectory($source);
         $this->print_debug_log("Moved $source To $destination");
         
         
