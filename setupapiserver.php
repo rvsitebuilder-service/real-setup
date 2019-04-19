@@ -1,10 +1,9 @@
-<?php 
+<?php
 
 
 require 'vendor/autoload.php';
 use GuzzleHttp\Client;
 use splitbrain\PHPArchive\Tar;
-use Illuminate\Filesystem\Filesystem;
 
 $headers = (function_exists('apache_request_headers') || is_callable('apache_request_headers'))  ? apache_request_headers() : rv_apache_request_headers();
 $headers = array_change_key_case($headers,CASE_UPPER);
@@ -13,7 +12,7 @@ $ignore_token           = (isset($headers['IGNORE-TOKEN']))             ? $heade
 $rvsb_installing_token  = (isset($headers['RVSB-INSTALLING-TOKEN']))    ? $headers['RVSB-INSTALLING-TOKEN'] : 0;
 $rvlicensecode          = (isset($headers['RV-LICENSE-CODE']))          ? $headers['RV-LICENSE-CODE']       : '';
 
-//default 
+//default
 $action         = '';
 $homeuser       = '';
 $domainname     = '';
@@ -35,7 +34,7 @@ $domainport     = '';
 $artisancmd     = '';
 $argkey         = '';
 $argvalue       = '';
-//get 
+//get
 if (isset($_GET['action']))         $action         = $_GET['action'];
 if (isset($_GET['homeuser']))       $homeuser       = $_GET['homeuser'];
 if (isset($_GET['domainname']))     $domainname     = $_GET['domainname'];
@@ -57,7 +56,7 @@ if (isset($_GET['domainport']))     $domainport     = $_GET['domainport'];
 if (isset($_GET['artisancmd']))     $artisancmd     = $_GET['artisancmd'];
 if (isset($_GET['argkey']))         $argkey         = $_GET['argkey'];
 if (isset($_GET['argvalue']))       $argvalue       = $_GET['argvalue'];
-    
+
 //post
 if (isset($_POST['action']))         $action         = $_POST['action'];
 if (isset($_POST['homeuser']))       $homeuser       = $_POST['homeuser'];
@@ -84,7 +83,7 @@ if (isset($_POST['argvalue']))       $argvalue       = $_POST['argvalue'];
 $setupObj = new RVsitebuilder_Setup_API($responsetype,$rvsb_installing_token,$responsetype,$ignore_token,$rvlicensecode);
 
 
-if($action == '' && !file_exists(dirname(__FILE__).'/.Rvsb-Installing-Token') && $rvsb_installing_token == 0) {
+if($action == '' && !file_exists(dirname(__FILE__).'/.Rvsb-Installing-Token' && $rvsb_installing_token == 0)) {
     $setupObj->send_token();
 }
 
@@ -166,7 +165,7 @@ class RVsitebuilder_Setup_API {
     protected $rvlicensecode;
     
     public function __construct($responsetype,$rvsb_installing_token,$call_responsetype,$ignore_token,$rvlicensecode)
-    {   
+    {
         //response type
         $this->responseType = $responsetype;
         $this->call_responsetype = $call_responsetype;
@@ -187,7 +186,7 @@ class RVsitebuilder_Setup_API {
         $this->install_log =  $this->installerconfig['install_log'];
         //remove installer path
         $this->removeinstallerpath = $this->installerconfig['removeinstallerpath'];
-        //rvlicensecode 
+        //rvlicensecode
         $this->rvlicensecode = $rvlicensecode;
     }
     
@@ -199,7 +198,7 @@ class RVsitebuilder_Setup_API {
         $defconfigpath = dirname(__FILE__).'/rvsitebuilderinstallerconfig_dist/config.ini';
         if(file_exists($defconfigpath)){
             $defconfig = parse_ini_file($defconfigpath,true);
-            $this->print_debug_log("Default Installer config ".json_encode($defconfig)); 
+            $this->print_debug_log("Default Installer config ".json_encode($defconfig));
         }
         
         //overwrite installer config by root config (in public path /home/user/public_html/.rvsitebuilderinstallerconfig)
@@ -278,7 +277,7 @@ class RVsitebuilder_Setup_API {
         file_put_contents(dirname(__FILE__).'/.Rvsb-Installing-Token', $this->response['rvsb_installing_token']);
         
         
-        $this->response['exectime'] = (microtime(true) - $time_start); 
+        $this->response['exectime'] = (microtime(true) - $time_start);
         $this->print_debug_log("Token Key ".$this->response['rvsb_installing_token']);
         $this->print_install_log(__METHOD__.' TRUE '.'timeusage '.$this->response['exectime']);
         return $this->print_response($this->response);
@@ -442,9 +441,9 @@ class RVsitebuilder_Setup_API {
         
         //download framework
         $downloadurl =  $this->mirror.'/download/rvsitebuilder/framework';
-        if(isset($this->installerconfig['framework']['getversion']) && $this->installerconfig['framework']['getversion'] == 'latest') 
+        if(isset($this->installerconfig['framework']['getversion']) && $this->installerconfig['framework']['getversion'] == 'latest')
         { $downloadurl = $this->mirror.'/download/rvsitebuilder/framework/tier/latest'; }
-        if(isset($this->installerconfig['framework']['getversion']) && preg_match('/[0-9]+\.[0-9]+\.[0-9]+/',$this->installerconfig['framework']['getversion'])) 
+        if(isset($this->installerconfig['framework']['getversion']) && preg_match('/[0-9]+\.[0-9]+\.[0-9]+/',$this->installerconfig['framework']['getversion']))
         { $downloadurl = $this->mirror.'/download/rvsitebuilder/framework/version/'.$this->installerconfig['framework']['getversion']; }
         
         $this->print_debug_log("Download Framework URL ".$downloadurl);
@@ -478,7 +477,7 @@ class RVsitebuilder_Setup_API {
         $this->response['message'] = 'Download Framework Success';
         $this->print_install_log(__METHOD__.' status TRUE'.' timeusage '.$this->response['exectime']);
         return $this->print_response($this->response);
-    } 
+    }
     
     public function download_vendor() {
         $time_start = microtime(true);
@@ -522,7 +521,7 @@ class RVsitebuilder_Setup_API {
                 $this->print_debug_log("Can not extract ".dirname(__FILE__).'/bundle_vendor.tar.gz');
                 return $this->print_response($this->response);
             }
-        } 
+        }
         
         //lookup and download all from key packages
         //วิธีนี้ อาจเจอ timeout
@@ -560,14 +559,24 @@ class RVsitebuilder_Setup_API {
             
         }
         
-        $files = new Filesystem();
-        
         //move vendor package to vendor path
+        $files = scandir(dirname(__FILE__).'/tmp/vendor/vendor');
         $source = dirname(__FILE__).'/tmp/vendor/vendor/';
         $destination = dirname(__FILE__).'/tmp/vendor/';
-        $moved = $files->copyDirectory($source, $destination);
-        $files->deleteDirectory($source);
-        $this->print_debug_log("Moved vendor from $source to $destination");
+        foreach ($files as $file) {
+            if (in_array($file, [".",".."])) continue;
+            rename($source.$file, $destination.$file);
+        }
+        
+//         $files = new File_Handler();
+//         //move vendor package to vendor path
+//         $source = dirname(__FILE__).'/tmp/vendor/vendor/';
+//         $destination = dirname(__FILE__).'/tmp/vendor/';
+//         $copy = $files->copyDirectory($source, $destination,[]);
+//         $this->print_debug_log("Copy vendor from $source to $destination");
+//         // Delete all successfully-copied files
+//         $this->rrmdir(dirname(__FILE__).'/tmp/vendor/vendor');
+//         $this->print_debug_log("Removed ".dirname(__FILE__).'/tmp/vendor/vendor');
         
         $this->response['status'] = true;
         $this->response['message'] = 'Download Vendor Success';
@@ -628,23 +637,23 @@ class RVsitebuilder_Setup_API {
         $this->print_debug_log('======'.__METHOD__.'======');
         
         $commonpkg = [  'blog',
-                        'core',
-                        'email',
-                        'manage',
-                        'queuesharedhost',
-                        'scheduler',
-                        'wysiwyg',
-                        'marketing'
-                    ];
+            'core',
+            'email',
+            'manage',
+            'queuesharedhost',
+            'scheduler',
+            'wysiwyg',
+            'marketing'
+        ];
         
         $this->print_debug_log("Common Package ".json_encode($commonpkg));
         
         foreach ($commonpkg as $pkg) {
             
             $downloadurl = $this->mirror.'/download/rvsitebuilder/'.$pkg ;
-            if(isset($this->installerconfig[$pkg]['getversion']) && $this->installerconfig[$pkg]['getversion'] == 'latest') 
+            if(isset($this->installerconfig[$pkg]['getversion']) && $this->installerconfig[$pkg]['getversion'] == 'latest')
             { $downloadurl = $this->mirror.'/download/rvsitebuilder/'.$pkg.'/tier/latest'; }
-            if(isset($this->installerconfig[$pkg]['getversion']) && preg_match('/[0-9]+\.[0-9]+\.[0-9]+/',$this->installerconfig[$pkg]['getversion'])) 
+            if(isset($this->installerconfig[$pkg]['getversion']) && preg_match('/[0-9]+\.[0-9]+\.[0-9]+/',$this->installerconfig[$pkg]['getversion']))
             { $downloadurl = $this->mirror.'/download/rvsitebuilder/'.$pkg.'/version/'.$this->installerconfig[$pkg]['getversion']; }
             
             $this->print_debug_log("Download Common Package URL ".$downloadurl);
@@ -776,7 +785,7 @@ class RVsitebuilder_Setup_API {
         $kernel->call('rvsitebuilder:updateenduserdb-run', ['secretkey' => $this->generateSecretKey()]);
         $this->print_debug_log($kernel->output());
         $unit_exec_time = (microtime(true) - $unit_time_start);
-        $this->print_install_log('artisan rvsitebuilder:updateenduserdb-run timeusage '.$unit_exec_time);        
+        $this->print_install_log('artisan rvsitebuilder:updateenduserdb-run timeusage '.$unit_exec_time);
         
         //vendor publish
         $unit_time_start = microtime(true);
@@ -826,7 +835,7 @@ class RVsitebuilder_Setup_API {
             $unit_exec_time = (microtime(true) - $unit_time_start);
             $this->print_install_log('artisan rvsitebuilder:updateuserinfo-run timeusage '.$unit_exec_time);
         }
-       
+        
         $this->response['status'] = true;
         $this->response['message'] = 'Artisan Command Success';
         $this->response['exectime'] = (microtime(true) - $time_start);
@@ -871,7 +880,7 @@ class RVsitebuilder_Setup_API {
             $kernel->call($artisancmd, [$argkey => $argvalue]);
             $this->print_debug_log($kernel->output());
         }
-       
+        
         
         $this->response['status'] = true;
         $this->response['message'] = 'Artisan Command Run Success';
@@ -879,13 +888,13 @@ class RVsitebuilder_Setup_API {
         $this->print_install_log(__METHOD__.' status TRUE'.' timeusage '.$this->response['exectime']);
         return $this->print_response($this->response);
         
-  	}
+    }
     
     public function finished_setup($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport) {
         $time_start = microtime(true);
         $this->print_debug_log('======'.__METHOD__.'======');
         
-        //default 
+        //default
         if($this->httpasuser){
             //touch install completed
             $this->print_debug_log("TOUCH INSTALL_COMPLETED");
@@ -907,8 +916,8 @@ class RVsitebuilder_Setup_API {
             $this->response['exectime'] = (microtime(true) - $time_start);
             $this->print_install_log(__METHOD__.' status TRUE'.' timeusage '.$this->response['exectime']);
             return $this->print_response($this->response);
-        } 
-        //ftp 
+        }
+        //ftp
         else {
             //install completed
             $this->print_debug_log("FTP INSTALL_COMPLETED");
@@ -982,7 +991,7 @@ class RVsitebuilder_Setup_API {
             if ( file_exists(dirname(__FILE__).'/install_log.txt') ) unlink(dirname(__FILE__).'/install_log.txt');
             if ( file_exists(dirname(__FILE__).'/error_log') ) unlink(dirname(__FILE__).'/error_log');
             if ( file_exists(dirname(__FILE__).'/setup.php') ) unlink(dirname(__FILE__).'/setup.php');
-            if ( file_exists(dirname(__FILE__).'/setupapiserver.php') ) unlink(dirname(__FILE__).'/setupapiserver.php');
+            //if ( file_exists(dirname(__FILE__).'/setupapiserver.php') ) unlink(dirname(__FILE__).'/setupapiserver.php');
             if ( file_exists(dirname(__FILE__).'/../domainready.png') ) unlink(dirname(__FILE__).'/../domainready.png');
             if ( file_exists(dirname(__FILE__).'/../setup.zip') ) unlink(dirname(__FILE__).'/../setup.zip');
             
@@ -992,9 +1001,6 @@ class RVsitebuilder_Setup_API {
             $this->rrmdir(dirname(__FILE__).'/src');
             $this->rrmdir(dirname(__FILE__).'/rvsitebuilderinstallerconfig_dist');
             //$this->rrmdir(dirname(__FILE__).'/../rvsitebuilder');
-               
-            //$files = new Filesystem();
-            //$files->deleteDirectory(dirname(__FILE__).'/../rvsitebuilder',false);
             
             $this->print_debug_log("Removed Installer Path");
         }
@@ -1022,7 +1028,7 @@ class RVsitebuilder_Setup_API {
     }
     
     
-   
+    
     
     
     public function install_all_pkg($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport) {
@@ -1033,11 +1039,11 @@ class RVsitebuilder_Setup_API {
             $this->copyFileDefault($homeuser,$domainname,$publicpath);
         } else {
             $this->print_debug_log("Copy Framework FTP");
-            $this->copyFileFTP($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport);            
+            $this->copyFileFTP($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport);
         }
         
         return;
-       
+        
     }
     
     function copyFileFTP($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport) {
@@ -1093,9 +1099,9 @@ class RVsitebuilder_Setup_API {
         if (file_exists($homeuser.'/rvsitebuildercms/'.$domainname.'/public/.htaccess')) {
             $frameworkhtaccess = file_get_contents($homeuser.'/rvsitebuildercms/'.$domainname.'/public/.htaccess');
             $frameworkhtaccess = "#Start Rvsitebuilder7 htaccess\n".
-                                 $frameworkhtaccess."\n".
-                                 $oldhtaccess."\n".
-                                 "#End Rvsitebuilder7 htaccess\n";
+                $frameworkhtaccess."\n".
+                $oldhtaccess."\n".
+                "#End Rvsitebuilder7 htaccess\n";
         }
         $oldhtaccess = '';
         if (file_exists($publicpath.'/.htaccess')) {
@@ -1117,7 +1123,7 @@ class RVsitebuilder_Setup_API {
             $result = $ftpHandler->put(dirname(__FILE__).'/htaccess.tmp',$public_html.'/.htaccess',FTP_BINARY);
             $this->print_debug_log("FTP put new ".dirname(__FILE__).'/htaccess.tmp'.' To '.$public_html.'/.htaccess');
         }
-      
+        
         #chmod folder
         $ftpHandler->ftp_change_mod_r($publicpath.'/storage',$public_html.'/storage' , 0777);
         $this->print_debug_log("FTP change mod ".$publicpath.'/storage'.'  '.$public_html.'/storage'. '0777');
@@ -1155,30 +1161,38 @@ class RVsitebuilder_Setup_API {
             $this->print_debug_log("Removed old framwork path ".$homeuser.'/rvsitebuildercms/'.$domainname);
         }
         
-        
-        $files = new Filesystem();
-        
-        //move tmp to freamwork path
+        //move temp to freamwork path
+        $files = scandir(dirname(__FILE__).'/tmp');
         $source = dirname(__FILE__).'/tmp/';
         $destination = $homeuser.'/rvsitebuildercms/'.$domainname.'/';
         if (!file_exists($destination)) {
-            $files->makeDirectory($destination, 0755, true, true);
-            $this->print_debug_log("Make dir $destination");
+            mkdir($destination, 0755, true);
         }
-        $moved = $files->copyDirectory($source, $destination);
-        $files->deleteDirectory($source);
-        $this->print_debug_log("Moved $source To $destination");
+        foreach ($files as $file) {
+            if (in_array($file, [".",".."])) continue;
+            rename($source.$file, $destination.$file);
+            $this->print_debug_log("Moved $source$file To $destination$file");
+        }
         
+        
+        
+        //move tmp to freamwork path
+//         $source = dirname(__FILE__).'/tmp/';
+//         $destination = $homeuser.'/rvsitebuildercms/'.$domainname.'/';
+//         if (!file_exists($destination)) {
+//             mkdir($destination, 0755, true);
+//             $this->print_debug_log("Make dir $destination");
+//         }
+//         $copy = $files->copyDirectory($source, $destination,[]);
+//         $this->rrmdir(dirname(__FILE__).'/tmp');
+//         $this->print_debug_log("Copy $source To $destination");
+        
+        $files = new File_Handler();
         
         //move framework/public to public path
-        $oldhtaccess = '';
-        if (file_exists($publicpath.'/.htaccess')) {
-            $this->print_debug_log("Has Old .htaccess $publicpath/.htaccess");
-            $oldhtaccess = file_get_contents($publicpath.'/.htaccess');
-        }
-        $source = $homeuser.'/rvsitebuildercms/'.$domainname.'/public/';
-        $destination = $publicpath.'/';
-        $copy = $files->copyDirectory($source, $destination,true);
+        $source = $homeuser.'/rvsitebuildercms/'.$domainname.'/public';
+        $destination = $publicpath;
+        $copy = $files->copyDirectory($source, $destination,['.htaccess']);
         $this->print_debug_log("Copy $source To $destination");
         
         
@@ -1187,11 +1201,13 @@ class RVsitebuilder_Setup_API {
         if (file_exists($homeuser.'/rvsitebuildercms/'.$domainname.'/public/.htaccess')) {
             $frameworkhtaccess = file_get_contents($homeuser.'/rvsitebuildercms/'.$domainname.'/public/.htaccess');
             $frameworkhtaccess = "#Start Rvsitebuilder7 htaccess\n".
-                                 $frameworkhtaccess."\n".
-                                 "#End Rvsitebuilder7 htaccess\n";
+                $frameworkhtaccess."\n".
+                "#End Rvsitebuilder7 htaccess\n";
         }
-        
-        if ($oldhtaccess != '') {
+        $oldhtaccess = '';
+        if (file_exists($publicpath.'/.htaccess')) {
+            $oldhtaccess = file_get_contents($publicpath.'/.htaccess');
+            $this->print_debug_log("Has Old .htaccess $publicpath/.htaccess");
             $writeoldhtaccess = file_put_contents($publicpath.'/.htaccess.backup' , $oldhtaccess);
             $this->print_debug_log("file put backup .htaccess ".$publicpath.'/.htaccess.backup');
             if (! preg_match('/^#Start Rvsitebuilder7 htaccess$/im', $oldhtaccess)) {
@@ -1210,476 +1226,476 @@ class RVsitebuilder_Setup_API {
         $this->response['exectime'] = (microtime(true) - $time_start);
         $this->print_install_log(__METHOD__.' TRUE (By Default)'.' timeusage '.$this->response['exectime']);
         return $this->print_response($this->response);
-    }
-    
-    
-    function chmod_r($path,$perm) {
-        $this->print_debug_log('======'.__METHOD__.'======');
+        }
         
-        if(!is_dir($path)) {
+        
+        function chmod_r($path,$perm) {
+            $this->print_debug_log('======'.__METHOD__.'======');
+            
+            if(!is_dir($path)) {
+                return true;
+            }
+            $dir = new DirectoryIterator($path);
+            foreach ($dir as $item) {
+                chmod($item->getPathname(), $perm);
+                if ($item->isDir() && !$item->isDot()) {
+                    $this->chmod_r($item->getPathname());
+                }
+            }
             return true;
         }
-        $dir = new DirectoryIterator($path);
-        foreach ($dir as $item) {
-            chmod($item->getPathname(), $perm);
-            if ($item->isDir() && !$item->isDot()) {
-                $this->chmod_r($item->getPathname());
+        
+        
+        public function doDownload($type, $url, $sink) {
+            $time_start = microtime(true);
+            $this->print_debug_log('======'.__METHOD__.'======');
+            
+            $response = [
+                'message' => '',
+                'success' => false
+            ];
+            
+            $client = new Client([
+                'curl'            => [CURLOPT_SSL_VERIFYPEER => false, CURLOPT_SSL_VERIFYHOST => false],
+                'allow_redirects' => false,
+                'cookies'         => true,
+                'verify'          => false
+            ]);
+            $headers = [
+                /// Domain user
+                'RV-Referer' => $this->get_current_domain(),
+                /// บอกให้ทำ GATracking
+                'Allow-GATracking' => 'true',
+                /// RVGlobalsoft Product
+                'RV-Product' => 'rvsitebuilder',
+                /// ทำ License-Code ดูตาม function เลย
+                'RV-License-Code' => $this->rvlicensecode,
+                /// Browser ของ user
+                'User-Agent' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36',
+                /// ส่ง IP ของ user ให้ด้วย เพราะที่ server เราจะเห็นแค่ IP ของ server ไม่ใช่ IP ของผู้ใช้งานจริงๆ
+                'RV-Forword-REMOTE-ADDR' => $this->get_client_ip()
+            ];
+            
+            $this->print_debug_log('Header request to server '.json_encode($headers));
+            $this->print_debug_log("Do Download Type=$type URL=$url Synk=$sink LicenseCode=$this->rvlicensecode");
+            
+            $res = $client->request(
+                $type,
+                $url,
+                [
+                    'headers'   => $headers,
+                    'sink'      => $sink,
+                    'timeout'   => 180
+                ]
+                );
+            
+            $this->print_debug_log('Server Response Status '.$res->getStatusCode());
+            $this->print_debug_log('Server Response Header '.json_encode((array) $res->getHeaders()));
+            
+            if($res->getHeaderLine('RV-DOWNLOAD-RESPONSE') != 'ok') {
+                $this->print_debug_log("Download Error, Server Header Response : ".$res->getHeaderLine('RV-DOWNLOAD-RESPONSE-MESSAGE'));
+                $response['message'] = $res->getHeaderLine('RV-DOWNLOAD-RESPONSE-MESSAGE');
+            }else if(!file_exists($sink)) {
+                $this->print_debug_log('Download Error ,file '.$sink.' not exists');
+                $response['message'] = 'Download Error ,file '.$sink.' not exists';
+            }else {
+                $this->print_debug_log('Download Success ,file '.$sink);
+                $response['success'] = true;
             }
-        }
-        return true;
-    }
-    
-    
-    public function doDownload($type, $url, $sink) {
-        $time_start = microtime(true);
-        $this->print_debug_log('======'.__METHOD__.'======');
-        
-        $response = [
-            'message' => '',
-            'success' => false
-        ];
-        
-        $client = new Client([
-                                'curl'            => [CURLOPT_SSL_VERIFYPEER => false, CURLOPT_SSL_VERIFYHOST => false],
-                                'allow_redirects' => false,
-                                'cookies'         => true,
-                                'verify'          => false
-                            ]);
-        $headers = [
-            /// Domain user
-            'RV-Referer' => $this->get_current_domain(),
-            /// บอกให้ทำ GATracking
-            'Allow-GATracking' => 'true',
-            /// RVGlobalsoft Product
-            'RV-Product' => 'rvsitebuilder',
-            /// ทำ License-Code ดูตาม function เลย
-            'RV-License-Code' => $this->rvlicensecode,
-            /// Browser ของ user
-            'User-Agent' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36',
-            /// ส่ง IP ของ user ให้ด้วย เพราะที่ server เราจะเห็นแค่ IP ของ server ไม่ใช่ IP ของผู้ใช้งานจริงๆ
-            'RV-Forword-REMOTE-ADDR' => $this->get_client_ip()
-        ];
-        
-        $this->print_debug_log('Header request to server '.json_encode($headers));
-        $this->print_debug_log("Do Download Type=$type URL=$url Synk=$sink LicenseCode=$this->rvlicensecode");
-        
-        $res = $client->request(
-                                    $type,
-                                    $url,
-                                    [
-                                        'headers'   => $headers,
-                                        'sink'      => $sink,
-                                        'timeout'   => 180
-                                    ]
-                                );
-        
-        $this->print_debug_log('Server Response Status '.$res->getStatusCode());
-        $this->print_debug_log('Server Response Header '.json_encode((array) $res->getHeaders()));
-        
-        if($res->getHeaderLine('RV-DOWNLOAD-RESPONSE') != 'ok') {
-            $this->print_debug_log("Download Error, Server Header Response : ".$res->getHeaderLine('RV-DOWNLOAD-RESPONSE-MESSAGE'));
-            $response['message'] = $res->getHeaderLine('RV-DOWNLOAD-RESPONSE-MESSAGE');
-        }else if(!file_exists($sink)) {
-            $this->print_debug_log('Download Error ,file '.$sink.' not exists');
-            $response['message'] = 'Download Error ,file '.$sink.' not exists';
-        }else {
-            $this->print_debug_log('Download Success ,file '.$sink);
-            $response['success'] = true;
-        }
-        $this->response['exectime'] = (microtime(true) - $time_start);
-        $this->print_install_log(__METHOD__.' TRUE (By Default)' . $url .' timeusage '.$this->response['exectime']);
-        return $response;
-    }
-    
-    public function doExtract($file,$path) {
-        $this->print_debug_log('======'.__METHOD__.'======');
-        
-        $response['message'] = '';
-        $response['success'] = false;
-        $this->print_debug_log("Do Extract $file $path");
-        
-        try {
-            $tar = new Tar();
-            $tar->open($file);
-            $tar->extract($path);
-            $this->print_debug_log("Do Extract Success $file $path");
-            $response['success'] = true;
-            return $response;
-        } catch (Exception $e) {
-            $this->print_debug_log("Do Extract Error ".$e->getMessage());
-            $response['message'] = $e->getMessage();
+            $this->response['exectime'] = (microtime(true) - $time_start);
+            $this->print_install_log(__METHOD__.' TRUE (By Default)' . $url .' timeusage '.$this->response['exectime']);
             return $response;
         }
         
-    }
-    
-    public function get_current_domain() {
-        $this->print_debug_log('======'.__METHOD__.'======');
-        $domainname = $_SERVER['SERVER_NAME'];
-        $domainname = str_replace("www.","",$domainname);
-        $this->print_debug_log("Current domain ".$domainname);
-        return $domainname;
-    }
-    
-    public function get_client_ip() {
-        $this->print_debug_log('======'.__METHOD__.'======');
-        
-        $ipaddress = '';
-        if (isset($_SERVER['HTTP_CLIENT_IP']))
-        {    $ipaddress = $_SERVER['HTTP_CLIENT_IP']; }
-        else if(isset($_SERVER['HTTP_X_FORWARDED_FOR']))
-        {    $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR']; }
-        else if(isset($_SERVER['HTTP_X_FORWARDED']))
-        {    $ipaddress = $_SERVER['HTTP_X_FORWARDED']; }
-        else if(isset($_SERVER['HTTP_FORWARDED_FOR']))
-        {    $ipaddress = $_SERVER['HTTP_FORWARDED_FOR']; }
-        else if(isset($_SERVER['HTTP_FORWARDED']))
-        {    $ipaddress = $_SERVER['HTTP_FORWARDED']; }
-        else if(isset($_SERVER['REMOTE_ADDR']))
-        {    $ipaddress = $_SERVER['REMOTE_ADDR']; }
-        else
-        {    $ipaddress = 'UNKNOWN'; }
-        $this->print_debug_log("Remote IP Address ".$ipaddress);
-        return $ipaddress;
-    }
-    
-    public function print_response($data) {
-        $this->print_debug_log('======'.__METHOD__.'======');
-        
-        if($this->responseType == 'application/json' || $this->call_responsetype == 'application/json') {
-            header('Content-type: application/json');
+        public function doExtract($file,$path) {
+            $this->print_debug_log('======'.__METHOD__.'======');
+            
+            $response['message'] = '';
+            $response['success'] = false;
+            $this->print_debug_log("Do Extract $file $path");
+            
+            try {
+                $tar = new Tar();
+                $tar->open($file);
+                $tar->extract($path);
+                $this->print_debug_log("Do Extract Success $file $path");
+                $response['success'] = true;
+                return $response;
+            } catch (Exception $e) {
+                $this->print_debug_log("Do Extract Error ".$e->getMessage());
+                $response['message'] = $e->getMessage();
+                return $response;
+            }
+            
         }
-        echo json_encode( $data );
-        exit;
-    }
-    
-    
-    
-    
-    
-    public function rrmdir($dir) {
-        $this->print_debug_log('======'.__METHOD__.'======');
         
-        if (is_dir($dir)) {
-            $objects = scandir($dir);
-            foreach ($objects as $object) {
-                if ($object != "." && $object != "..") {
-                    if (filetype($dir."/".$object) == "dir")
-                        $this->rrmdir($dir."/".$object);
-                        else unlink   ($dir."/".$object);
+        public function get_current_domain() {
+            $this->print_debug_log('======'.__METHOD__.'======');
+            $domainname = $_SERVER['SERVER_NAME'];
+            $domainname = str_replace("www.","",$domainname);
+            $this->print_debug_log("Current domain ".$domainname);
+            return $domainname;
+        }
+        
+        public function get_client_ip() {
+            $this->print_debug_log('======'.__METHOD__.'======');
+            
+            $ipaddress = '';
+            if (isset($_SERVER['HTTP_CLIENT_IP']))
+            {    $ipaddress = $_SERVER['HTTP_CLIENT_IP']; }
+            else if(isset($_SERVER['HTTP_X_FORWARDED_FOR']))
+            {    $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR']; }
+            else if(isset($_SERVER['HTTP_X_FORWARDED']))
+            {    $ipaddress = $_SERVER['HTTP_X_FORWARDED']; }
+            else if(isset($_SERVER['HTTP_FORWARDED_FOR']))
+            {    $ipaddress = $_SERVER['HTTP_FORWARDED_FOR']; }
+            else if(isset($_SERVER['HTTP_FORWARDED']))
+            {    $ipaddress = $_SERVER['HTTP_FORWARDED']; }
+            else if(isset($_SERVER['REMOTE_ADDR']))
+            {    $ipaddress = $_SERVER['REMOTE_ADDR']; }
+            else
+            {    $ipaddress = 'UNKNOWN'; }
+            $this->print_debug_log("Remote IP Address ".$ipaddress);
+            return $ipaddress;
+        }
+        
+        public function print_response($data) {
+            $this->print_debug_log('======'.__METHOD__.'======');
+            
+            if($this->responseType == 'application/json' || $this->call_responsetype == 'application/json') {
+                header('Content-type: application/json');
+            }
+            echo json_encode( $data );
+            exit;
+        }
+        
+        
+        
+        
+        
+        public function rrmdir($dir) {
+            $this->print_debug_log('======'.__METHOD__.'======');
+            
+            if (is_dir($dir)) {
+                $objects = scandir($dir);
+                foreach ($objects as $object) {
+                    if ($object != "." && $object != "..") {
+                        if (filetype($dir."/".$object) == "dir")
+                            $this->rrmdir($dir."/".$object);
+                            else unlink   ($dir."/".$object);
+                    }
                 }
+                reset($objects);
+                rmdir($dir);
             }
-            reset($objects);
-            rmdir($dir);
-        }
-        return true;
-    }
-    
-    /*
-     * updateuserinfo('1','last_name','bbbbb');
-     */
-    public function updateuserinfo($user_id,$update_key,$update_val){
-        $this->print_debug_log('======'.__METHOD__.'======');
-        
-        $response = [];
-        $response['success'] = 'true';
-        $response['message'] = '';
-        $db_server_name = getEnvData('DB_HOST');
-        $db_port = getEnvData('DB_PORT');
-        $db_name = getEnvData('DB_DATABASE');
-        $db_user_name = getEnvData('DB_USERNAME');
-        $db_password = getEnvData('DB_PASSWORD');
-        
-        $this->print_debug_log("Update User info user_id=$user_id update_key=$update_key update_val=$update_val");
-        $this->print_debug_log("Database info db_server_name=$db_server_name db_port=$db_port db_name=$db_name db_user_name=$db_user_name db_password=$db_password");
-        
-        if($update_key == 'password'){
-            $update_val = bcrypt($update_val);
+            return true;
         }
         
-        $mysqli = new mysqli($db_server_name, $db_user_name, $db_password, $db_name);
-        if (mysqli_connect_errno()) {
-            $this->print_debug_log("DB connect error ".mysqli_connect_error());
-            $response['success'] = 'false';
-            $response['message'] = sprintf("Connect failed : %s\n", mysqli_connect_error());
+        /*
+         * updateuserinfo('1','last_name','bbbbb');
+         */
+        public function updateuserinfo($user_id,$update_key,$update_val){
+            $this->print_debug_log('======'.__METHOD__.'======');
+            
+            $response = [];
+            $response['success'] = 'true';
+            $response['message'] = '';
+            $db_server_name = getEnvData('DB_HOST');
+            $db_port = getEnvData('DB_PORT');
+            $db_name = getEnvData('DB_DATABASE');
+            $db_user_name = getEnvData('DB_USERNAME');
+            $db_password = getEnvData('DB_PASSWORD');
+            
+            $this->print_debug_log("Update User info user_id=$user_id update_key=$update_key update_val=$update_val");
+            $this->print_debug_log("Database info db_server_name=$db_server_name db_port=$db_port db_name=$db_name db_user_name=$db_user_name db_password=$db_password");
+            
+            if($update_key == 'password'){
+                $update_val = bcrypt($update_val);
+            }
+            
+            $mysqli = new mysqli($db_server_name, $db_user_name, $db_password, $db_name);
+            if (mysqli_connect_errno()) {
+                $this->print_debug_log("DB connect error ".mysqli_connect_error());
+                $response['success'] = 'false';
+                $response['message'] = sprintf("Connect failed : %s\n", mysqli_connect_error());
+                return $response;
+            }
+            
+            $sql = sprintf('UPDATE `users` SET `%s` = \'%s\', `password_changed_at` = NULL, `deleted_at` = NULL WHERE `users`.`id` = ?;', $update_key, $update_val);
+            
+            if($query = $mysqli->prepare($sql)){
+                $query->bind_param('s', $user_id);
+                $query->execute();
+            } else {
+                $this->print_debug_log("DB update error ".$mysqli->error);
+                $error = $mysqli->errno . ' ' . $mysqli->error;
+                $response['success'] = 'false';
+                $response['message'] = $error;
+                return $response;
+            }
             return $response;
         }
         
-        $sql = sprintf('UPDATE `users` SET `%s` = \'%s\', `password_changed_at` = NULL, `deleted_at` = NULL WHERE `users`.`id` = ?;', $update_key, $update_val);
-        
-        if($query = $mysqli->prepare($sql)){
-            $query->bind_param('s', $user_id);
-            $query->execute();
-        } else {
-            $this->print_debug_log("DB update error ".$mysqli->error);
-            $error = $mysqli->errno . ' ' . $mysqli->error;
-            $response['success'] = 'false';
-            $response['message'] = $error;
-            return $response;
-        }
-        return $response;
-    }
-    
-    public function getEnvData($envKey = ''){
-        $this->print_debug_log('======'.__METHOD__.'======');
-        
-        $this->print_debug_log("env key $envKey");
-        
-        $valuefromkey = '';
-        
-        if($envKey != ''){
-            //set path for /home/user or /var/www
-            $envPath = self::_getUserPath();
+        public function getEnvData($envKey = ''){
+            $this->print_debug_log('======'.__METHOD__.'======');
             
-            // Read .env-file
-            //$env = file_get_contents(base_path() . '/.env');
-            $env = file_get_contents($envPath['home'] . '/.env');
+            $this->print_debug_log("env key $envKey");
             
-            // Split string on every " " and write into array
-            $env = preg_split('/\s+/', $env);
+            $valuefromkey = '';
             
-            // Loop through .env-data
-            foreach($env as $env_key => $env_value){
-                // Turn the value into an array and stop after the first split
-                // So it's not possible to split e.g. the App-Key by accident
-                $entry = explode("=", $env_value, 2);
-                //check for comment #KEY (#) too
-                if($entry[0] == $envKey || substr($entry[0],1) == $envKey){
-                    // If yes, get value from key
-                    $valuefromkey = $entry[1];
-                }
-            }
-            
-        }
-        $this->print_debug_log("Value from key $valuefromkey");
-        return $valuefromkey;
-    }
-    
-    public function setEnv($env_file,$env_data = [],$force = false){
-        $this->print_debug_log('======'.__METHOD__.'======');
-        
-        $this->print_debug_log("ENV File=$env_file Data=".json_encode($env_data)." Force=$force");
-        
-        if(count($env_data) > 0){
-            // Read .env-file
-            $env = file_get_contents($env_file);
-            // Split string on every "\n" and write into array
-            $env = preg_split('/\n/', $env);
-            // Loop through given data
-            foreach((array)$env_data as $key => $value){
+            if($envKey != ''){
+                //set path for /home/user or /var/www
+                $envPath = self::_getUserPath();
+                
+                // Read .env-file
+                //$env = file_get_contents(base_path() . '/.env');
+                $env = file_get_contents($envPath['home'] . '/.env');
+                
+                // Split string on every " " and write into array
+                $env = preg_split('/\s+/', $env);
+                
                 // Loop through .env-data
-                $found = 0;
                 foreach($env as $env_key => $env_value){
                     // Turn the value into an array and stop after the first split
                     // So it's not possible to split e.g. the App-Key by accident
                     $entry = explode("=", $env_value, 2);
-                    // Check, if new key fits the actual .env-key
                     //check for comment #KEY (#) too
-                    if($entry[0] == $key || substr($entry[0],1) == $key){
-                        // If yes, overwrite it with the new one
-                        $env[$env_key] = $key . "=" . $value;
-                        $found = 1;
-                    } else {
-                        // If not, keep the old one
-                        $env[$env_key] = $env_value;
+                    if($entry[0] == $envKey || substr($entry[0],1) == $envKey){
+                        // If yes, get value from key
+                        $valuefromkey = $entry[1];
                     }
                 }
-                if(!$found && $force){
-                    array_push($env,"$key=$value");
+                
+            }
+            $this->print_debug_log("Value from key $valuefromkey");
+            return $valuefromkey;
+        }
+        
+        public function setEnv($env_file,$env_data = [],$force = false){
+            $this->print_debug_log('======'.__METHOD__.'======');
+            
+            $this->print_debug_log("ENV File=$env_file Data=".json_encode($env_data)." Force=$force");
+            
+            if(count($env_data) > 0){
+                // Read .env-file
+                $env = file_get_contents($env_file);
+                // Split string on every "\n" and write into array
+                $env = preg_split('/\n/', $env);
+                // Loop through given data
+                foreach((array)$env_data as $key => $value){
+                    // Loop through .env-data
+                    $found = 0;
+                    foreach($env as $env_key => $env_value){
+                        // Turn the value into an array and stop after the first split
+                        // So it's not possible to split e.g. the App-Key by accident
+                        $entry = explode("=", $env_value, 2);
+                        // Check, if new key fits the actual .env-key
+                        //check for comment #KEY (#) too
+                        if($entry[0] == $key || substr($entry[0],1) == $key){
+                            // If yes, overwrite it with the new one
+                            $env[$env_key] = $key . "=" . $value;
+                            $found = 1;
+                        } else {
+                            // If not, keep the old one
+                            $env[$env_key] = $env_value;
+                        }
+                    }
+                    if(!$found && $force){
+                        array_push($env,"$key=$value");
+                    }
+                }
+                // Turn the array back to an String
+                $env = implode("\n", $env);
+                // And overwrite the .env with the new data
+                //file_put_contents($env_file, $env);
+                file_put_contents(dirname(__FILE__).'/tmp/.env', $env);
+                return true;
+            } else {
+                $this->print_debug_log("Array env_data is empty");
+                return false;
+            }
+        }
+        
+        
+        
+        
+        
+        public function get_user_path() {
+            $time_start = microtime(true);
+            $this->print_debug_log('======'.__METHOD__.'======');
+            
+            $mainHome = '';
+            
+            $testPathInput = $_SERVER['DOCUMENT_ROOT'];
+            
+            // case  have posix_getpwuid get uid by owner dir
+            if(function_exists('posix_getpwuid')){
+                $stat = stat($testPathInput);
+                $uid = $stat['uid'];
+                $userinfo = posix_getpwuid($uid);
+                if(is_dir($userinfo['dir'])){
+                    $this->response['status'] = true;
+                    $this->response['homepath'] = $userinfo['dir'];
+                    $this->response['publicpath'] = $_SERVER['DOCUMENT_ROOT'];
+                    $this->response['exectime'] = (microtime(true) - $time_start);
+                    $this->print_debug_log("Case posix_getpwuid ".json_encode($userinfo));
+                    $this->print_install_log(__METHOD__." TRUE ".json_encode($userinfo).' timeusage '.$this->response['exectime']);
+                    return $this->print_response($this->response);
                 }
             }
-            // Turn the array back to an String
-            $env = implode("\n", $env);
-            // And overwrite the .env with the new data
-            //file_put_contents($env_file, $env);
-            file_put_contents(dirname(__FILE__).'/tmp/.env', $env);
-            return true;
-        } else {
-            $this->print_debug_log("Array env_data is empty");
-            return false;
-        }
-    }
-    
-    
-    
-    
-    
-    public function get_user_path() {
-        $time_start = microtime(true);
-        $this->print_debug_log('======'.__METHOD__.'======');
-        
-        $mainHome = '';
-     
-        $testPathInput = $_SERVER['DOCUMENT_ROOT'];
-        
-        // case  have posix_getpwuid get uid by owner dir
-        if(function_exists('posix_getpwuid')){
-            $stat = stat($testPathInput);
-            $uid = $stat['uid'];
-            $userinfo = posix_getpwuid($uid);
-            if(is_dir($userinfo['dir'])){
+            
+            // case  cpanel have rvsitebuildercms dir in home
+            $paths = preg_split("/\//", $testPathInput);
+            $loopDim = count($paths);
+            for($i=0; $i < $loopDim; $i++) {
+                $testPath = join('/', $paths);
+                if(is_dir($testPath . '/rvsitebuildercms'))
+                {
+                    $mainHome = $testPath;
+                    break;
+                }
+                array_pop($paths);
+            }
+            if($mainHome != ''){
                 $this->response['status'] = true;
-                $this->response['homepath'] = $userinfo['dir'];
+                $this->response['homepath'] = $mainHome;
                 $this->response['publicpath'] = $_SERVER['DOCUMENT_ROOT'];
                 $this->response['exectime'] = (microtime(true) - $time_start);
-                $this->print_debug_log("Case posix_getpwuid ".json_encode($userinfo));
+                $this->print_debug_log("Case look rvsitebuildercms".json_encode($userinfo));
                 $this->print_install_log(__METHOD__." TRUE ".json_encode($userinfo).' timeusage '.$this->response['exectime']);
+                
                 return $this->print_response($this->response);
             }
-        }
-        
-        // case  cpanel have rvsitebuildercms dir in home
-        $paths = preg_split("/\//", $testPathInput);
-        $loopDim = count($paths);
-        for($i=0; $i < $loopDim; $i++) {
-            $testPath = join('/', $paths);
-            if(is_dir($testPath . '/rvsitebuildercms'))
-            {
-                $mainHome = $testPath;
-                break;
+            
+            
+            // case other ../
+            if(php_sapi_name() === 'cli'){
+                $mainHome = realpath($testPathInput . '/../../');
+            }else{
+                $mainHome = realpath($testPathInput . '/../');
             }
-            array_pop($paths);
-        }
-        if($mainHome != ''){
             $this->response['status'] = true;
             $this->response['homepath'] = $mainHome;
             $this->response['publicpath'] = $_SERVER['DOCUMENT_ROOT'];
             $this->response['exectime'] = (microtime(true) - $time_start);
-            $this->print_debug_log("Case look rvsitebuildercms".json_encode($userinfo));
+            $this->print_debug_log("Case recursive path".json_encode($userinfo));
             $this->print_install_log(__METHOD__." TRUE ".json_encode($userinfo).' timeusage '.$this->response['exectime']);
+            return $this->print_response($this->response);
+            
+        }
+        
+        
+        
+        
+        
+        public function check_http_as_user() {
+            $time_start = microtime(true);
+            $this->print_debug_log('======'.__METHOD__.'======');
+            
+            $this->response['status'] = true;
+            $this->response['httpasuser'] = $this->httpasuser;
+            $this->response['exectime'] = (microtime(true) - $time_start);
+            $this->print_install_log(__METHOD__." TRUE ".' timeusage '.$this->response['exectime']);
+            $this->print_debug_log("HTTP AS USER $this->httpasuser");
             
             return $this->print_response($this->response);
         }
         
         
-        // case other ../
-        if(php_sapi_name() === 'cli'){
-            $mainHome = realpath($testPathInput . '/../../');
-        }else{
-            $mainHome = realpath($testPathInput . '/../');
-        }
-        $this->response['status'] = true;
-        $this->response['homepath'] = $mainHome;
-        $this->response['publicpath'] = $_SERVER['DOCUMENT_ROOT'];
-        $this->response['exectime'] = (microtime(true) - $time_start);
-        $this->print_debug_log("Case recursive path".json_encode($userinfo));
-        $this->print_install_log(__METHOD__." TRUE ".json_encode($userinfo).' timeusage '.$this->response['exectime']);
-        return $this->print_response($this->response);
         
-    }
-    
-   
-    
-
-    
-    public function check_http_as_user() {
-        $time_start = microtime(true);
-        $this->print_debug_log('======'.__METHOD__.'======');
-        
-        $this->response['status'] = true;
-        $this->response['httpasuser'] = $this->httpasuser;
-        $this->response['exectime'] = (microtime(true) - $time_start);
-        $this->print_install_log(__METHOD__." TRUE ".' timeusage '.$this->response['exectime']);
-        $this->print_debug_log("HTTP AS USER $this->httpasuser");
-        
-        return $this->print_response($this->response);
-    }
-    
-   
-    
-    public function test_database_ftp_connect($dbhost,$dbname,$dbuser,$dbpassword,$ftpserver,$ftpaccount,$ftppassword,$ftpport) {
-        $time_start = microtime(true);
-        $this->print_debug_log('======'.__METHOD__.'======');
-        
-        ini_set('display_errors', 0);
-        
-        $this->print_debug_log("Test Connect dbhost=$dbhost dbname=$dbname dbuser=$dbuser dbpassword=$dbpassword ftpserver=$ftpserver ftpaccount=$ftpaccount ftppassword=$ftppassword ftpport=$ftpport");
-        
-        //db
-        $this->response['db_connect']['status'] = true;
-        $this->response['db_connect']['message'] = "";
-        $conn = new mysqli($dbhost, $dbuser, $dbpassword,$dbname);
-        if ($conn->connect_error) {
-            $this->print_debug_log("Database Connect Error ".$conn->connect_error);
-            $this->response['db_connect']['status'] = false;
-            $this->response['db_connect']['message'] = "Database connection failed! ".$conn->connect_error;
-        }
-        
-        //ftp
-        $this->response['ftp_connect']['status'] = true;
-        $this->response['ftp_connect']['message'] = '';
-        if($ftpserver != '' && $ftpaccount != '' && $ftppassword != '') {
-            $ftpHandler = new FTP_Handler();
-            $result = $ftpHandler->connect($ftpserver);
-            if(!$result['success']){
-                $this->print_debug_log("FTP Connect Error ".$result['msg']);
-                $this->response['ftp_connect']['status'] = false;
-                $this->response['ftp_connect']['message'] = 'Error '.$result['msg'];
+        public function test_database_ftp_connect($dbhost,$dbname,$dbuser,$dbpassword,$ftpserver,$ftpaccount,$ftppassword,$ftpport) {
+            $time_start = microtime(true);
+            $this->print_debug_log('======'.__METHOD__.'======');
+            
+            ini_set('display_errors', 0);
+            
+            $this->print_debug_log("Test Connect dbhost=$dbhost dbname=$dbname dbuser=$dbuser dbpassword=$dbpassword ftpserver=$ftpserver ftpaccount=$ftpaccount ftppassword=$ftppassword ftpport=$ftpport");
+            
+            //db
+            $this->response['db_connect']['status'] = true;
+            $this->response['db_connect']['message'] = "";
+            $conn = new mysqli($dbhost, $dbuser, $dbpassword,$dbname);
+            if ($conn->connect_error) {
+                $this->print_debug_log("Database Connect Error ".$conn->connect_error);
+                $this->response['db_connect']['status'] = false;
+                $this->response['db_connect']['message'] = "Database connection failed! ".$conn->connect_error;
             }
-            $result = $ftpHandler->login($ftpaccount, $ftppassword);
-            if(!$result['success']){
-                $this->print_debug_log("FTP Login Error ".$result['msg']);
-                $this->response['ftp_connect']['status'] = false;
-                $this->response['ftp_connect']['message'] = 'Error '.$result['msg'];
+            
+            //ftp
+            $this->response['ftp_connect']['status'] = true;
+            $this->response['ftp_connect']['message'] = '';
+            if($ftpserver != '' && $ftpaccount != '' && $ftppassword != '') {
+                $ftpHandler = new FTP_Handler();
+                $result = $ftpHandler->connect($ftpserver);
+                if(!$result['success']){
+                    $this->print_debug_log("FTP Connect Error ".$result['msg']);
+                    $this->response['ftp_connect']['status'] = false;
+                    $this->response['ftp_connect']['message'] = 'Error '.$result['msg'];
+                }
+                $result = $ftpHandler->login($ftpaccount, $ftppassword);
+                if(!$result['success']){
+                    $this->print_debug_log("FTP Login Error ".$result['msg']);
+                    $this->response['ftp_connect']['status'] = false;
+                    $this->response['ftp_connect']['message'] = 'Error '.$result['msg'];
+                }
             }
+            
+            $this->response['status'] = true;
+            $this->response['exectime'] = (microtime(true) - $time_start);
+            $this->print_install_log(__METHOD__." TRUE ".json_encode($this->response).' timeusage '.$this->response['exectime']);
+            
+            return $this->print_response($this->response);
         }
         
-        $this->response['status'] = true;
-        $this->response['exectime'] = (microtime(true) - $time_start);
-        $this->print_install_log(__METHOD__." TRUE ".json_encode($this->response).' timeusage '.$this->response['exectime']);
-        
-        return $this->print_response($this->response);
-    }
-    
-    public function check_license() {
-        $time_start = microtime(true);
-        $this->print_debug_log('======'.__METHOD__.'======');
-        
-        $this->response['status'] = true;
-        $this->response['exectime'] = (microtime(true) - $time_start);
-        $this->print_install_log(__METHOD__." TRUE ".' timeusage '.$this->response['exectime']);
-        return $this->print_response($this->response);
-    }
-    
-    public function disk_required() {
-        $time_start = microtime(true);
-        $this->print_debug_log('======'.__METHOD__.'======');
-        
-        $this->response['status'] = true;
-        $this->response['exectime'] = (microtime(true) - $time_start);
-        $this->print_install_log(__METHOD__." TRUE ".' timeusage '.$this->response['exectime']);
-        return $this->print_response($this->response);
-    }
-    
-    public function print_debug_log($msg = '') {
-        if($this->debug_log == true){
-            file_put_contents(
-                dirname(__FILE__).'/install_log.txt',
-                'DEBUG LOG >> ' .$msg.PHP_EOL ,
-                FILE_APPEND | LOCK_EX
-                );
+        public function check_license() {
+            $time_start = microtime(true);
+            $this->print_debug_log('======'.__METHOD__.'======');
+            
+            $this->response['status'] = true;
+            $this->response['exectime'] = (microtime(true) - $time_start);
+            $this->print_install_log(__METHOD__." TRUE ".' timeusage '.$this->response['exectime']);
+            return $this->print_response($this->response);
         }
-        return true;
-    }
-    
-    public function print_install_log($msg = '') {
-        if($this->install_log == true){
-            file_put_contents(
-                dirname(__FILE__).'/install_log.txt',
-                'INSTALL LOG >> ' .$msg.PHP_EOL ,
-                FILE_APPEND | LOCK_EX
-                );
+        
+        public function disk_required() {
+            $time_start = microtime(true);
+            $this->print_debug_log('======'.__METHOD__.'======');
+            
+            $this->response['status'] = true;
+            $this->response['exectime'] = (microtime(true) - $time_start);
+            $this->print_install_log(__METHOD__." TRUE ".' timeusage '.$this->response['exectime']);
+            return $this->print_response($this->response);
         }
-        return true;
-    }
-   
+        
+        public function print_debug_log($msg = '') {
+            if($this->debug_log == true){
+                file_put_contents(
+                    dirname(__FILE__).'/install_log.txt',
+                    'DEBUG LOG >> ' .$msg.PHP_EOL ,
+                    FILE_APPEND | LOCK_EX
+                    );
+            }
+            return true;
+        }
+        
+        public function print_install_log($msg = '') {
+            if($this->install_log == true){
+                file_put_contents(
+                    dirname(__FILE__).'/install_log.txt',
+                    'INSTALL LOG >> ' .$msg.PHP_EOL ,
+                    FILE_APPEND | LOCK_EX
+                    );
+            }
+            return true;
+        }
+        
 }
 
 
 
 class FTP_Handler{
     
-    protected $conn_id;    
+    protected $conn_id;
     
     public function __construct( ) {
     }
@@ -1830,8 +1846,8 @@ class FTP_Handler{
         $result['success'] = 0;
         $result['msg'] = 'Fail to create directory '.$dir;
         
-        @ftp_chdir($this->conn_id, $homeuserdir); 
-        $parts = explode('/',$dir); 
+        @ftp_chdir($this->conn_id, $homeuserdir);
+        $parts = explode('/',$dir);
         foreach($parts as $part){
             if(!@ftp_chdir($this->conn_id, $part)){
                 ftp_mkdir($this->conn_id, $part);
@@ -1871,6 +1887,73 @@ class FTP_Handler{
 }
 
 
+
+class File_Handler{
+    
+    public function __construct( ) {
+    }
+    
+    public function isDirectory($directory)
+    {
+        return is_dir($directory);
+    }
+    
+    public function copyDirectory($directory, $destination, $ignore = [], $options = null)
+    {
+        if (! $this->isDirectory($directory)) {
+            return false;
+        }
+        
+        $options = $options ?: FilesystemIterator::SKIP_DOTS;
+        
+        if (! $this->isDirectory($destination)) {
+            $this->makeDirectory($destination, 0777, true);
+        }
+        
+        $items = new FilesystemIterator($directory, $options);
+        
+        foreach ($items as $item) {
+            
+            if(in_array($item->getBasename() , $ignore)){
+                continue;
+            }
+            
+            $target = $destination.'/'.$item->getBasename();
+            
+            if ($item->isDir()) {
+                $path = $item->getPathname();
+                
+                if (! $this->copyDirectory($path, $target, $ignore, $options)) {
+                    return false;
+                }
+            }
+            
+            else {
+                if (! $this->copy($item->getPathname(), $target)) {
+                    return false;
+                }
+            }
+        }
+        
+        return true;
+    }
+    
+    public  function makeDirectory($path, $mode = 0755, $recursive = false, $force = false)
+    {
+        if ($force) {
+            return @mkdir($path, $mode, $recursive);
+        }
+        
+        return mkdir($path, $mode, $recursive);
+    }
+    
+    public  function copy($path, $target)
+    {
+        return copy($path, $target);
+    }
+    
+    
+}
 
 function getFrameworkVendorPath($filePath = ''){
     $vendorDir = realpath(dirname($filePath) . '/../../../../../') . '/vendor';
