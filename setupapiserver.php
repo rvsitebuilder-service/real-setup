@@ -1174,8 +1174,8 @@ class RVsitebuilder_Setup_API {
             $this->print_debug_log("Has Old .htaccess $publicpath/.htaccess");
             $oldhtaccess = file_get_contents($publicpath.'/.htaccess');
         }
-        $source = $homeuser.'/rvsitebuildercms/'.$domainname.'/public';
-        $destination = $publicpath;
+        $source = $homeuser.'/rvsitebuildercms/'.$domainname.'/public/';
+        $destination = $publicpath.'/';
         $moved = $files->moveDirectory($source, $destination,true);
         $this->print_debug_log("Moved $source To $destination");
         
