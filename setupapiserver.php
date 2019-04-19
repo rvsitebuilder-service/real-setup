@@ -1176,8 +1176,8 @@ class RVsitebuilder_Setup_API {
         }
         $source = $homeuser.'/rvsitebuildercms/'.$domainname.'/public/';
         $destination = $publicpath.'/';
-        $moved = $files->moveDirectory($source, $destination,true);
-        $this->print_debug_log("Moved $source To $destination");
+        $copy = $files->copyDirectory($source, $destination,true);
+        $this->print_debug_log("Copy $source To $destination");
         
         
         //write new .htaccess to docroot
