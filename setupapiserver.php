@@ -981,7 +981,7 @@ class RVsitebuilder_Setup_API {
             if ( file_exists(dirname(__FILE__).'/install_log.txt') ) unlink(dirname(__FILE__).'/install_log.txt');
             if ( file_exists(dirname(__FILE__).'/error_log') ) unlink(dirname(__FILE__).'/error_log');
             if ( file_exists(dirname(__FILE__).'/setup.php') ) unlink(dirname(__FILE__).'/setup.php');
-            //if ( file_exists(dirname(__FILE__).'/setupapiserver.php') ) unlink(dirname(__FILE__).'/setupapiserver.php');
+            if ( file_exists(dirname(__FILE__).'/setupapiserver.php') ) unlink(dirname(__FILE__).'/setupapiserver.php');
             if ( file_exists(dirname(__FILE__).'/../domainready.png') ) unlink(dirname(__FILE__).'/../domainready.png');
             if ( file_exists(dirname(__FILE__).'/../setup.zip') ) unlink(dirname(__FILE__).'/../setup.zip');
             
@@ -990,7 +990,7 @@ class RVsitebuilder_Setup_API {
             $this->rrmdir(dirname(__FILE__).'/vendor');
             $this->rrmdir(dirname(__FILE__).'/src');
             $this->rrmdir(dirname(__FILE__).'/rvsitebuilderinstallerconfig_dist');
-            $this->rrmdir(dirname(__FILE__).'/../rvsitebuilder');
+            //$this->rrmdir(dirname(__FILE__).'/../rvsitebuilder');
                
             //$files = new Filesystem();
             //$files->deleteDirectory(dirname(__FILE__).'/../rvsitebuilder',false);
