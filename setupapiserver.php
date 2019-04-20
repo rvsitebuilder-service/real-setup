@@ -37,6 +37,8 @@ $domainport     = '';
 $artisancmd     = '';
 $argkey         = '';
 $argvalue       = '';
+$devtokenkey    = '';
+
 //get
 if (isset($_GET['action']))         $action         = $_GET['action'];
 if (isset($_GET['homeuser']))       $homeuser       = $_GET['homeuser'];
@@ -59,6 +61,7 @@ if (isset($_GET['domainport']))     $domainport     = $_GET['domainport'];
 if (isset($_GET['artisancmd']))     $artisancmd     = $_GET['artisancmd'];
 if (isset($_GET['argkey']))         $argkey         = $_GET['argkey'];
 if (isset($_GET['argvalue']))       $argvalue       = $_GET['argvalue'];
+if (isset($_GET['devtokenkey']))    $devtokenkey    = $_GET['devtokenkey'];
 
 //post
 if (isset($_POST['action']))         $action         = $_POST['action'];
@@ -82,6 +85,7 @@ if (isset($_POST['domainport']))     $domainport     = $_POST['domainport'];
 if (isset($_POST['artisancmd']))     $artisancmd     = $_POST['artisancmd'];
 if (isset($_POST['argkey']))         $argkey         = $_POST['argkey'];
 if (isset($_POST['argvalue']))       $argvalue       = $_POST['argvalue'];
+if (isset($_POST['devtokenkey']))    $devtokenkey    = $_POST['devtokenkey'];
 
 $setupObj = new RVsitebuilder_Setup_API($responsetype,$rvsb_installing_token,$responsetype,$ignore_token,$rvlicensecode);
 
@@ -103,7 +107,7 @@ if($action == 'download_vendor'){
 }
 
 if($action == 'setup_env'){
-    $setupObj->setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname,$ftpserver,$ftpport,$domainport);
+    $setupObj->setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname,$ftpserver,$ftpport,$domainport,$devtokenkey);
 }
 
 if($action == 'download_common_pkg'){
@@ -146,6 +150,11 @@ if($action == 'disk_required') {
 if($action == 'test_database_ftp_connect') {
     $setupObj->test_database_ftp_connect($dbhost,$dbname,$dbuser,$dbpassword,$ftpserver,$ftpaccount,$ftppassword,$ftpport);
 }
+if($action == 'validate_developer_token') {
+    $setupObj->validate_developer_token($devtokenkey);
+}
+
+
 
 
 
@@ -585,7 +594,7 @@ class RVsitebuilder_Setup_API {
     }
     
     
-    public function setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname,$ftpserver,$ftpport,$domainport) {
+    public function setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname,$ftpserver,$ftpport,$domainport,$devtokenkey) {
         $time_start = microtime(true);
         $this->print_debug_log('======'.__METHOD__.'======');
         
@@ -609,6 +618,7 @@ class RVsitebuilder_Setup_API {
         $env_data['DOCUMENT_ROOT'] = $publicpath;
         $env_data['DOCUMENT_ROOT'] = $publicpath;
         $env_data['RV_MIRROR']  = $this->mirror;
+        $env_data['DEVELOPER_TOKEN_KEY']  = $devtokenkey;
         
         
         $this->print_debug_log("ENV data ".json_encode($env_data));
@@ -966,11 +976,12 @@ class RVsitebuilder_Setup_API {
         $time_start = microtime(true);
         $this->print_debug_log('======'.__METHOD__.'======');
         
-        //remove file
+        //remove installer dir , setup.zip
         if($this->removeinstallerpath) {
             $files = new Filesystem();
             $files->remove(dirname(__FILE__).'/../rvsitebuilder');
-            $this->print_debug_log("Removed Installer Path");
+            $files->remove(dirname(__FILE__).'/../setup.zip');
+            $this->print_debug_log("Removed Installer Path / Removed setup.zip");
         } else {
             $this->print_debug_log("Not removed installer path by root or user installer config");
         }
@@ -984,6 +995,38 @@ class RVsitebuilder_Setup_API {
         
     }
     
+    public function validate_developer_token($devtokenkey) {
+        $time_start = microtime(true);
+        $this->print_debug_log('======'.__METHOD__.'======');
+        
+        $this->response['dev_token'] = false;
+        
+        try {
+            $client = new Client([
+                'curl'            => [CURLOPT_SSL_VERIFYPEER => false, CURLOPT_SSL_VERIFYHOST => false],
+                'allow_redirects' => false,
+                'cookies'         => true,
+                'verify'          => false
+            ]);
+            $this->print_debug_log("Validate developer token Type=POST URL=http://license3.rvglobalsoft.com/validatetoken Devtoken=$devtokenkey");
+            $form_params = ['devtokenkey'=>$devtokenkey];
+            $res = $client->request('POST', 'http://license3.rvglobalsoft.com/validatetoken' ,['form_params' => $form_params]);
+            $this->print_debug_log('Server Response Status '.$res->getStatusCode());
+            $this->print_debug_log('Server Response Header '.json_encode((array) $res->getHeaders()));
+            $rescontent = json_decode($res->getBody(), true);
+            if (isset($rescontent['status']) && true == $rescontent['status']) {
+                $this->response['dev_token'] = true;
+            } else {
+                $this->response['message'] = $rescontent['message'];
+            }
+        } catch (\Exception $e) {
+            $this->print_debug_log('Validate developer token error '.$e->getMessage());
+            $this->response['message']  = $e->getMessage();
+        }
+        $this->response['status'] = true;
+        $this->response['exectime'] = (microtime(true) - $time_start);
+        return $this->print_response($this->response);
+    }
     
     public function generateSecretKey($length = 64) {
         $this->print_debug_log('======'.__METHOD__.'======');
@@ -1320,28 +1363,6 @@ class RVsitebuilder_Setup_API {
             }
             echo json_encode( $data );
             exit;
-        }
-        
-        
-        
-        
-        
-        public function rrmdir($dir) {
-            $this->print_debug_log('======'.__METHOD__.'======');
-            
-            if (is_dir($dir)) {
-                $objects = scandir($dir);
-                foreach ($objects as $object) {
-                    if ($object != "." && $object != "..") {
-                        if (filetype($dir."/".$object) == "dir")
-                            $this->rrmdir($dir."/".$object);
-                            else unlink   ($dir."/".$object);
-                    }
-                }
-                reset($objects);
-                rmdir($dir);
-            }
-            return true;
         }
         
         /*

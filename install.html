@@ -168,6 +168,16 @@
                                 <div class="help-block with-errors"></div>
                             </div>
                         </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-4">parse_ini_file </div>
+                                <div class="col col-lg-2">
+                                    <input type="text" class="form-control border-0 font-weight-bold text-danger  chk_pre_require" name="parse_ini_file" style="background: none;" value="FALSE"
+                                        id="parse_ini_file" placeholder="" required readonly>
+                                </div>
+                                <div class="help-block with-errors"></div>
+                            </div>
+                        </div>
                         <h5 class="title">PHP INI</h5>
                         <div class="form-group">
                             <div class="row">
@@ -296,6 +306,20 @@
 				   
 					<!-- start step block -->
 					<div id="form-step-2" role="form" data-toggle="validator">
+						<div id="devtoken" class="d-none">
+	                        <div class="form-group">
+	                            <div class="row">
+	                                <div class="col col-lg-2">Developer Token Key:</div>
+	                                <div class="col col-lg-4">
+	                                    <input type="text" class="form-control"
+	                                        name="devtokenkey" id="devtokenkey"
+	                                        placeholder="Write your Developer Token Key"  value="">
+	                                </div>
+	                                <div class="help-block with-errors"></div>
+	                            </div>
+	                        </div>
+	                        <span id="devtoken_error" class="d-none list-group-item list-group-item-action list-group-item-warning margin-b"></span>
+                        </div>
 					    <div class="form-group">
                             <div class="row">
                                 <div class="col col-lg-2">Setup for:</div>
@@ -592,11 +616,15 @@
 			
 			
 			//bootstrap input validate default 
-			var ajaxInvoke = false;
+			var ajaxInvokeStep1 = false;
+			var ajaxInvokeStep2 = false;
             $("#smartwizard").on("leaveStep", function(e, anchorObject, stepNumber, stepDirection) {
+
             	console.log('step '+stepNumber);
+            	
             	var elmForm = $("#form-step-" + stepNumber);
-                if(stepDirection === 'forward' && elmForm){
+                
+            	if(stepDirection === 'forward' && elmForm){
                     elmForm.validator('validate');
                     var elmErr = elmForm.children('.has-error');
                     if(elmErr && elmErr.length > 0){
@@ -604,24 +632,25 @@
                         return false;
                     }
                 }
-                if(stepNumber == 0) {
+                if(stepNumber == 0 && stepDirection === 'forward') {
                 	var noerror =  true;
                     $("#form-step-0 .chk_pre_require").each(function() {
                           if($(this).val() === "FALSE") {
                               $("#chk_pre_require_error").removeClass("d-none").text("PHP required error");
                               console.log('pre check error');
                               noerror = false;
-                              return;
+                              return noerror;
                           }
                     })
                     return noerror;
                 } 
-                if(stepNumber == 1 && ajaxInvoke ==false) {
+                if(stepNumber == 1 && ajaxInvokeStep1 ==false && stepDirection === 'forward') {
                 	$("#connect_db_error").addClass("d-none");
                 	$("#connect_ftp_error").addClass("d-none");
                 	
-                	ajaxInvoke = true;
-            		param = {
+                	ajaxInvokeStep1 = true;
+            		
+                	param = {
                             'action':'test_database_ftp_connect',
                             'dbhost':$("#dbhost").val(),
                             'dbname':$("#dbname").val(),
@@ -651,21 +680,54 @@
                             		$("#smartwizard").smartWizard("next");
                             	}
                             	else {
-                            		ajaxInvoke = false;
+                            		ajaxInvokeStep1 = false;
                             		if(data.db_connect.status == false) {
                             			console.log('test database connect error');
                             			$("#connect_db_error").removeClass("d-none").text(data.db_connect.message);
-                            			//return false;
                             		}
                             		if(data.ftp_connect.status == false) {
                                         console.log('test ftp connect error');
                                         $("#connect_ftp_error").removeClass("d-none").text(data.ftp_connect.message);
-                                        //return false;
                                     }
                             	}
-                            	//$("#smartwizard").smartWizard("next");
                             }
-                            //$("#smartwizard").smartWizard("next");
+                        },
+                    }); 
+                    return false;
+                }
+                if(stepNumber == 2 && ajaxInvokeStep2 ==false && stepDirection === 'forward') {
+                	$("#devtoken_error").addClass("d-none");
+                	
+                	ajaxInvokeStep2 = true;
+            		
+                	param = {
+                            'action':'validate_developer_token',
+                            'devtokenkey':$("#devtokenkey").val(),
+                    };
+                    $.ajax({
+                        url : 'setupapiserver.php',
+                        data : param,
+                        cache : false,
+                        type : 'POST',
+                        dataType : "json",
+                        headers : {'Ignore-Token':1},
+                        error : function() {
+                        	console.log('ajax validate developer token connect error');
+                        	$("#smartwizard").smartWizard("next");
+                        },
+                        success : function(data) {
+                            console.log(data);
+                            if (data.status == true){
+                            	if(data.dev_token == true){
+                            		console.log('validate developer token pass');
+                            		$("#smartwizard").smartWizard("next");
+                            	}
+                            	else {
+                            		ajaxInvokeStep2 = false;
+                           			console.log('validate developer token failed');
+                           			$("#devtoken_error").removeClass("d-none").text(data.message);
+                            	}
+                            }
                         },
                     }); 
                     return false;
@@ -726,6 +788,7 @@
                 }
             }); 
             
+            
             //check http as user
             param = {'action':'check_http_as_user'};
             doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
@@ -745,6 +808,20 @@
                     return true;
                 }
             }); 
+            
+            
+            //check local install (developer)
+            // 10.  0.0.0 –  10.255.255.255 
+            //127.  0.0.0 – 127.255.255.255     
+			//172. 16.0.0 – 172. 31.255.255    
+			//192.168.0.0 – 192.168.255.255
+            host = window.location.hostname;
+            if(/(^192\.168\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])$)|(^172\.([1][6-9]|[2][0-9]|[3][0-1])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])$)|(^127\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])$)|(^10\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])$)/.test(host)
+               || /localhost/.test(host) ){
+            	console.log('developer server '+host);
+            	$("#devtoken").removeClass("d-none");
+                $("#devtokenkey").attr('required', 'required');
+            }
             
             
             //checkbox before install
@@ -838,8 +915,9 @@
                                                 		'ftppassword': $('#ftppassword').val(),
                                                 		'appname': $('#websitename').val(),
                                                 		'ftpport': $('#ftpport').val(),
+                                                		'devtokenkey' : $('#devtokenkey').val(),
                                                 		};
-                                                doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
+                                                doAnAjax('setupapiserver.php',param,'POST', function(error, data) {
                                                     console.log(data);
                                                     if (data === null  || typeof data.status === "undefined" || data.status == false){
                                                         $('span.setup_env').text((typeof data.message == 'undefined') ? 'ERROR' : data.message);
@@ -877,7 +955,7 @@
                                                                 		'ftpport': $('#ftpport').val(),
                                                                 		};
                                                                 
-                                                                doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
+                                                                doAnAjax('setupapiserver.php',param,'POST', function(error, data) {
                                                                     console.log(data);
                                                                     if (data === null  || typeof data.status === "undefined" || data.status == false){
                                                                         $('span.install_all_pkg').text((typeof data.message == 'undefined') ? 'ERROR' : data.message);
@@ -900,7 +978,7 @@
                                                                         		'adminfirstname': $('#firstname').val(),
                                                                         		'adminlastname': $('#lastname').val(), 
                                                                         		};
-                                                                        doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
+                                                                        doAnAjax('setupapiserver.php',param,'POST', function(error, data) {
                                                                             console.log(data);
                                                                             if (data === null  || typeof data.status === "undefined" || data.status == false){
                                                                                 $('span.artisan_call').text((typeof data.message == 'undefined') ? 'ERROR' : data.message);
@@ -923,7 +1001,7 @@
                                                                                 		'ftppassword': $('#ftppassword').val(),
                                                                                 		'ftpport': $('#ftpport').val(),
                                                                                 		};
-                                                                                doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
+                                                                                doAnAjax('setupapiserver.php',param,'POST', function(error, data) {
                                                                                     console.log(data);
                                                                                     if (data === null  || typeof data.status === "undefined" || data.status == false){
                                                                                         $('span.finished_setup').text((typeof data.message == 'undefined') ? 'ERROR' : data.message);
