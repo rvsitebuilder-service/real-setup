@@ -153,6 +153,12 @@ if($action == 'test_database_ftp_connect') {
 if($action == 'validate_developer_token') {
     $setupObj->validate_developer_token($devtokenkey);
 }
+if($action == 'check_dev_mode') {
+    $setupObj->check_dev_mode();
+}
+    
+    
+    
 
 
 
@@ -1140,8 +1146,10 @@ class RVsitebuilder_Setup_API {
             $this->print_debug_log("FTP put prepend ".dirname(__FILE__).'/htaccess.tmp'.' To '.$public_html.'/.htaccess');
         }
         else {
-            //htaccess has rvsitebuilder content , do noting.
-            $this->print_debug_log("not write htaccess ,cause it already has a rvsitebuilder7 htaccess content");
+            //htaccess has rvsitebuilder content , write old htaccess.
+            $writehtaccess =  file_put_contents(dirname(__FILE__).'/htaccess.tmp' , $oldhtaccess);
+            $result = $ftpHandler->put(dirname(__FILE__).'/htaccess.tmp',$public_html.'/.htaccess',FTP_BINARY);
+            $this->print_debug_log("write old htaccess  ,cause it already has a rvsitebuilder7 htaccess content");
         }
         
         #chmod folder
@@ -1225,8 +1233,9 @@ class RVsitebuilder_Setup_API {
             $this->print_debug_log("file put prepend .htaccess ".$publicpath.'/.htaccess');
         }
         else {
-            //htaccess has rvsitebuilder content , do noting.
-            $this->print_debug_log("not write htaccess ,cause it already has a rvsitebuilder7 htaccess content");
+            //htaccess has rvsitebuilder content , write old htaccess.
+            $writehtaccess =  file_put_contents($publicpath.'/.htaccess' , $oldhtaccess);
+            $this->print_debug_log("write old htaccess  ,cause it already has a rvsitebuilder7 htaccess content");
         }
         
         
@@ -1494,6 +1503,24 @@ class RVsitebuilder_Setup_API {
             $time_start = microtime(true);
             $this->print_debug_log('======'.__METHOD__.'======');
             
+            $userpathinfo = $this->get_user_path_info();
+            $this->response['status'] = true;
+            $this->response['homepath'] = $userpathinfo['homepath'];
+            $this->response['publicpath'] = $userpathinfo['publicpath'];
+            $this->response['exectime'] = (microtime(true) - $time_start);
+            $this->print_debug_log('User path info '.json_encode($userpathinfo));
+            $this->print_install_log(__METHOD__." TRUE ".json_encode($userpathinfo).' timeusage '.$this->response['exectime']);
+            return $this->print_response($this->response);
+            
+        }
+        
+        
+        public function get_user_path_info(){
+            $time_start = microtime(true);
+            $this->print_debug_log('======'.__METHOD__.'======');
+            
+            $userpathinfo = [];
+            
             $mainHome = '';
             
             $testPathInput = $_SERVER['DOCUMENT_ROOT'];
@@ -1504,13 +1531,10 @@ class RVsitebuilder_Setup_API {
                 $uid = $stat['uid'];
                 $userinfo = posix_getpwuid($uid);
                 if(is_dir($userinfo['dir'])){
-                    $this->response['status'] = true;
-                    $this->response['homepath'] = $userinfo['dir'];
-                    $this->response['publicpath'] = $_SERVER['DOCUMENT_ROOT'];
-                    $this->response['exectime'] = (microtime(true) - $time_start);
-                    $this->print_debug_log("Case posix_getpwuid ".json_encode($userinfo));
-                    $this->print_install_log(__METHOD__." TRUE ".json_encode($userinfo).' timeusage '.$this->response['exectime']);
-                    return $this->print_response($this->response);
+                    $userpathinfo['homepath'] = $userinfo['dir'];
+                    $userpathinfo['publicpath'] = $_SERVER['DOCUMENT_ROOT'];
+                    $this->print_debug_log("Case posix_getpwuid ".json_encode($userpathinfo));
+                    return $userpathinfo;
                 }
             }
             
@@ -1527,14 +1551,10 @@ class RVsitebuilder_Setup_API {
                 array_pop($paths);
             }
             if($mainHome != ''){
-                $this->response['status'] = true;
-                $this->response['homepath'] = $mainHome;
-                $this->response['publicpath'] = $_SERVER['DOCUMENT_ROOT'];
-                $this->response['exectime'] = (microtime(true) - $time_start);
-                $this->print_debug_log("Case look rvsitebuildercms".json_encode($userinfo));
-                $this->print_install_log(__METHOD__." TRUE ".json_encode($userinfo).' timeusage '.$this->response['exectime']);
-                
-                return $this->print_response($this->response);
+                $userpathinfo['homepath'] = $mainHome;
+                $userpathinfo['publicpath'] = $_SERVER['DOCUMENT_ROOT'];
+                $this->print_debug_log("Case look rvsitebuildercms".json_encode($userpathinfo));
+                return $userpathinfo;
             }
             
             
@@ -1544,16 +1564,12 @@ class RVsitebuilder_Setup_API {
             }else{
                 $mainHome = realpath($testPathInput . '/../');
             }
-            $this->response['status'] = true;
-            $this->response['homepath'] = $mainHome;
-            $this->response['publicpath'] = $_SERVER['DOCUMENT_ROOT'];
-            $this->response['exectime'] = (microtime(true) - $time_start);
-            $this->print_debug_log("Case recursive path".json_encode($userinfo));
-            $this->print_install_log(__METHOD__." TRUE ".json_encode($userinfo).' timeusage '.$this->response['exectime']);
-            return $this->print_response($this->response);
+            $userpathinfo['homepath'] = $mainHome;
+            $userpathinfo['publicpath'] = $_SERVER['DOCUMENT_ROOT'];
+            $this->print_debug_log("Case recursive path".json_encode($userpathinfo));
+            return $userpathinfo;
             
         }
-        
         
         
         
@@ -1620,6 +1636,23 @@ class RVsitebuilder_Setup_API {
         public function check_license() {
             $time_start = microtime(true);
             $this->print_debug_log('======'.__METHOD__.'======');
+            
+            $this->response['status'] = true;
+            $this->response['exectime'] = (microtime(true) - $time_start);
+            $this->print_install_log(__METHOD__." TRUE ".' timeusage '.$this->response['exectime']);
+            return $this->print_response($this->response);
+        }
+        
+        public function check_dev_mode() {
+            $time_start = microtime(true);
+            $this->print_debug_log('======'.__METHOD__.'======');
+            
+            $userpathinfo = $this->get_user_path_info();
+            $this->response['dev_mode'] = false;
+            if(file_exists($userpathinfo['homepath'].'/devmode')) {
+                $this->response['dev_mode'] = true;
+            }
+            
             
             $this->response['status'] = true;
             $this->response['exectime'] = (microtime(true) - $time_start);
@@ -1875,73 +1908,6 @@ class FTP_Handler{
 }
 
 
-
-class File_Handler{
-    
-    public function __construct( ) {
-    }
-    
-    public function isDirectory($directory)
-    {
-        return is_dir($directory);
-    }
-    
-    public function copyDirectory($directory, $destination, $ignore = [], $options = null)
-    {
-        if (! $this->isDirectory($directory)) {
-            return false;
-        }
-        
-        $options = $options ?: FilesystemIterator::SKIP_DOTS;
-        
-        if (! $this->isDirectory($destination)) {
-            $this->makeDirectory($destination, 0777, true);
-        }
-        
-        $items = new FilesystemIterator($directory, $options);
-        
-        foreach ($items as $item) {
-            
-            if(in_array($item->getBasename() , $ignore)){
-                continue;
-            }
-            
-            $target = $destination.'/'.$item->getBasename();
-            
-            if ($item->isDir()) {
-                $path = $item->getPathname();
-                
-                if (! $this->copyDirectory($path, $target, $ignore, $options)) {
-                    return false;
-                }
-            }
-            
-            else {
-                if (! $this->copy($item->getPathname(), $target)) {
-                    return false;
-                }
-            }
-        }
-        
-        return true;
-    }
-    
-    public  function makeDirectory($path, $mode = 0755, $recursive = false, $force = false)
-    {
-        if ($force) {
-            return @mkdir($path, $mode, $recursive);
-        }
-        
-        return mkdir($path, $mode, $recursive);
-    }
-    
-    public  function copy($path, $target)
-    {
-        return copy($path, $target);
-    }
-    
-    
-}
 
 function getFrameworkVendorPath($filePath = ''){
     $vendorDir = realpath(dirname($filePath) . '/../../../../../') . '/vendor';

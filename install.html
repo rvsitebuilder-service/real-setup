@@ -309,7 +309,7 @@
 						<div id="devtoken" class="d-none">
 	                        <div class="form-group">
 	                            <div class="row">
-	                                <div class="col col-lg-2">Developer Token Key:</div>
+	                                <div class="col col-lg-3">Developer Token Key:</div>
 	                                <div class="col col-lg-4">
 	                                    <input type="text" class="form-control"
 	                                        name="devtokenkey" id="devtokenkey"
@@ -318,11 +318,11 @@
 	                                <div class="help-block with-errors"></div>
 	                            </div>
 	                        </div>
-	                        <span id="devtoken_error" class="d-none list-group-item list-group-item-action list-group-item-warning margin-b"></span>
+	                        <span id="devtoken_error" class="d-none list-group-item list-group-item-action list-group-item-warning margin-b" style="margin-bottom:5px;"></span>
                         </div>
 					    <div class="form-group">
                             <div class="row">
-                                <div class="col col-lg-2">Setup for:</div>
+                                <div class="col col-lg-3">Setup for:</div>
                                 <div class="col col-lg-4">
                                     <input type="url" class="form-control " name="url"
                                         id="url" placeholder="" required disabled>
@@ -332,7 +332,7 @@
                         </div>
                         <div class="form-group">
                             <div class="row">
-                                <div class="col col-lg-2">Home path:</div>
+                                <div class="col col-lg-3">Home path:</div>
                                 <div class="col col-lg-4">
                                     <input type="text" class="form-control " name="homepath"
                                         id="homepath" placeholder="" required disabled>
@@ -342,7 +342,7 @@
                         </div>
                         <div class="form-group">
                             <div class="row">
-                                <div class="col col-lg-2">Public path:</div>
+                                <div class="col col-lg-3">Public path:</div>
                                 <div class="col col-lg-4">
                                     <input type="text" class="form-control " name="publicpath"
                                         id="publicpath" placeholder="" required disabled>
@@ -352,7 +352,7 @@
                         </div>
                         <div class="form-group">
                             <div class="row">
-                                <div class="col col-lg-2">Website name:</div>
+                                <div class="col col-lg-3">Website name:</div>
                                 <div class="col col-lg-4">
                                     <input type="text" class="form-control " name="websitename"
                                         id="websitename" placeholder="" required  value="RVsitebuilder7">
@@ -362,7 +362,7 @@
                         </div>
 						<div class="form-group">
 							<div class="row">
-								<div class="col col-lg-2">Admin e-mail:</div>
+								<div class="col col-lg-3">Admin e-mail:</div>
 								<div class="col col-lg-4">
 									<input type="email" class="form-control " name="email"
 										id="email" placeholder="Write your email address" required>
@@ -372,7 +372,7 @@
 						</div>
 						<div class="form-group">
 							<div class="row">
-								<div class="col col-lg-2">Admin firstname:</div>
+								<div class="col col-lg-3">Admin firstname:</div>
 								<div class="col col-lg-4">
 									<input type="text" class="form-control"
 										 name="firstname" id="firstname"
@@ -383,7 +383,7 @@
 						</div>
 						<div class="form-group">
                             <div class="row">
-                                <div class="col col-lg-2">Admin lastname:</div>
+                                <div class="col col-lg-3">Admin lastname:</div>
                                 <div class="col col-lg-4">
                                     <input type="text" class="form-control"
                                          name="lastname" id="lastname"
@@ -394,7 +394,7 @@
                         </div>
                         <div class="form-group">
                             <div class="row">
-                                <div class="col col-lg-2">Admin password:</div>
+                                <div class="col col-lg-3">Admin password:</div>
                                 <div class="col col-lg-4">
                                     <input type="password" class="form-control"
                                         name="password" id="password"
@@ -405,7 +405,7 @@
                         </div>
                         <div class="form-group">
                             <div class="row">
-                                <div class="col col-lg-2">Password again:</div>
+                                <div class="col col-lg-3">Password again:</div>
                                 <div class="col col-lg-4">
                                     <input type="password" class="form-control"
                                         name="password2" id="password2"
@@ -811,17 +811,31 @@
             
             
             //check local install (developer)
-            // 10.  0.0.0 –  10.255.255.255 
-            //127.  0.0.0 – 127.255.255.255     
-			//172. 16.0.0 – 172. 31.255.255    
-			//192.168.0.0 – 192.168.255.255
-            host = window.location.hostname;
-            if(/(^192\.168\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])$)|(^172\.([1][6-9]|[2][0-9]|[3][0-1])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])$)|(^127\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])$)|(^10\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])$)/.test(host)
-               || /localhost/.test(host) ){
-            	console.log('developer server '+host);
-            	$("#devtoken").removeClass("d-none");
-                $("#devtokenkey").attr('required', 'required');
-            }
+            param = {'action':'check_dev_mode'};
+            doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
+                console.log(data);
+                if (data.status == true){
+	                if(data.dev_mode == true) {
+	                	// 10.  0.0.0 –  10.255.255.255 
+	                    //127.  0.0.0 – 127.255.255.255     
+	        			//172. 16.0.0 – 172. 31.255.255    
+	        			//192.168.0.0 – 192.168.255.255
+	                    host = window.location.hostname;
+	                    if(/(^192\.168\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])$)|(^172\.([1][6-9]|[2][0-9]|[3][0-1])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])$)|(^127\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])$)|(^10\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])$)/.test(host)
+	                       || /localhost/.test(host) ){
+	                    	console.log('developer server '+host);
+	                    	$("#devtoken").removeClass("d-none");
+	                        $("#devtokenkey").attr('required', 'required');
+	                    }
+	                }
+	                else {
+	                    return true;
+	                }
+                } else {
+                    return true;
+                }
+            }); 
+            
             
             
             //checkbox before install
