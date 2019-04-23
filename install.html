@@ -700,36 +700,43 @@
                 	
                 	ajaxInvokeStep2 = true;
             		
-                	param = {
-                            'action':'validate_developer_token',
-                            'devtokenkey':$("#devtokenkey").val(),
-                    };
-                    $.ajax({
-                        url : 'setupapiserver.php',
-                        data : param,
-                        cache : false,
-                        type : 'POST',
-                        dataType : "json",
-                        headers : {'Ignore-Token':1},
-                        error : function() {
-                        	console.log('ajax validate developer token connect error');
-                        	$("#smartwizard").smartWizard("next");
-                        },
-                        success : function(data) {
-                            console.log(data);
-                            if (data.status == true){
-                            	if(data.dev_token == true){
-                            		console.log('validate developer token pass');
-                            		$("#smartwizard").smartWizard("next");
-                            	}
-                            	else {
-                            		ajaxInvokeStep2 = false;
-                           			console.log('validate developer token failed');
-                           			$("#devtoken_error").removeClass("d-none").text(data.message);
-                            	}
-                            }
-                        },
-                    }); 
+                	if($("#devtokenkey").attr('required') != 'required') {
+                		console.log('developer token key not required');
+                		$("#smartwizard").smartWizard("next");
+                	}
+                	else {
+                		param = {
+                                'action':'validate_developer_token',
+                                'devtokenkey':$("#devtokenkey").val(),
+                        };
+                        $.ajax({
+                            url : 'setupapiserver.php',
+                            data : param,
+                            cache : false,
+                            type : 'POST',
+                            dataType : "json",
+                            headers : {'Ignore-Token':1},
+                            error : function() {
+                            	console.log('ajax validate developer token connect error');
+                            	$("#smartwizard").smartWizard("next");
+                            },
+                            success : function(data) {
+                                console.log(data);
+                                if (data.status == true){
+                                	if(data.dev_token == true){
+                                		console.log('validate developer token pass');
+                                		$("#smartwizard").smartWizard("next");
+                                	}
+                                	else {
+                                		ajaxInvokeStep2 = false;
+                               			console.log('validate developer token failed');
+                               			$("#devtoken_error").removeClass("d-none").text(data.message);
+                                	}
+                                }
+                            },
+                        }); 
+                	}
+                	
                     return false;
                 }
                 
