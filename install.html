@@ -355,7 +355,7 @@
                                 <div class="col col-lg-3">Website name:</div>
                                 <div class="col col-lg-4">
                                     <input type="text" class="form-control " name="websitename"
-                                        id="websitename" placeholder="" required  value="RVsitebuilder7">
+                                        id="websitename" placeholder="" required  value="">
                                 </div>
                                 <div class="help-block with-errors"></div>
                             </div>
@@ -843,6 +843,9 @@
                 }
             }); 
             
+            
+            //default app_url
+            $("#websitename").val(window.location.hostname);
             
             
             //checkbox before install
