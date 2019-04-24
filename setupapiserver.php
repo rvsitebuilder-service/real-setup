@@ -38,6 +38,7 @@ $artisancmd     = '';
 $argkey         = '';
 $argvalue       = '';
 $devtokenkey    = '';
+$additionalpkg  = '';
 
 //get
 if (isset($_GET['action']))         $action         = $_GET['action'];
@@ -62,6 +63,7 @@ if (isset($_GET['artisancmd']))     $artisancmd     = $_GET['artisancmd'];
 if (isset($_GET['argkey']))         $argkey         = $_GET['argkey'];
 if (isset($_GET['argvalue']))       $argvalue       = $_GET['argvalue'];
 if (isset($_GET['devtokenkey']))    $devtokenkey    = $_GET['devtokenkey'];
+if (isset($_GET['additionalpkg']))  $additionalpkg  = $_GET['additionalpkg'];
 
 //post
 if (isset($_POST['action']))         $action         = $_POST['action'];
@@ -86,6 +88,8 @@ if (isset($_POST['artisancmd']))     $artisancmd     = $_POST['artisancmd'];
 if (isset($_POST['argkey']))         $argkey         = $_POST['argkey'];
 if (isset($_POST['argvalue']))       $argvalue       = $_POST['argvalue'];
 if (isset($_POST['devtokenkey']))    $devtokenkey    = $_POST['devtokenkey'];
+if (isset($_POST['additionalpkg']))  $additionalpkg  = $_POST['additionalpkg'];
+
 
 $setupObj = new RVsitebuilder_Setup_API($responsetype,$rvsb_installing_token,$responsetype,$ignore_token,$rvlicensecode);
 
@@ -111,7 +115,7 @@ if($action == 'setup_env'){
 }
 
 if($action == 'download_common_pkg'){
-    $setupObj->download_common_pkg();
+    $setupObj->download_common_pkg($additionalpkg);
 }
 
 if($action == 'install_all_pkg' && $homeuser != '' && $domainname != '' && $publicpath != ''){
@@ -646,7 +650,7 @@ class RVsitebuilder_Setup_API {
     }
     
     
-    public function download_common_pkg() {
+    public function download_common_pkg($additionalpkg) {
         $time_start = microtime(true);
         $this->print_debug_log('======'.__METHOD__.'======');
         
@@ -662,6 +666,10 @@ class RVsitebuilder_Setup_API {
             'wysiwyg',
             'marketing'
         ];
+        
+        if($additionalpkg != '') {
+            array_push($commonpkg , json_decode($additionalpkg,true));
+        }
         
         $this->print_debug_log("Common Package ".json_encode($commonpkg));
         
