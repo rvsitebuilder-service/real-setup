@@ -832,6 +832,14 @@ class RVsitebuilder_Setup_API {
         $unit_exec_time = (microtime(true) - $unit_time_start);
         $this->print_install_log('artisan config:clear timeusage '.$unit_exec_time);
         
+        /*
+        $unit_time_start = microtime(true);
+        $kernel->call('config:cache', []);
+        $this->print_debug_log($kernel->output());
+        $unit_exec_time = (microtime(true) - $unit_time_start);
+        $this->print_install_log('artisan config:cache timeusage '.$unit_exec_time);
+        */
+        
         $unit_time_start = microtime(true);
         $kernel->call('route:clear', []);
         $this->print_debug_log($kernel->output());
