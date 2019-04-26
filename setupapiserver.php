@@ -668,7 +668,10 @@ class RVsitebuilder_Setup_API {
         ];
         
         if($additionalpkg != '') {
-            array_push($commonpkg , json_decode($additionalpkg,true));
+            $packages = json_decode($additionalpkg,true);
+            foreach ($packages as $package) {
+                array_push($commonpkg , $package);
+            }
         }
         
         $this->print_debug_log("Common Package ".json_encode($commonpkg));
@@ -913,6 +916,32 @@ class RVsitebuilder_Setup_API {
             $kernel->call($artisancmd, [$argkey => $argvalue]);
             $this->print_debug_log($kernel->output());
         }
+        
+        
+        //clear cache
+        $unit_time_start = microtime(true);
+        $kernel->call('cache:clear', []);
+        $this->print_debug_log($kernel->output());
+        $unit_exec_time = (microtime(true) - $unit_time_start);
+        $this->print_install_log('artisan cache:clear timeusage '.$unit_exec_time);
+        
+        $unit_time_start = microtime(true);
+        $kernel->call('config:clear', []);
+        $this->print_debug_log($kernel->output());
+        $unit_exec_time = (microtime(true) - $unit_time_start);
+        $this->print_install_log('artisan config:clear timeusage '.$unit_exec_time);
+        
+        $unit_time_start = microtime(true);
+        $kernel->call('route:clear', []);
+        $this->print_debug_log($kernel->output());
+        $unit_exec_time = (microtime(true) - $unit_time_start);
+        $this->print_install_log('artisan route:clear timeusage '.$unit_exec_time);
+        
+        $unit_time_start = microtime(true);
+        $kernel->call('view:clear', []);
+        $this->print_debug_log($kernel->output());
+        $unit_exec_time = (microtime(true) - $unit_time_start);
+        $this->print_install_log('artisan view:clear timeusage '.$unit_exec_time);
         
         
         $this->response['status'] = true;
