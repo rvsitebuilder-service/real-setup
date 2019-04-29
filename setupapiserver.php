@@ -913,7 +913,7 @@ class RVsitebuilder_Setup_API {
         $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
         
         if($artisancmd != '' && $argkey !='' && $argvalue != '') {
-            $kernel->call($artisancmd, [$argkey => $argvalue]);
+            $kernel->call($artisancmd, ['dbkey'=>$argkey,'dbvalue'=>$argvalue]);
             $this->print_debug_log($kernel->output());
         }
         
