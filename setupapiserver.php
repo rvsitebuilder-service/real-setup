@@ -810,7 +810,7 @@ class RVsitebuilder_Setup_API {
         
         //user secret key
         $unit_time_start = microtime(true);
-        $kernel->call('rvsitebuilder:updateenduserdb-run', ['secretkey' => $this->generateSecretKey()]);
+        $kernel->call('rvsitebuilder:updateenduserdb-run', ['dbkey'=>'secretkey','dbvalue'=>$this->generateSecretKey()]);
         $this->print_debug_log($kernel->output());
         $unit_exec_time = (microtime(true) - $unit_time_start);
         $this->print_install_log('artisan rvsitebuilder:updateenduserdb-run timeusage '.$unit_exec_time);
