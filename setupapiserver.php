@@ -912,7 +912,11 @@ class RVsitebuilder_Setup_API {
         $this->print_debug_log('require_one '.$homeuser.'/rvsitebuildercms/'.$domainname.'/bootstrap/app.php');
         $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
         
-        if($artisancmd != '' && $argkey !='' && $argvalue != '') {
+        if($artisancmd == 'rvsitebuilder:gentemplate' && $argkey !='' && $argvalue != '') {
+            $kernel->call($artisancmd, [$argkey => $argvalue]);
+            $this->print_debug_log($kernel->output());
+        }
+        if($artisancmd == 'rvsitebuilder:updateenduserdb-run' && $argkey !='' && $argvalue != '') {
             $kernel->call($artisancmd, ['dbkey'=>$argkey,'dbvalue'=>$argvalue]);
             $this->print_debug_log($kernel->output());
         }
