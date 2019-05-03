@@ -35,8 +35,7 @@ $adminfirstname = '';
 $adminlastname  = '';
 $domainport     = '';
 $artisancmd     = '';
-$argkey         = '';
-$argvalue       = '';
+$artisanparam   = '{}';
 $devtokenkey    = '';
 $additionalpkg  = '';
 
@@ -60,8 +59,7 @@ if (isset($_GET['adminfirstname'])) $adminfirstname = $_GET['adminfirstname'];
 if (isset($_GET['adminlastname']))  $adminlastname  = $_GET['adminlastname'];
 if (isset($_GET['domainport']))     $domainport     = $_GET['domainport'];
 if (isset($_GET['artisancmd']))     $artisancmd     = $_GET['artisancmd'];
-if (isset($_GET['argkey']))         $argkey         = $_GET['argkey'];
-if (isset($_GET['argvalue']))       $argvalue       = $_GET['argvalue'];
+if (isset($_GET['artisanparam']))   $artisanparam   = $_GET['artisanparam'];
 if (isset($_GET['devtokenkey']))    $devtokenkey    = $_GET['devtokenkey'];
 if (isset($_GET['additionalpkg']))  $additionalpkg  = $_GET['additionalpkg'];
 
@@ -85,7 +83,7 @@ if (isset($_POST['adminfirstname'])) $adminfirstname = $_POST['adminfirstname'];
 if (isset($_POST['adminlastname']))  $adminlastname  = $_POST['adminlastname'];
 if (isset($_POST['domainport']))     $domainport     = $_POST['domainport'];
 if (isset($_POST['artisancmd']))     $artisancmd     = $_POST['artisancmd'];
-if (isset($_POST['argkey']))         $argkey         = $_POST['argkey'];
+if (isset($_POST['artisanparam']))   $artisanparam   = $_POST['artisanparam'];
 if (isset($_POST['argvalue']))       $argvalue       = $_POST['argvalue'];
 if (isset($_POST['devtokenkey']))    $devtokenkey    = $_POST['devtokenkey'];
 if (isset($_POST['additionalpkg']))  $additionalpkg  = $_POST['additionalpkg'];
@@ -126,7 +124,7 @@ if($action == 'artisan_call'){
     $setupObj->artisan_call($homeuser,$domainname,$publicpath,$adminemail,$adminpassword,$adminfirstname,$adminlastname);
 }
 if($action == 'artisan_cmd_run'){
-    $setupObj->artisan_cmd_run($homeuser,$domainname,$artisancmd,$argkey,$argvalue);
+    $setupObj->artisan_cmd_run($homeuser,$domainname,$artisancmd,$artisanparam);
 }
 
 if($action == 'finished_setup'){
@@ -835,6 +833,22 @@ class RVsitebuilder_Setup_API {
         $unit_exec_time = (microtime(true) - $unit_time_start);
         $this->print_install_log('artisan config:clear timeusage '.$unit_exec_time);
         
+        //update admin info from wizard request
+        if($adminemail != '' && $adminpassword != '') {
+            $this->print_debug_log("Update user info to DB adminemail=$adminemail adminpassword=$adminpassword adminfirstname=$adminfirstname adminlastname=$adminlastname");
+            $unit_time_start = microtime(true);
+            $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'email', 'update_val' => $adminemail]);
+            $this->print_debug_log($kernel->output());
+            $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'password', 'update_val' => $adminpassword]);
+            $this->print_debug_log($kernel->output());
+            $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'first_name', 'update_val' => $adminfirstname]);
+            $this->print_debug_log($kernel->output());
+            $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'last_name', 'update_val' => $adminlastname]);
+            $this->print_debug_log($kernel->output());
+            $unit_exec_time = (microtime(true) - $unit_time_start);
+            $this->print_install_log('artisan rvsitebuilder:updateuserinfo-run timeusage '.$unit_exec_time);
+        }
+        
         /*
         $unit_time_start = microtime(true);
         $kernel->call('config:cache', []);
@@ -854,23 +868,8 @@ class RVsitebuilder_Setup_API {
         $this->print_debug_log($kernel->output());
         $unit_exec_time = (microtime(true) - $unit_time_start);
         $this->print_install_log('artisan view:clear timeusage '.$unit_exec_time);
+
         
-        
-        //update admin info from wizard request
-        if($adminemail != '' && $adminpassword != '') {
-            $this->print_debug_log("Update user info to DB adminemail=$adminemail adminpassword=$adminpassword adminfirstname=$adminfirstname adminlastname=$adminlastname");
-            $unit_time_start = microtime(true);
-            $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'email', 'update_val' => $adminemail]);
-            $this->print_debug_log($kernel->output());
-            $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'password', 'update_val' => $adminpassword]);
-            $this->print_debug_log($kernel->output());
-            $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'first_name', 'update_val' => $adminfirstname]);
-            $this->print_debug_log($kernel->output());
-            $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'last_name', 'update_val' => $adminlastname]);
-            $this->print_debug_log($kernel->output());
-            $unit_exec_time = (microtime(true) - $unit_time_start);
-            $this->print_install_log('artisan rvsitebuilder:updateuserinfo-run timeusage '.$unit_exec_time);
-        }
         
         $this->response['status'] = true;
         $this->response['message'] = 'Artisan Command Success';
@@ -879,7 +878,7 @@ class RVsitebuilder_Setup_API {
         return $this->print_response($this->response);
     }
     
-    public function artisan_cmd_run($homeuser,$domainname,$artisancmd,$argkey,$argvalue){
+    public function artisan_cmd_run($homeuser,$domainname,$artisancmd,$artisanparam){
         //called from tryout
         
         $time_start = microtime(true);
@@ -912,14 +911,12 @@ class RVsitebuilder_Setup_API {
         $this->print_debug_log('require_one '.$homeuser.'/rvsitebuildercms/'.$domainname.'/bootstrap/app.php');
         $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
         
-        if($artisancmd == 'rvsitebuilder:gentemplate' && $argkey !='' && $argvalue != '') {
-            $kernel->call($artisancmd, [$argkey => $argvalue]);
+        if($artisancmd != '' && $artisanparam !='{}') {
+            $param = json_decode($artisanparam ,  true);
+            $kernel->call($artisancmd, $param);
             $this->print_debug_log($kernel->output());
         }
-        if($artisancmd == 'rvsitebuilder:updateenduserdb-run' && $argkey !='' && $argvalue != '') {
-            $kernel->call($artisancmd, ['dbkey'=>$argkey,'dbvalue'=>$argvalue]);
-            $this->print_debug_log($kernel->output());
-        }
+     
         
         
         //clear cache
