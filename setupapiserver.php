@@ -161,9 +161,9 @@ if($action == 'validate_developer_token') {
 if($action == 'check_dev_mode') {
     $setupObj->check_dev_mode();
 }
-    
-    
-    
+
+
+
 
 
 
@@ -585,7 +585,7 @@ class RVsitebuilder_Setup_API {
             
         }
         
-      
+        
         
         //move vendor package to vendor path
         $source = dirname(__FILE__).'/tmp/vendor/vendor';
@@ -658,7 +658,7 @@ class RVsitebuilder_Setup_API {
         
         $files = new Filesystem();
         
-        $commonpkg = [  
+        $commonpkg = [
             'blog',
             'core',
             'email',
@@ -810,12 +810,6 @@ class RVsitebuilder_Setup_API {
         $unit_exec_time = (microtime(true) - $unit_time_start);
         $this->print_install_log('artisan db:seed --force timeusage '.$unit_exec_time);
         
-        $unit_time_start = microtime(true);
-        $kernel->call('rvsitebuilder:notifynewinstall', []);
-        $this->print_debug_log($kernel->output());
-        $unit_exec_time = (microtime(true) - $unit_time_start);
-        $this->print_install_log('rvsitebuilder:notifynewinstall timeusage'.$unit_exec_time);
-        
         //user secret key
         $unit_time_start = microtime(true);
         $kernel->call('rvsitebuilder:updateenduserdb-run', ['dbkey'=>'secretkey','dbvalue'=>$this->generateSecretKey()]);
@@ -830,6 +824,48 @@ class RVsitebuilder_Setup_API {
         $unit_exec_time = (microtime(true) - $unit_time_start);
         $this->print_install_log('artisan vendor:publish timeusage '.$unit_exec_time);
         
+        //update user admin information
+        if($adminemail != '') {
+            $this->print_debug_log("Update user info to DB adminemail=$adminemail");
+            $unit_time_start = microtime(true);
+            $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'email', 'update_val' => $adminemail]);
+            $this->print_debug_log($kernel->output());
+            $unit_exec_time = (microtime(true) - $unit_time_start);
+            $this->print_install_log('artisan rvsitebuilder:updateuserinfo-run timeusage '.$unit_exec_time);
+        }
+        if($adminpassword != '') {
+            $this->print_debug_log("Update user info to DB adminpassword=$adminpassword");
+            $unit_time_start = microtime(true);
+            $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'password', 'update_val' => $adminpassword]);
+            $this->print_debug_log($kernel->output());
+            $unit_exec_time = (microtime(true) - $unit_time_start);
+            $this->print_install_log('artisan rvsitebuilder:updateuserinfo-run timeusage '.$unit_exec_time);
+        }
+        if($adminfirstname != '') {
+            $this->print_debug_log("Update user info to DB adminfirstname=$adminfirstname");
+            $unit_time_start = microtime(true);
+            $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'first_name', 'update_val' => $adminfirstname]);
+            $this->print_debug_log($kernel->output());
+            $unit_exec_time = (microtime(true) - $unit_time_start);
+            $this->print_install_log('artisan rvsitebuilder:updateuserinfo-run timeusage '.$unit_exec_time);
+        }
+        if($adminlastname != '') {
+            $this->print_debug_log("Update user info to DB adminlastname=$adminlastname");
+            $unit_time_start = microtime(true);
+            $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'last_name', 'update_val' => $adminlastname]);
+            $this->print_debug_log($kernel->output());
+            $unit_exec_time = (microtime(true) - $unit_time_start);
+            $this->print_install_log('artisan rvsitebuilder:updateuserinfo-run timeusage '.$unit_exec_time);
+        }
+        
+        
+        //email notify to admin $unit_time_start = microtime(true);
+        $kernel->call('rvsitebuilder:notifynewinstall', []);
+        $this->print_debug_log($kernel->output());
+        $unit_exec_time = (microtime(true) - $unit_time_start);
+        $this->print_install_log('rvsitebuilder:notifynewinstall timeusage'.$unit_exec_time);
+        
+        
         //clear cache
         $unit_time_start = microtime(true);
         $kernel->call('cache:clear', []);
@@ -843,29 +879,14 @@ class RVsitebuilder_Setup_API {
         $unit_exec_time = (microtime(true) - $unit_time_start);
         $this->print_install_log('artisan config:clear timeusage '.$unit_exec_time);
         
-        //update admin info from wizard request
-        if($adminemail != '' && $adminpassword != '') {
-            $this->print_debug_log("Update user info to DB adminemail=$adminemail adminpassword=$adminpassword adminfirstname=$adminfirstname adminlastname=$adminlastname");
-            $unit_time_start = microtime(true);
-            $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'email', 'update_val' => $adminemail]);
-            $this->print_debug_log($kernel->output());
-            $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'password', 'update_val' => $adminpassword]);
-            $this->print_debug_log($kernel->output());
-            $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'first_name', 'update_val' => $adminfirstname]);
-            $this->print_debug_log($kernel->output());
-            $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'last_name', 'update_val' => $adminlastname]);
-            $this->print_debug_log($kernel->output());
-            $unit_exec_time = (microtime(true) - $unit_time_start);
-            $this->print_install_log('artisan rvsitebuilder:updateuserinfo-run timeusage '.$unit_exec_time);
-        }
         
         /*
-        $unit_time_start = microtime(true);
-        $kernel->call('config:cache', []);
-        $this->print_debug_log($kernel->output());
-        $unit_exec_time = (microtime(true) - $unit_time_start);
-        $this->print_install_log('artisan config:cache timeusage '.$unit_exec_time);
-        */
+         $unit_time_start = microtime(true);
+         $kernel->call('config:cache', []);
+         $this->print_debug_log($kernel->output());
+         $unit_exec_time = (microtime(true) - $unit_time_start);
+         $this->print_install_log('artisan config:cache timeusage '.$unit_exec_time);
+         */
         
         $unit_time_start = microtime(true);
         $kernel->call('route:clear', []);
@@ -878,7 +899,7 @@ class RVsitebuilder_Setup_API {
         $this->print_debug_log($kernel->output());
         $unit_exec_time = (microtime(true) - $unit_time_start);
         $this->print_install_log('artisan view:clear timeusage '.$unit_exec_time);
-
+        
         
         
         $this->response['status'] = true;
@@ -926,7 +947,7 @@ class RVsitebuilder_Setup_API {
             $kernel->call($artisancmd, $param);
             $this->print_debug_log($kernel->output());
         }
-     
+        
         
         
         //clear cache
@@ -1174,8 +1195,8 @@ class RVsitebuilder_Setup_API {
         if (file_exists($homeuser.'/rvsitebuildercms/'.$domainname.'/public/.htaccess')) {
             $frameworkhtaccess = file_get_contents($homeuser.'/rvsitebuildercms/'.$domainname.'/public/.htaccess');
             $frameworkhtaccess = "#Start Rvsitebuilder7 htaccess\n".
-                                 $frameworkhtaccess."\n".
-                                 "#End Rvsitebuilder7 htaccess\n";
+                $frameworkhtaccess."\n".
+                "#End Rvsitebuilder7 htaccess\n";
         }
         $oldhtaccess = '';
         if (file_exists($publicpath.'/.htaccess')) {
@@ -1247,13 +1268,13 @@ class RVsitebuilder_Setup_API {
             $this->print_debug_log("Removed old framwork path ".$homeuser.'/rvsitebuildercms/'.$domainname);
         }
         
-
+        
         //move temp to freamwork path
         $source = dirname(__FILE__).'/tmp';
         $destination = $homeuser.'/rvsitebuildercms/'.$domainname ;
         $moved = $files->rename($source , $destination ,true);
         $this->print_debug_log("Moved $source To $destination");
-
+        
         
         //old htaccess
         $oldhtaccess = '';
@@ -1274,8 +1295,8 @@ class RVsitebuilder_Setup_API {
         if (file_exists($homeuser.'/rvsitebuildercms/'.$domainname.'/public/.htaccess')) {
             $frameworkhtaccess = file_get_contents($homeuser.'/rvsitebuildercms/'.$domainname.'/public/.htaccess');
             $frameworkhtaccess = "#Start Rvsitebuilder7 htaccess\n".
-                                 $frameworkhtaccess."\n".
-                                 "#End Rvsitebuilder7 htaccess\n";
+                $frameworkhtaccess."\n".
+                "#End Rvsitebuilder7 htaccess\n";
         }
         
         if ($oldhtaccess == '') {
@@ -1302,470 +1323,470 @@ class RVsitebuilder_Setup_API {
         $this->print_install_log(__METHOD__.' TRUE (By Default)'.' timeusage '.$this->response['exectime']);
         return $this->print_response($this->response);
     }
+    
+    
+    
+    
+    
+    public function doDownload($type, $url, $sink) {
+        $time_start = microtime(true);
+        $this->print_debug_log('======'.__METHOD__.'======');
         
+        $response = [
+            'message' => '',
+            'success' => false
+        ];
         
-     
+        $client = new Client([
+            'curl'            => [CURLOPT_SSL_VERIFYPEER => false, CURLOPT_SSL_VERIFYHOST => false],
+            'allow_redirects' => false,
+            'cookies'         => true,
+            'verify'          => false
+        ]);
+        $headers = [
+            /// Domain user
+            'RV-Referer' => $this->get_current_domain(),
+            /// บอกให้ทำ GATracking
+            'Allow-GATracking' => 'true',
+            /// RVGlobalsoft Product
+            'RV-Product' => 'rvsitebuilder',
+            /// ทำ License-Code ดูตาม function เลย
+            'RV-License-Code' => $this->rvlicensecode,
+            /// Browser ของ user
+            'User-Agent' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36',
+            /// ส่ง IP ของ user ให้ด้วย เพราะที่ server เราจะเห็นแค่ IP ของ server ไม่ใช่ IP ของผู้ใช้งานจริงๆ
+            'RV-Forword-REMOTE-ADDR' => $this->get_client_ip()
+        ];
         
+        $this->print_debug_log('Header request to server '.json_encode($headers));
+        $this->print_debug_log("Do Download Type=$type URL=$url Synk=$sink LicenseCode=$this->rvlicensecode");
         
-        public function doDownload($type, $url, $sink) {
-            $time_start = microtime(true);
-            $this->print_debug_log('======'.__METHOD__.'======');
-            
-            $response = [
-                'message' => '',
-                'success' => false
-            ];
-            
-            $client = new Client([
-                'curl'            => [CURLOPT_SSL_VERIFYPEER => false, CURLOPT_SSL_VERIFYHOST => false],
-                'allow_redirects' => false,
-                'cookies'         => true,
-                'verify'          => false
-            ]);
-            $headers = [
-                /// Domain user
-                'RV-Referer' => $this->get_current_domain(),
-                /// บอกให้ทำ GATracking
-                'Allow-GATracking' => 'true',
-                /// RVGlobalsoft Product
-                'RV-Product' => 'rvsitebuilder',
-                /// ทำ License-Code ดูตาม function เลย
-                'RV-License-Code' => $this->rvlicensecode,
-                /// Browser ของ user
-                'User-Agent' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36',
-                /// ส่ง IP ของ user ให้ด้วย เพราะที่ server เราจะเห็นแค่ IP ของ server ไม่ใช่ IP ของผู้ใช้งานจริงๆ
-                'RV-Forword-REMOTE-ADDR' => $this->get_client_ip()
-            ];
-            
-            $this->print_debug_log('Header request to server '.json_encode($headers));
-            $this->print_debug_log("Do Download Type=$type URL=$url Synk=$sink LicenseCode=$this->rvlicensecode");
-            
-            $res = $client->request(
-                $type,
-                $url,
-                [
-                    'headers'   => $headers,
-                    'sink'      => $sink,
-                    'timeout'   => 180
-                ]
-                );
-            
-            $this->print_debug_log('Server Response Status '.$res->getStatusCode());
-            $this->print_debug_log('Server Response Header '.json_encode((array) $res->getHeaders()));
-            
-            if($res->getHeaderLine('RV-DOWNLOAD-RESPONSE') != 'ok') {
-                $this->print_debug_log("Download Error, Server Header Response : ".$res->getHeaderLine('RV-DOWNLOAD-RESPONSE-MESSAGE'));
-                $response['message'] = $res->getHeaderLine('RV-DOWNLOAD-RESPONSE-MESSAGE');
-            }else if(!file_exists($sink)) {
-                $this->print_debug_log('Download Error ,file '.$sink.' not exists');
-                $response['message'] = 'Download Error ,file '.$sink.' not exists';
-            }else {
-                $this->print_debug_log('Download Success ,file '.$sink);
-                $response['success'] = true;
-            }
-            $this->response['exectime'] = (microtime(true) - $time_start);
-            $this->print_install_log(__METHOD__.' TRUE (By Default)' . $url .' timeusage '.$this->response['exectime']);
+        $res = $client->request(
+            $type,
+            $url,
+            [
+                'headers'   => $headers,
+                'sink'      => $sink,
+                'timeout'   => 180
+            ]
+            );
+        
+        $this->print_debug_log('Server Response Status '.$res->getStatusCode());
+        $this->print_debug_log('Server Response Header '.json_encode((array) $res->getHeaders()));
+        
+        if($res->getHeaderLine('RV-DOWNLOAD-RESPONSE') != 'ok') {
+            $this->print_debug_log("Download Error, Server Header Response : ".$res->getHeaderLine('RV-DOWNLOAD-RESPONSE-MESSAGE'));
+            $response['message'] = $res->getHeaderLine('RV-DOWNLOAD-RESPONSE-MESSAGE');
+        }else if(!file_exists($sink)) {
+            $this->print_debug_log('Download Error ,file '.$sink.' not exists');
+            $response['message'] = 'Download Error ,file '.$sink.' not exists';
+        }else {
+            $this->print_debug_log('Download Success ,file '.$sink);
+            $response['success'] = true;
+        }
+        $this->response['exectime'] = (microtime(true) - $time_start);
+        $this->print_install_log(__METHOD__.' TRUE (By Default)' . $url .' timeusage '.$this->response['exectime']);
+        return $response;
+    }
+    
+    public function doExtract($file,$path) {
+        $this->print_debug_log('======'.__METHOD__.'======');
+        
+        $response['message'] = '';
+        $response['success'] = false;
+        $this->print_debug_log("Do Extract $file $path");
+        
+        try {
+            $tar = new Tar();
+            $tar->open($file);
+            $tar->extract($path);
+            $this->print_debug_log("Do Extract Success $file $path");
+            $response['success'] = true;
+            return $response;
+        } catch (Exception $e) {
+            $this->print_debug_log("Do Extract Error ".$e->getMessage());
+            $response['message'] = $e->getMessage();
             return $response;
         }
         
-        public function doExtract($file,$path) {
-            $this->print_debug_log('======'.__METHOD__.'======');
-            
-            $response['message'] = '';
-            $response['success'] = false;
-            $this->print_debug_log("Do Extract $file $path");
-            
-            try {
-                $tar = new Tar();
-                $tar->open($file);
-                $tar->extract($path);
-                $this->print_debug_log("Do Extract Success $file $path");
-                $response['success'] = true;
-                return $response;
-            } catch (Exception $e) {
-                $this->print_debug_log("Do Extract Error ".$e->getMessage());
-                $response['message'] = $e->getMessage();
-                return $response;
-            }
-            
+    }
+    
+    public function get_current_domain() {
+        $this->print_debug_log('======'.__METHOD__.'======');
+        $domainname = $_SERVER['SERVER_NAME'];
+        $domainname = str_replace("www.","",$domainname);
+        $this->print_debug_log("Current domain ".$domainname);
+        return $domainname;
+    }
+    
+    public function get_client_ip() {
+        $this->print_debug_log('======'.__METHOD__.'======');
+        
+        $ipaddress = '';
+        if (isset($_SERVER['HTTP_CLIENT_IP']))
+        {    $ipaddress = $_SERVER['HTTP_CLIENT_IP']; }
+        else if(isset($_SERVER['HTTP_X_FORWARDED_FOR']))
+        {    $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR']; }
+        else if(isset($_SERVER['HTTP_X_FORWARDED']))
+        {    $ipaddress = $_SERVER['HTTP_X_FORWARDED']; }
+        else if(isset($_SERVER['HTTP_FORWARDED_FOR']))
+        {    $ipaddress = $_SERVER['HTTP_FORWARDED_FOR']; }
+        else if(isset($_SERVER['HTTP_FORWARDED']))
+        {    $ipaddress = $_SERVER['HTTP_FORWARDED']; }
+        else if(isset($_SERVER['REMOTE_ADDR']))
+        {    $ipaddress = $_SERVER['REMOTE_ADDR']; }
+        else
+        {    $ipaddress = 'UNKNOWN'; }
+        $this->print_debug_log("Remote IP Address ".$ipaddress);
+        return $ipaddress;
+    }
+    
+    public function print_response($data) {
+        $this->print_debug_log('======'.__METHOD__.'======');
+        
+        if($this->responseType == 'application/json' || $this->call_responsetype == 'application/json') {
+            header('Content-type: application/json');
+        }
+        echo json_encode( $data );
+        exit;
+    }
+    
+    /*
+     * updateuserinfo('1','last_name','bbbbb');
+     */
+    public function updateuserinfo($user_id,$update_key,$update_val){
+        $this->print_debug_log('======'.__METHOD__.'======');
+        
+        $response = [];
+        $response['success'] = 'true';
+        $response['message'] = '';
+        $db_server_name = getEnvData('DB_HOST');
+        $db_port = getEnvData('DB_PORT');
+        $db_name = getEnvData('DB_DATABASE');
+        $db_user_name = getEnvData('DB_USERNAME');
+        $db_password = getEnvData('DB_PASSWORD');
+        
+        $this->print_debug_log("Update User info user_id=$user_id update_key=$update_key update_val=$update_val");
+        $this->print_debug_log("Database info db_server_name=$db_server_name db_port=$db_port db_name=$db_name db_user_name=$db_user_name db_password=$db_password");
+        
+        if($update_key == 'password'){
+            $update_val = bcrypt($update_val);
         }
         
-        public function get_current_domain() {
-            $this->print_debug_log('======'.__METHOD__.'======');
-            $domainname = $_SERVER['SERVER_NAME'];
-            $domainname = str_replace("www.","",$domainname);
-            $this->print_debug_log("Current domain ".$domainname);
-            return $domainname;
-        }
-        
-        public function get_client_ip() {
-            $this->print_debug_log('======'.__METHOD__.'======');
-            
-            $ipaddress = '';
-            if (isset($_SERVER['HTTP_CLIENT_IP']))
-            {    $ipaddress = $_SERVER['HTTP_CLIENT_IP']; }
-            else if(isset($_SERVER['HTTP_X_FORWARDED_FOR']))
-            {    $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR']; }
-            else if(isset($_SERVER['HTTP_X_FORWARDED']))
-            {    $ipaddress = $_SERVER['HTTP_X_FORWARDED']; }
-            else if(isset($_SERVER['HTTP_FORWARDED_FOR']))
-            {    $ipaddress = $_SERVER['HTTP_FORWARDED_FOR']; }
-            else if(isset($_SERVER['HTTP_FORWARDED']))
-            {    $ipaddress = $_SERVER['HTTP_FORWARDED']; }
-            else if(isset($_SERVER['REMOTE_ADDR']))
-            {    $ipaddress = $_SERVER['REMOTE_ADDR']; }
-            else
-            {    $ipaddress = 'UNKNOWN'; }
-            $this->print_debug_log("Remote IP Address ".$ipaddress);
-            return $ipaddress;
-        }
-        
-        public function print_response($data) {
-            $this->print_debug_log('======'.__METHOD__.'======');
-            
-            if($this->responseType == 'application/json' || $this->call_responsetype == 'application/json') {
-                header('Content-type: application/json');
-            }
-            echo json_encode( $data );
-            exit;
-        }
-        
-        /*
-         * updateuserinfo('1','last_name','bbbbb');
-         */
-        public function updateuserinfo($user_id,$update_key,$update_val){
-            $this->print_debug_log('======'.__METHOD__.'======');
-            
-            $response = [];
-            $response['success'] = 'true';
-            $response['message'] = '';
-            $db_server_name = getEnvData('DB_HOST');
-            $db_port = getEnvData('DB_PORT');
-            $db_name = getEnvData('DB_DATABASE');
-            $db_user_name = getEnvData('DB_USERNAME');
-            $db_password = getEnvData('DB_PASSWORD');
-            
-            $this->print_debug_log("Update User info user_id=$user_id update_key=$update_key update_val=$update_val");
-            $this->print_debug_log("Database info db_server_name=$db_server_name db_port=$db_port db_name=$db_name db_user_name=$db_user_name db_password=$db_password");
-            
-            if($update_key == 'password'){
-                $update_val = bcrypt($update_val);
-            }
-            
-            $mysqli = new mysqli($db_server_name, $db_user_name, $db_password, $db_name);
-            if (mysqli_connect_errno()) {
-                $this->print_debug_log("DB connect error ".mysqli_connect_error());
-                $response['success'] = 'false';
-                $response['message'] = sprintf("Connect failed : %s\n", mysqli_connect_error());
-                return $response;
-            }
-            
-            $sql = sprintf('UPDATE `users` SET `%s` = \'%s\', `password_changed_at` = NULL, `deleted_at` = NULL WHERE `users`.`id` = ?;', $update_key, $update_val);
-            
-            if($query = $mysqli->prepare($sql)){
-                $query->bind_param('s', $user_id);
-                $query->execute();
-            } else {
-                $this->print_debug_log("DB update error ".$mysqli->error);
-                $error = $mysqli->errno . ' ' . $mysqli->error;
-                $response['success'] = 'false';
-                $response['message'] = $error;
-                return $response;
-            }
+        $mysqli = new mysqli($db_server_name, $db_user_name, $db_password, $db_name);
+        if (mysqli_connect_errno()) {
+            $this->print_debug_log("DB connect error ".mysqli_connect_error());
+            $response['success'] = 'false';
+            $response['message'] = sprintf("Connect failed : %s\n", mysqli_connect_error());
             return $response;
         }
         
-        public function getEnvData($envKey = ''){
-            $this->print_debug_log('======'.__METHOD__.'======');
+        $sql = sprintf('UPDATE `users` SET `%s` = \'%s\', `password_changed_at` = NULL, `deleted_at` = NULL WHERE `users`.`id` = ?;', $update_key, $update_val);
+        
+        if($query = $mysqli->prepare($sql)){
+            $query->bind_param('s', $user_id);
+            $query->execute();
+        } else {
+            $this->print_debug_log("DB update error ".$mysqli->error);
+            $error = $mysqli->errno . ' ' . $mysqli->error;
+            $response['success'] = 'false';
+            $response['message'] = $error;
+            return $response;
+        }
+        return $response;
+    }
+    
+    public function getEnvData($envKey = ''){
+        $this->print_debug_log('======'.__METHOD__.'======');
+        
+        $this->print_debug_log("env key $envKey");
+        
+        $valuefromkey = '';
+        
+        if($envKey != ''){
+            //set path for /home/user or /var/www
+            $envPath = self::_getUserPath();
             
-            $this->print_debug_log("env key $envKey");
+            // Read .env-file
+            //$env = file_get_contents(base_path() . '/.env');
+            $env = file_get_contents($envPath['home'] . '/.env');
             
-            $valuefromkey = '';
+            // Split string on every " " and write into array
+            $env = preg_split('/\s+/', $env);
             
-            if($envKey != ''){
-                //set path for /home/user or /var/www
-                $envPath = self::_getUserPath();
-                
-                // Read .env-file
-                //$env = file_get_contents(base_path() . '/.env');
-                $env = file_get_contents($envPath['home'] . '/.env');
-                
-                // Split string on every " " and write into array
-                $env = preg_split('/\s+/', $env);
-                
+            // Loop through .env-data
+            foreach($env as $env_key => $env_value){
+                // Turn the value into an array and stop after the first split
+                // So it's not possible to split e.g. the App-Key by accident
+                $entry = explode("=", $env_value, 2);
+                //check for comment #KEY (#) too
+                if($entry[0] == $envKey || substr($entry[0],1) == $envKey){
+                    // If yes, get value from key
+                    $valuefromkey = $entry[1];
+                }
+            }
+            
+        }
+        $this->print_debug_log("Value from key $valuefromkey");
+        return $valuefromkey;
+    }
+    
+    public function setEnv($env_file,$env_data = [],$force = false){
+        $this->print_debug_log('======'.__METHOD__.'======');
+        
+        $this->print_debug_log("ENV File=$env_file Data=".json_encode($env_data)." Force=$force");
+        
+        if(count($env_data) > 0){
+            // Read .env-file
+            $env = file_get_contents($env_file);
+            // Split string on every "\n" and write into array
+            $env = preg_split('/\n/', $env);
+            // Loop through given data
+            foreach((array)$env_data as $key => $value){
                 // Loop through .env-data
+                $found = 0;
                 foreach($env as $env_key => $env_value){
                     // Turn the value into an array and stop after the first split
                     // So it's not possible to split e.g. the App-Key by accident
                     $entry = explode("=", $env_value, 2);
+                    // Check, if new key fits the actual .env-key
                     //check for comment #KEY (#) too
-                    if($entry[0] == $envKey || substr($entry[0],1) == $envKey){
-                        // If yes, get value from key
-                        $valuefromkey = $entry[1];
+                    if($entry[0] == $key || substr($entry[0],1) == $key){
+                        // If yes, overwrite it with the new one
+                        $env[$env_key] = $key . "=" . $value;
+                        $found = 1;
+                    } else {
+                        // If not, keep the old one
+                        $env[$env_key] = $env_value;
                     }
                 }
-                
-            }
-            $this->print_debug_log("Value from key $valuefromkey");
-            return $valuefromkey;
-        }
-        
-        public function setEnv($env_file,$env_data = [],$force = false){
-            $this->print_debug_log('======'.__METHOD__.'======');
-            
-            $this->print_debug_log("ENV File=$env_file Data=".json_encode($env_data)." Force=$force");
-            
-            if(count($env_data) > 0){
-                // Read .env-file
-                $env = file_get_contents($env_file);
-                // Split string on every "\n" and write into array
-                $env = preg_split('/\n/', $env);
-                // Loop through given data
-                foreach((array)$env_data as $key => $value){
-                    // Loop through .env-data
-                    $found = 0;
-                    foreach($env as $env_key => $env_value){
-                        // Turn the value into an array and stop after the first split
-                        // So it's not possible to split e.g. the App-Key by accident
-                        $entry = explode("=", $env_value, 2);
-                        // Check, if new key fits the actual .env-key
-                        //check for comment #KEY (#) too
-                        if($entry[0] == $key || substr($entry[0],1) == $key){
-                            // If yes, overwrite it with the new one
-                            $env[$env_key] = $key . "=" . $value;
-                            $found = 1;
-                        } else {
-                            // If not, keep the old one
-                            $env[$env_key] = $env_value;
-                        }
-                    }
-                    if(!$found && $force){
-                        array_push($env,"$key=$value");
-                    }
-                }
-                // Turn the array back to an String
-                $env = implode("\n", $env);
-                // And overwrite the .env with the new data
-                //file_put_contents($env_file, $env);
-                file_put_contents(dirname(__FILE__).'/tmp/.env', $env);
-                return true;
-            } else {
-                $this->print_debug_log("Array env_data is empty");
-                return false;
-            }
-        }
-       
-        public function get_user_path() {
-            $time_start = microtime(true);
-            $this->print_debug_log('======'.__METHOD__.'======');
-            
-            $userpathinfo = $this->get_user_path_info();
-            $this->response['status'] = true;
-            $this->response['homepath'] = $userpathinfo['homepath'];
-            $this->response['publicpath'] = $userpathinfo['publicpath'];
-            $this->response['exectime'] = (microtime(true) - $time_start);
-            $this->print_debug_log('User path info '.json_encode($userpathinfo));
-            $this->print_install_log(__METHOD__." TRUE ".json_encode($userpathinfo).' timeusage '.$this->response['exectime']);
-            return $this->print_response($this->response);
-            
-        }
-        
-        
-        public function get_user_path_info(){
-            $time_start = microtime(true);
-            $this->print_debug_log('======'.__METHOD__.'======');
-            
-            $userpathinfo = [];
-            
-            $mainHome = '';
-            
-            $testPathInput = $_SERVER['DOCUMENT_ROOT'];
-            
-            // case  have posix_getpwuid get uid by owner dir
-            if(function_exists('posix_getpwuid')){
-                $stat = stat($testPathInput);
-                $uid = $stat['uid'];
-                $userinfo = posix_getpwuid($uid);
-                if(is_dir($userinfo['dir'])){
-                    $userpathinfo['homepath'] = $userinfo['dir'];
-                    $userpathinfo['publicpath'] = $_SERVER['DOCUMENT_ROOT'];
-                    $this->print_debug_log("Case posix_getpwuid ".json_encode($userpathinfo));
-                    return $userpathinfo;
+                if(!$found && $force){
+                    array_push($env,"$key=$value");
                 }
             }
-            
-            // case  cpanel have rvsitebuildercms dir in home
-            $paths = preg_split("/\//", $testPathInput);
-            $loopDim = count($paths);
-            for($i=0; $i < $loopDim; $i++) {
-                $testPath = join('/', $paths);
-                if(is_dir($testPath . '/rvsitebuildercms'))
-                {
-                    $mainHome = $testPath;
-                    break;
-                }
-                array_pop($paths);
-            }
-            if($mainHome != ''){
-                $userpathinfo['homepath'] = $mainHome;
+            // Turn the array back to an String
+            $env = implode("\n", $env);
+            // And overwrite the .env with the new data
+            //file_put_contents($env_file, $env);
+            file_put_contents(dirname(__FILE__).'/tmp/.env', $env);
+            return true;
+        } else {
+            $this->print_debug_log("Array env_data is empty");
+            return false;
+        }
+    }
+    
+    public function get_user_path() {
+        $time_start = microtime(true);
+        $this->print_debug_log('======'.__METHOD__.'======');
+        
+        $userpathinfo = $this->get_user_path_info();
+        $this->response['status'] = true;
+        $this->response['homepath'] = $userpathinfo['homepath'];
+        $this->response['publicpath'] = $userpathinfo['publicpath'];
+        $this->response['exectime'] = (microtime(true) - $time_start);
+        $this->print_debug_log('User path info '.json_encode($userpathinfo));
+        $this->print_install_log(__METHOD__." TRUE ".json_encode($userpathinfo).' timeusage '.$this->response['exectime']);
+        return $this->print_response($this->response);
+        
+    }
+    
+    
+    public function get_user_path_info(){
+        $time_start = microtime(true);
+        $this->print_debug_log('======'.__METHOD__.'======');
+        
+        $userpathinfo = [];
+        
+        $mainHome = '';
+        
+        $testPathInput = $_SERVER['DOCUMENT_ROOT'];
+        
+        // case  have posix_getpwuid get uid by owner dir
+        if(function_exists('posix_getpwuid')){
+            $stat = stat($testPathInput);
+            $uid = $stat['uid'];
+            $userinfo = posix_getpwuid($uid);
+            if(is_dir($userinfo['dir'])){
+                $userpathinfo['homepath'] = $userinfo['dir'];
                 $userpathinfo['publicpath'] = $_SERVER['DOCUMENT_ROOT'];
-                $this->print_debug_log("Case look rvsitebuildercms".json_encode($userpathinfo));
+                $this->print_debug_log("Case posix_getpwuid ".json_encode($userpathinfo));
                 return $userpathinfo;
             }
-            
-            
-            // case other ../
-            if(php_sapi_name() === 'cli'){
-                $mainHome = realpath($testPathInput . '/../../');
-            }else{
-                $mainHome = realpath($testPathInput . '/../');
+        }
+        
+        // case  cpanel have rvsitebuildercms dir in home
+        $paths = preg_split("/\//", $testPathInput);
+        $loopDim = count($paths);
+        for($i=0; $i < $loopDim; $i++) {
+            $testPath = join('/', $paths);
+            if(is_dir($testPath . '/rvsitebuildercms'))
+            {
+                $mainHome = $testPath;
+                break;
             }
+            array_pop($paths);
+        }
+        if($mainHome != ''){
             $userpathinfo['homepath'] = $mainHome;
             $userpathinfo['publicpath'] = $_SERVER['DOCUMENT_ROOT'];
-            $this->print_debug_log("Case recursive path".json_encode($userpathinfo));
+            $this->print_debug_log("Case look rvsitebuildercms".json_encode($userpathinfo));
             return $userpathinfo;
-            
         }
         
         
+        // case other ../
+        if(php_sapi_name() === 'cli'){
+            $mainHome = realpath($testPathInput . '/../../');
+        }else{
+            $mainHome = realpath($testPathInput . '/../');
+        }
+        $userpathinfo['homepath'] = $mainHome;
+        $userpathinfo['publicpath'] = $_SERVER['DOCUMENT_ROOT'];
+        $this->print_debug_log("Case recursive path".json_encode($userpathinfo));
+        return $userpathinfo;
         
+    }
+    
+    
+    
+    
+    public function check_http_as_user() {
+        $time_start = microtime(true);
+        $this->print_debug_log('======'.__METHOD__.'======');
         
-        public function check_http_as_user() {
-            $time_start = microtime(true);
-            $this->print_debug_log('======'.__METHOD__.'======');
-            
-            $this->response['status'] = true;
-            $this->response['httpasuser'] = $this->httpasuser;
-            $this->response['exectime'] = (microtime(true) - $time_start);
-            $this->print_install_log(__METHOD__." TRUE ".' timeusage '.$this->response['exectime']);
-            $this->print_debug_log("HTTP AS USER $this->httpasuser");
-            
-            return $this->print_response($this->response);
+        $this->response['status'] = true;
+        $this->response['httpasuser'] = $this->httpasuser;
+        $this->response['exectime'] = (microtime(true) - $time_start);
+        $this->print_install_log(__METHOD__." TRUE ".' timeusage '.$this->response['exectime']);
+        $this->print_debug_log("HTTP AS USER $this->httpasuser");
+        
+        return $this->print_response($this->response);
+    }
+    
+    
+    
+    public function test_database_ftp_connect($dbhost,$dbname,$dbuser,$dbpassword,$ftpserver,$ftpaccount,$ftppassword,$ftpport) {
+        $time_start = microtime(true);
+        $this->print_debug_log('======'.__METHOD__.'======');
+        
+        ini_set('display_errors', 0);
+        
+        $this->print_debug_log("Test Connect dbhost=$dbhost dbname=$dbname dbuser=$dbuser dbpassword=$dbpassword ftpserver=$ftpserver ftpaccount=$ftpaccount ftppassword=$ftppassword ftpport=$ftpport");
+        
+        //db
+        $this->response['db_connect']['status'] = true;
+        $this->response['db_connect']['message'] = "";
+        $conn = new mysqli($dbhost, $dbuser, $dbpassword,$dbname);
+        if ($conn->connect_error) {
+            $this->print_debug_log("Database Connect Error ".$conn->connect_error);
+            $this->response['db_connect']['status'] = false;
+            $this->response['db_connect']['message'] = "Database connection failed! ".$conn->connect_error;
         }
         
-        
-        
-        public function test_database_ftp_connect($dbhost,$dbname,$dbuser,$dbpassword,$ftpserver,$ftpaccount,$ftppassword,$ftpport) {
-            $time_start = microtime(true);
-            $this->print_debug_log('======'.__METHOD__.'======');
-            
-            ini_set('display_errors', 0);
-            
-            $this->print_debug_log("Test Connect dbhost=$dbhost dbname=$dbname dbuser=$dbuser dbpassword=$dbpassword ftpserver=$ftpserver ftpaccount=$ftpaccount ftppassword=$ftppassword ftpport=$ftpport");
-            
-            //db
-            $this->response['db_connect']['status'] = true;
-            $this->response['db_connect']['message'] = "";
-            $conn = new mysqli($dbhost, $dbuser, $dbpassword,$dbname);
-            if ($conn->connect_error) {
-                $this->print_debug_log("Database Connect Error ".$conn->connect_error);
-                $this->response['db_connect']['status'] = false;
-                $this->response['db_connect']['message'] = "Database connection failed! ".$conn->connect_error;
+        //ftp
+        $this->response['ftp_connect']['status'] = true;
+        $this->response['ftp_connect']['message'] = '';
+        if($ftpserver != '' && $ftpaccount != '' && $ftppassword != '') {
+            $ftpHandler = new FTP_Handler();
+            $result = $ftpHandler->connect($ftpserver);
+            if(!$result['success']){
+                $this->print_debug_log("FTP Connect Error ".$result['msg']);
+                $this->response['ftp_connect']['status'] = false;
+                $this->response['ftp_connect']['message'] = 'Error '.$result['msg'];
             }
-            
-            //ftp
-            $this->response['ftp_connect']['status'] = true;
-            $this->response['ftp_connect']['message'] = '';
-            if($ftpserver != '' && $ftpaccount != '' && $ftppassword != '') {
-                $ftpHandler = new FTP_Handler();
-                $result = $ftpHandler->connect($ftpserver);
-                if(!$result['success']){
-                    $this->print_debug_log("FTP Connect Error ".$result['msg']);
-                    $this->response['ftp_connect']['status'] = false;
-                    $this->response['ftp_connect']['message'] = 'Error '.$result['msg'];
-                }
-                $result = $ftpHandler->login($ftpaccount, $ftppassword);
-                if(!$result['success']){
-                    $this->print_debug_log("FTP Login Error ".$result['msg']);
-                    $this->response['ftp_connect']['status'] = false;
-                    $this->response['ftp_connect']['message'] = 'Error '.$result['msg'];
-                }
+            $result = $ftpHandler->login($ftpaccount, $ftppassword);
+            if(!$result['success']){
+                $this->print_debug_log("FTP Login Error ".$result['msg']);
+                $this->response['ftp_connect']['status'] = false;
+                $this->response['ftp_connect']['message'] = 'Error '.$result['msg'];
             }
-            
-            $this->response['status'] = true;
-            $this->response['exectime'] = (microtime(true) - $time_start);
-            $this->print_install_log(__METHOD__." TRUE ".json_encode($this->response).' timeusage '.$this->response['exectime']);
-            
-            return $this->print_response($this->response);
         }
         
-        public function check_license() {
-            $time_start = microtime(true);
-            $this->print_debug_log('======'.__METHOD__.'======');
-            
-            $this->response['status'] = true;
-            $this->response['exectime'] = (microtime(true) - $time_start);
-            $this->print_install_log(__METHOD__." TRUE ".' timeusage '.$this->response['exectime']);
-            return $this->print_response($this->response);
+        $this->response['status'] = true;
+        $this->response['exectime'] = (microtime(true) - $time_start);
+        $this->print_install_log(__METHOD__." TRUE ".json_encode($this->response).' timeusage '.$this->response['exectime']);
+        
+        return $this->print_response($this->response);
+    }
+    
+    public function check_license() {
+        $time_start = microtime(true);
+        $this->print_debug_log('======'.__METHOD__.'======');
+        
+        $this->response['status'] = true;
+        $this->response['exectime'] = (microtime(true) - $time_start);
+        $this->print_install_log(__METHOD__." TRUE ".' timeusage '.$this->response['exectime']);
+        return $this->print_response($this->response);
+    }
+    
+    public function check_dev_mode() {
+        $time_start = microtime(true);
+        $this->print_debug_log('======'.__METHOD__.'======');
+        
+        $userpathinfo = $this->get_user_path_info();
+        $this->response['dev_mode'] = false;
+        if(file_exists($userpathinfo['homepath'].'/devmode')) {
+            $this->response['dev_mode'] = true;
         }
         
-        public function check_dev_mode() {
-            $time_start = microtime(true);
-            $this->print_debug_log('======'.__METHOD__.'======');
-            
-            $userpathinfo = $this->get_user_path_info();
-            $this->response['dev_mode'] = false;
-            if(file_exists($userpathinfo['homepath'].'/devmode')) {
-                $this->response['dev_mode'] = true;
-            }
-            
-            
-            $this->response['status'] = true;
-            $this->response['exectime'] = (microtime(true) - $time_start);
-            $this->print_install_log(__METHOD__." TRUE ".' timeusage '.$this->response['exectime']);
-            return $this->print_response($this->response);
-        }
         
-        public function disk_required() {
-            $time_start = microtime(true);
-            $this->print_debug_log('======'.__METHOD__.'======');
-            
-            $this->response['status'] = true;
-            $this->response['exectime'] = (microtime(true) - $time_start);
-            $this->print_install_log(__METHOD__." TRUE ".' timeusage '.$this->response['exectime']);
-            return $this->print_response($this->response);
-        }
+        $this->response['status'] = true;
+        $this->response['exectime'] = (microtime(true) - $time_start);
+        $this->print_install_log(__METHOD__." TRUE ".' timeusage '.$this->response['exectime']);
+        return $this->print_response($this->response);
+    }
+    
+    public function disk_required() {
+        $time_start = microtime(true);
+        $this->print_debug_log('======'.__METHOD__.'======');
         
-        public function print_debug_log($msg = '') {
-            if($this->debug_log == true){
-                if(file_exists(dirname(__FILE__).'/install_log.txt')) {
-                    file_put_contents(
-                        dirname(__FILE__).'/install_log.txt',
-                        'DEBUG LOG >> ' .$msg.PHP_EOL ,
-                        FILE_APPEND | LOCK_EX
+        $this->response['status'] = true;
+        $this->response['exectime'] = (microtime(true) - $time_start);
+        $this->print_install_log(__METHOD__." TRUE ".' timeusage '.$this->response['exectime']);
+        return $this->print_response($this->response);
+    }
+    
+    public function print_debug_log($msg = '') {
+        if($this->debug_log == true){
+            if(file_exists(dirname(__FILE__).'/install_log.txt')) {
+                file_put_contents(
+                    dirname(__FILE__).'/install_log.txt',
+                    'DEBUG LOG >> ' .$msg.PHP_EOL ,
+                    FILE_APPEND | LOCK_EX
                     );
-                }
-                elseif(file_exists(dirname(__FILE__).'/../rvsitebuilder_install_log.txt')){
-                    file_put_contents(
-                        dirname(__FILE__).'/../rvsitebuilder_install_log.txt',
-                        'DEBUG LOG >> ' .$msg.PHP_EOL ,
-                        FILE_APPEND | LOCK_EX
-                    );
-                }
             }
-            return true;
-        }
-        
-        public function print_install_log($msg = '') {
-            if($this->install_log == true){
-                if(file_exists(dirname(__FILE__).'/install_log.txt')) {
-                    file_put_contents(
-                        dirname(__FILE__).'/install_log.txt',
-                        'INSTALL LOG >> ' .$msg.PHP_EOL ,
-                        FILE_APPEND | LOCK_EX
+            elseif(file_exists(dirname(__FILE__).'/../rvsitebuilder_install_log.txt')){
+                file_put_contents(
+                    dirname(__FILE__).'/../rvsitebuilder_install_log.txt',
+                    'DEBUG LOG >> ' .$msg.PHP_EOL ,
+                    FILE_APPEND | LOCK_EX
                     );
-                }
-                elseif(file_exists(dirname(__FILE__).'/../rvsitebuilder_install_log.txt')){
-                    file_put_contents(
-                        dirname(__FILE__).'/../rvsitebuilder_install_log.txt',
-                        'INSTALL LOG >> ' .$msg.PHP_EOL ,
-                        FILE_APPEND | LOCK_EX
-                    );
-                }
             }
-            return true;
         }
-        
+        return true;
+    }
+    
+    public function print_install_log($msg = '') {
+        if($this->install_log == true){
+            if(file_exists(dirname(__FILE__).'/install_log.txt')) {
+                file_put_contents(
+                    dirname(__FILE__).'/install_log.txt',
+                    'INSTALL LOG >> ' .$msg.PHP_EOL ,
+                    FILE_APPEND | LOCK_EX
+                    );
+            }
+            elseif(file_exists(dirname(__FILE__).'/../rvsitebuilder_install_log.txt')){
+                file_put_contents(
+                    dirname(__FILE__).'/../rvsitebuilder_install_log.txt',
+                    'INSTALL LOG >> ' .$msg.PHP_EOL ,
+                    FILE_APPEND | LOCK_EX
+                    );
+            }
+        }
+        return true;
+    }
+    
 }
 
 
