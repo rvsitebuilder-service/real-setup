@@ -38,7 +38,7 @@ $artisancmd     = '';
 $artisanparam   = '{}';
 $devtokenkey    = '';
 $additionalpkg  = '';
-$welcomeemailtype = 'end-user';
+$welcomeemailtype = 'default';
 
 //get
 if (isset($_GET['action']))         $action         = $_GET['action'];
