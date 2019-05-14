@@ -38,6 +38,7 @@ $artisancmd     = '';
 $artisanparam   = '{}';
 $devtokenkey    = '';
 $additionalpkg  = '';
+$welcomeemailtype = 'end-user';
 
 //get
 if (isset($_GET['action']))         $action         = $_GET['action'];
@@ -62,6 +63,7 @@ if (isset($_GET['artisancmd']))     $artisancmd     = $_GET['artisancmd'];
 if (isset($_GET['artisanparam']))   $artisanparam   = $_GET['artisanparam'];
 if (isset($_GET['devtokenkey']))    $devtokenkey    = $_GET['devtokenkey'];
 if (isset($_GET['additionalpkg']))  $additionalpkg  = $_GET['additionalpkg'];
+if (isset($_GET['welcomeemailtype']))  $welcomeemailtype  = $_GET['welcomeemailtype'];
 
 //post
 if (isset($_POST['action']))         $action         = $_POST['action'];
@@ -87,6 +89,7 @@ if (isset($_POST['artisanparam']))   $artisanparam   = $_POST['artisanparam'];
 if (isset($_POST['argvalue']))       $argvalue       = $_POST['argvalue'];
 if (isset($_POST['devtokenkey']))    $devtokenkey    = $_POST['devtokenkey'];
 if (isset($_POST['additionalpkg']))  $additionalpkg  = $_POST['additionalpkg'];
+if (isset($_POST['welcomeemailtype']))  $welcomeemailtype  = $_POST['welcomeemailtype'];
 
 
 $setupObj = new RVsitebuilder_Setup_API($responsetype,$rvsb_installing_token,$responsetype,$ignore_token,$rvlicensecode);
@@ -109,7 +112,7 @@ if($action == 'download_vendor'){
 }
 
 if($action == 'setup_env'){
-    $setupObj->setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname,$ftpserver,$ftpport,$domainport,$devtokenkey);
+    $setupObj->setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname,$ftpserver,$ftpport,$domainport,$devtokenkey,$welcomeemailtype);
 }
 
 if($action == 'download_common_pkg'){
@@ -602,7 +605,7 @@ class RVsitebuilder_Setup_API {
     }
     
     
-    public function setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname,$ftpserver,$ftpport,$domainport,$devtokenkey) {
+    public function setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname,$ftpserver,$ftpport,$domainport,$devtokenkey,$welcomeemailtype) {
         $time_start = microtime(true);
         $this->print_debug_log('======'.__METHOD__.'======');
         
@@ -627,6 +630,7 @@ class RVsitebuilder_Setup_API {
         $env_data['DOCUMENT_ROOT'] = $publicpath;
         $env_data['RV_MIRROR']  = $this->mirror;
         $env_data['DEVELOPER_TOKEN_KEY']  = $devtokenkey;
+        $env_data['WELCOME_EMAIL_TYPE']  = $welcomeemailtype;
         
         
         $this->print_debug_log("ENV data ".json_encode($env_data));
@@ -805,6 +809,12 @@ class RVsitebuilder_Setup_API {
         $this->print_debug_log($kernel->output());
         $unit_exec_time = (microtime(true) - $unit_time_start);
         $this->print_install_log('artisan db:seed --force timeusage '.$unit_exec_time);
+        
+        $unit_time_start = microtime(true);
+        $kernel->call('rvsitebuilder:notifynewinstall', []);
+        $this->print_debug_log($kernel->output());
+        $unit_exec_time = (microtime(true) - $unit_time_start);
+        $this->print_install_log('rvsitebuilder:notifynewinstall timeusage'.$unit_exec_time);
         
         //user secret key
         $unit_time_start = microtime(true);
