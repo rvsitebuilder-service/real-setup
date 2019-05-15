@@ -897,7 +897,7 @@
                                 $('#exectime').text(parseFloat($('#exectime').text()) + parseFloat((typeof data.exectime == 'undefined') ? 0 : data.exectime));
                                 
                                 
-                                param = {'action':'download_framework' };
+                                param = {'action':'download_framework' ,'homeuser':$('#homepath').val(),'domainname': window.location.hostname, 'publicpath': $('#publicpath').val()};
                                 doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
                                     console.log(data);
                                     if (data === null  || typeof data.status === "undefined" || data.status == false){
@@ -911,7 +911,7 @@
                                         $('#exectime').text(parseFloat($('#exectime').text()) + parseFloat((typeof data.exectime == 'undefined') ? 0 : data.exectime));
                                         
                                         
-                                        param = {'action':'download_vendor' };
+                                        param = {'action':'download_vendor','homeuser':$('#homepath').val(),'domainname': window.location.hostname};
                                         doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
                                             console.log(data);
                                             if (data === null  || typeof data.status === "undefined" || data.status == false){
@@ -954,7 +954,7 @@
                                                         $('#exectime').text(parseFloat($('#exectime').text()) + parseFloat((typeof data.exectime == 'undefined') ? 0 : data.exectime));
                                                         
                                                         
-                                                        param = {'action':'download_common_pkg'};
+                                                        param = {'action':'download_common_pkg','homeuser':$('#homepath').val(),'domainname': window.location.hostname};
                                                         doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
                                                             console.log(data);
                                                             if (data === null  || typeof data.status === "undefined" || data.status == false){

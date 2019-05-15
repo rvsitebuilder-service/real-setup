@@ -104,11 +104,11 @@ if($action == 'pre_check_php'){
 }
 
 if($action == 'download_framework'){
-    $setupObj->download_framework();
+    $setupObj->download_framework($homeuser,$domainname,$publicpath);
 }
 
 if($action == 'download_vendor'){
-    $setupObj->download_vendor();
+    $setupObj->download_vendor($homeuser,$domainname);
 }
 
 if($action == 'setup_env'){
@@ -116,7 +116,7 @@ if($action == 'setup_env'){
 }
 
 if($action == 'download_common_pkg'){
-    $setupObj->download_common_pkg($additionalpkg);
+    $setupObj->download_common_pkg($homeuser,$domainname,$additionalpkg);
 }
 
 if($action == 'install_all_pkg' && $homeuser != '' && $domainname != '' && $publicpath != ''){
@@ -458,11 +458,19 @@ class RVsitebuilder_Setup_API {
         
     }
     
-    public function download_framework() {
+    public function download_framework($homeuser,$domainname,$publicpath) {
         $time_start = microtime(true);
         $this->print_debug_log('======'.__METHOD__.'======');
         
-        //download framework
+        $files =  new Filesystem();
+        
+        //remove first if /home/<user>/rvsitebuildercms/$domainname
+        if(file_exists($homeuser.'/rvsitebuildercms/'.$domainname)) {
+            $files->remove($homeuser.'/rvsitebuildercms/'.$domainname);
+            $this->print_debug_log("Removed old framwork path ".$homeuser.'/rvsitebuildercms/'.$domainname);
+        }
+        
+        //download framework url
         $downloadurl =  $this->mirror.'/download/rvsitebuilder/framework';
         if(isset($this->installerconfig['framework']['getversion']) && $this->installerconfig['framework']['getversion'] == 'latest')
         { $downloadurl = $this->mirror.'/download/rvsitebuilder/framework/tier/latest'; }
@@ -471,6 +479,7 @@ class RVsitebuilder_Setup_API {
         
         $this->print_debug_log("Download Framework URL ".$downloadurl);
         
+        //download framework
         $downloadframework = $this->doDownload('GET' , $downloadurl , dirname(__FILE__).'/framework.tar.gz');
         if($downloadframework['success'] == false){
             $this->response['message'] = 'Can not download framework '.$downloadframework['message'];
@@ -479,9 +488,13 @@ class RVsitebuilder_Setup_API {
             $this->print_debug_log("Download Framework  Failed ".$downloadframework['message']);
             return $this->print_response($this->response);
         }
+        
         //extract framework
-        $extractframework = $this->doExtract(dirname(__FILE__).'/framework.tar.gz',dirname(__FILE__).'/tmp/');
+        $extractframework = $this->doExtract(dirname(__FILE__).'/framework.tar.gz',$homeuser.'/rvsitebuildercms/'.$domainname.'/');
         if($extractframework['success'] == false) {
+            if(file_exists(dirname(__FILE__).'/framework.tar.gz')){
+                $files->remove(dirname(__FILE__).'/framework.tar.gz');
+            }
             $this->response['message'] = 'Can not extract framework.tar.gz '.$extractframework['message'];
             $this->response['exectime'] = (microtime(true) - $time_start);
             $this->print_install_log(__METHOD__.' status FALSE (Extract Framework Failed) '.$extractframework['message'].' timeusage '.$this->response['exectime']);
@@ -489,11 +502,22 @@ class RVsitebuilder_Setup_API {
             return $this->print_response($this->response);
         }
         
+        //copy framework/public to public path
+        $source = $homeuser.'/rvsitebuildercms/'.$domainname.'/public';
+        $destination = $publicpath;
+        $copy = $files->mirror($source, $destination,null,['override' => true]);
+        $this->print_debug_log("Copy $source To $destination");
+        
         //delete appsconfig.json
-        $files = new Filesystem();
-        if(file_exists(dirname(__FILE__).'/tmp/storage/appsconfig.json')){
-            $files->remove(dirname(__FILE__).'/tmp/storage/appsconfig.json');
-            $this->print_debug_log("Removed ".dirname(__FILE__).'/tmp/storage/appsconfig.json');
+        if($files->exists($homeuser.'/rvsitebuildercms/'.$domainname.'/storage/appsconfig.json')){
+            $files->remove($homeuser.'/rvsitebuildercms/'.$domainname.'/storage/appsconfig.json');
+            $this->print_debug_log("Removed ".$homeuser.'/rvsitebuildercms/'.$domainname.'/storage/appsconfig.json');
+        }
+        
+        //delete framwork package
+        if($files->exists(dirname(__FILE__).'/framework.tar.gz')){
+            $files->remove(dirname(__FILE__).'/framework.tar.gz');
+            $this->print_debug_log("Removed ".dirname(__FILE__).'/framework.tar.gz');
         }
         
         $this->response['exectime'] = (microtime(true) - $time_start);
@@ -503,24 +527,24 @@ class RVsitebuilder_Setup_API {
         return $this->print_response($this->response);
     }
     
-    public function download_vendor() {
+    public function download_vendor($homeuser,$domainname) {
         $time_start = microtime(true);
         $this->print_debug_log('======'.__METHOD__.'======');
         
         $files = new Filesystem();
         
         //check rvsitebuilder.json
-        if(! file_exists(dirname(__FILE__).'/tmp/rvsitebuilder.json')){
+        if(! $files->exists($homeuser.'/rvsitebuildercms/'.$domainname.'/rvsitebuilder.json')){
             $this->response['message'] = 'Can not open file rvsitebuilder.json';
             $this->response['exectime'] = (microtime(true) - $time_start);
-            $this->print_install_log(__METHOD__.' status FALSE'."Not found ".dirname(__FILE__).'/tmp/rvsitebuilder.json'.' timeusage '.$this->response['exectime']);
+            $this->print_install_log(__METHOD__.' status FALSE'."Not found ".$homeuser.'/rvsitebuildercms/'.$domainname.'/rvsitebuilder.json'.' timeusage '.$this->response['exectime']);
             return $this->print_response($this->response);
         }
         
         //read rvsitebuilder.json
-        $rvsbjson = json_decode(file_get_contents(dirname(__FILE__).'/tmp/rvsitebuilder.json'), true);
+        $rvsbjson = json_decode(file_get_contents($homeuser.'/rvsitebuildercms/'.$domainname.'/rvsitebuilder.json'), true);
         
-        //first download from key vendor-packages (bundle_vendor) if key exists
+        // first download from key vendor-packages (bundle_vendor) if key exists
         // link download = http://files.mirror1.rvsitebuilder.com/download/rvsitebuilder/framework%2Fbundle_vendor/version/0.0.8
         // vendor-packages = rvsitebuilder\/framework\/bundle_vendor
         if(isset($rvsbjson['vendor-packages']) && key($rvsbjson['vendor-packages']) != ''){
@@ -533,19 +557,31 @@ class RVsitebuilder_Setup_API {
             $this->print_debug_log("Vendor URL download ".$downloadvendorurl);
             $downloadvendor = $this->doDownload('GET' , $downloadvendorurl , dirname(__FILE__).'/bundle_vendor.tar.gz');
             if($downloadvendor['success'] == false) {
+                if($files->exists(dirname(__FILE__).'/bundle_vendor.tar.gz')) {
+                    $files->remove(dirname(__FILE__).'/bundle_vendor.tar.gz');
+                }
                 $this->response['message'] = 'Can not download vendor '.$downloadvendor['message'];
                 $this->response['exectime'] = (microtime(true) - $time_start);
                 $this->print_install_log(__METHOD__.' status FALSE (Can not download vendor) '.$downloadvendor['message'].' '.$downloadvendorurl.' timeusage '.$this->response['exectime']);
                 $this->print_debug_log("Can not download ".$downloadvendorurl.' '.$downloadvendor['message']);
                 return $this->print_response($this->response);
             }
-            $extractvendor = $this->doExtract(dirname(__FILE__).'/bundle_vendor.tar.gz',dirname(__FILE__).'/tmp/vendor/');
+            $extractvendor = $this->doExtract(dirname(__FILE__).'/bundle_vendor.tar.gz',$homeuser.'/rvsitebuildercms/'.$domainname.'/');
             if($extractvendor['success'] == false) {
-                $this->response['message'] = 'Can not extract vendor.tar.gz '.$extractvendor['message'];
+                if($files->exists(dirname(__FILE__).'/bundle_vendor.tar.gz')) {
+                    $files->remove(dirname(__FILE__).'/bundle_vendor.tar.gz');
+                }
+                $this->response['message'] = 'Can not extract bundle_vendor.tar.gz '.$extractvendor['message'];
                 $this->response['exectime'] = (microtime(true) - $time_start);
-                $this->print_install_log(__METHOD__.' status FALSE (Can not extract vendor.tar.gz) '.$extractvendor['message'].' timeusage '.$this->response['exectime']);
-                $this->print_debug_log("Can not extract ".dirname(__FILE__).'/bundle_vendor.tar.gz');
+                $this->print_install_log(__METHOD__.' status FALSE (Can not extract bundle_vendor.tar.gz) '.$extractvendor['message'].' timeusage '.$this->response['exectime']);
+                $this->print_debug_log("Can not extract ".$homeuser.'/rvsitebuildercms/'.$domainname.'/bundle_vendor.tar.gz');
                 return $this->print_response($this->response);
+            }
+            
+            //remove bundle_vendor.tar.gz
+            if($files->exists(dirname(__FILE__).'/bundle_vendor.tar.gz')) {
+                $files->remove(dirname(__FILE__).'/bundle_vendor.tar.gz');
+                $this->print_debug_log("Removed ".dirname(__FILE__).'/bundle_vendor.tar.gz');
             }
         }
         
@@ -566,41 +602,40 @@ class RVsitebuilder_Setup_API {
                 $this->print_debug_log("Package URL Download ".$downloadvendorurl);
                 $downloadvendor = $this->doDownload('GET' , $downloadvendorurl , dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
                 if($downloadvendor['success'] == false) {
+                    if($files->exists(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz')) {
+                        $files->remove(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
+                    }
                     $this->response['message'] = 'Can not download vendor '.$downloadvendorurl.' '.$downloadvendor['message'];
                     $this->response['exectime'] = (microtime(true) - $time_start);
                     $this->print_install_log(__METHOD__.' status FALSE (Can not download vendor) '.$downloadvendor['message'].' '.$downloadvendorurl.' timeusage '.$this->response['exectime']);
                     $this->print_debug_log("Can not download ".$downloadvendorurl.' '.$downloadvendor['message']);
                     return $this->print_response($this->response);
                 }
-                $extractvendor = $this->doExtract(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz',dirname(__FILE__).'/tmp/vendor/');
+                $extractvendor = $this->doExtract(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz',$homeuser.'/rvsitebuildercms/'.$domainname.'/vendor/');
                 if($extractvendor['success'] == false) {
+                    if($files->exists(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz')) {
+                        $files->remove(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
+                    }
                     $this->response['message'] = 'Can not extract vendor '.$package_name_encoded.' '.$extractvendor['message'];
                     $this->response['exectime'] = (microtime(true) - $time_start);
                     $this->print_install_log(__METHOD__.' status FALSE (Can not extract vendor) '.$package_name_encoded.' '.$extractvendor['message'].' timeusage '.$this->response['exectime']);
                     $this->print_debug_log("Can not extract ".dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz '.$extractvendor['message']);
                     return $this->print_response($this->response);
                 }
-                $files->remove(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
+                
+                if($files->exists(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz')) {
+                    $$files->remove(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
+                    $this->print_debug_log("Removed ".dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
+                }
             }
             
         }
-        
-        
-        
-        //move vendor package to vendor path
-        $source = dirname(__FILE__).'/tmp/vendor/vendor';
-        $destination = dirname(__FILE__).'/tmp/vendor';
-        $copy = $files->mirror($source, $destination);
-        $remove = $files->remove($source);
-        $this->print_debug_log("Moved vendor from $source to $destination");
-        
-        
+     
         $this->response['status'] = true;
         $this->response['message'] = 'Download Vendor Success';
         $this->response['exectime'] = (microtime(true) - $time_start);
         $this->print_install_log(__METHOD__.' status TRUE'.' timeusage '.$this->response['exectime']);
         return $this->print_response($this->response);
-        
         
     }
     
@@ -635,7 +670,7 @@ class RVsitebuilder_Setup_API {
         
         $this->print_debug_log("ENV data ".json_encode($env_data));
         
-        $setupenv = $this->setEnv(dirname(__FILE__).'/tmp/env.example',$env_data,true);
+        $setupenv = $this->setEnv($homeuser.'/rvsitebuildercms/'.$domainname.'/env.example',$env_data,true);
         
         if($setupenv) {
             $this->response['status'] = true;
@@ -652,7 +687,7 @@ class RVsitebuilder_Setup_API {
     }
     
     
-    public function download_common_pkg($additionalpkg) {
+    public function download_common_pkg($homeuser,$domainname,$additionalpkg) {
         $time_start = microtime(true);
         $this->print_debug_log('======'.__METHOD__.'======');
         
@@ -691,15 +726,22 @@ class RVsitebuilder_Setup_API {
             //download package
             $downloadpkg = $this->doDownload('GET' , $downloadurl , dirname(__FILE__).'/'.$pkg.'.tar.gz');
             if($downloadpkg['success'] == false){
+                if($files->exists(dirname(__FILE__).'/'.$pkg.'.tar.gz')) {
+                    $files->remove(dirname(__FILE__).'/'.$pkg.'.tar.gz');
+                }
                 $this->response['message'] = 'Can not download package '.$pkg.' '.$downloadpkg['message'];
                 $this->response['exectime'] = (microtime(true) - $time_start);
                 $this->print_install_log(__METHOD__.' status FALSE (Can not download package) '.$pkg.' '.$downloadpkg['message'].' timeusage '.$this->response['exectime']);
                 $this->print_debug_log("Can not download package ".$pkg.' '.$downloadpkg['message']);
                 return $this->print_response($this->response);
             }
+            
             //extract package
-            $extractpkg = $this->doExtract(dirname(__FILE__).'/'.$pkg.'.tar.gz',dirname(__FILE__).'/tmp/packages/');
+            $extractpkg = $this->doExtract(dirname(__FILE__).'/'.$pkg.'.tar.gz' , $homeuser.'/rvsitebuildercms/'.$domainname.'/packages/');
             if($extractpkg['success'] == false) {
+                if($files->exists(dirname(__FILE__).'/'.$pkg.'.tar.gz')) {
+                    $files->remove(dirname(__FILE__).'/'.$pkg.'.tar.gz');
+                }
                 $this->response['message'] = 'Can not extract package '.$pkg.' '.$extractpkg['message'];
                 $this->response['exectime'] = (microtime(true) - $time_start);
                 $this->print_install_log(__METHOD__.' status FALSE (Can not extract package) '.$pkg.' '.$extractpkg['message'].' timeusage '.$this->response['exectime']);
@@ -707,7 +749,8 @@ class RVsitebuilder_Setup_API {
                 return $this->print_response($this->response);
             }
             
-            $rvsbjson = json_decode(file_get_contents(dirname(__FILE__).'/tmp/packages/rvsitebuilder/'.$pkg.'/rvsitebuilder.json'), true);
+            $rvsbjson = json_decode(file_get_contents($homeuser.'/rvsitebuildercms/'.$domainname.'/packages/rvsitebuilder/'.$pkg.'/rvsitebuilder.json'), true);
+            
             foreach($rvsbjson['packages'] as $package_key => $value){
                 $update_package_name = $rvsbjson['packages'][$package_key]['name'];
                 $update_package_version = isset($rvsbjson['packages'][$package_key]['version']) ? $rvsbjson['packages'][$package_key]['version'] : '';
@@ -715,8 +758,8 @@ class RVsitebuilder_Setup_API {
                 $app_name = urldecode($app_name);
                 $package_name_encoded = urlencode($app_name);
                 
-                if(is_dir(dirname(__FILE__).'/tmp/' . $product_name . '/' . $app_name)){
-                    $this->print_debug_log("Is DIR ".dirname(__FILE__).'/tmp/' . $product_name . '/' . $app_name." continue ");
+                if(is_dir($homeuser.'/rvsitebuildercms/'.$domainname.'/'.$product_name .'/'.$app_name)){
+                    $this->print_debug_log("Is DIR ".$homeuser.'/rvsitebuildercms/'.$domainname.'/'.$product_name .'/'.$app_name." continue ");
                     continue;
                 }
                 
@@ -730,24 +773,33 @@ class RVsitebuilder_Setup_API {
                 
                 $downloadvendor = $this->doDownload('GET' , $downloadvendorurl , dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
                 if($downloadvendor['success'] == false) {
+                    if($files->exists(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz')) {
+                        $files->remove(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
+                    }
                     $this->response['message'] = 'Can not download vendor '.$downloadvendorurl.' '.$downloadvendor['message'];
                     $this->response['exectime'] = (microtime(true) - $time_start);
                     $this->print_install_log(__METHOD__.' status FALSE (Can not download vendor) '.$downloadvendorurl.' '.$downloadvendor['message'].' timeusage '.$this->response['exectime']);
                     $this->print_debug_log("Can not download vendor URL ".$downloadvendorurl.' '.$downloadvendor['message']);
                     return $this->print_response($this->response);
                 }
-                $extractvendor = $this->doExtract(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz',dirname(__FILE__).'/tmp/');
+                $extractvendor = $this->doExtract(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz' , $homeuser.'/rvsitebuildercms/'.$domainname.'/');
                 if($extractvendor['success'] == false) {
+                    if($files->exists(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz')) {
+                        $files->remove(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
+                    }
                     $this->response['message'] = 'Can not extract vendor '.$package_name_encoded.' '.$extractvendor['message'];
                     $this->response['exectime'] = (microtime(true) - $time_start);
                     $this->print_install_log(__METHOD__.' status FALSE (Can not extract vendor) '.$package_name_encoded.' '.$extractvendor['message'].' timeusage '.$this->response['exectime']);
                     $this->print_debug_log("Can not extract ".dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz '.$extractvendor['message']);
                     return $this->print_response($this->response);
                 }
-                $this->print_debug_log("Removed ".dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
+                
                 $files->remove(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
+                $this->print_debug_log("Removed ".dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
             }
+            
             $files->remove(dirname(__FILE__).'/'.$pkg.'.tar.gz');
+            $this->print_debug_log("Removed ".dirname(__FILE__).'/'.$pkg.'.tar.gz');
         }
         
         $this->response['status'] = true;
@@ -810,6 +862,12 @@ class RVsitebuilder_Setup_API {
         $unit_exec_time = (microtime(true) - $unit_time_start);
         $this->print_install_log('artisan db:seed --force timeusage '.$unit_exec_time);
         
+        $unit_time_start = microtime(true);
+        $kernel->call('rvsitebuilder:notifynewinstall', []);
+        $this->print_debug_log($kernel->output());
+        $unit_exec_time = (microtime(true) - $unit_time_start);
+        $this->print_install_log('rvsitebuilder:notifynewinstall timeusage'.$unit_exec_time);
+        
         //user secret key
         $unit_time_start = microtime(true);
         $kernel->call('rvsitebuilder:updateenduserdb-run', ['dbkey'=>'secretkey','dbvalue'=>$this->generateSecretKey()]);
@@ -824,48 +882,6 @@ class RVsitebuilder_Setup_API {
         $unit_exec_time = (microtime(true) - $unit_time_start);
         $this->print_install_log('artisan vendor:publish timeusage '.$unit_exec_time);
         
-        //update user admin information
-        if($adminemail != '') {
-            $this->print_debug_log("Update user info to DB adminemail=$adminemail");
-            $unit_time_start = microtime(true);
-            $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'email', 'update_val' => $adminemail]);
-            $this->print_debug_log($kernel->output());
-            $unit_exec_time = (microtime(true) - $unit_time_start);
-            $this->print_install_log('artisan rvsitebuilder:updateuserinfo-run timeusage '.$unit_exec_time);
-        }
-        if($adminpassword != '') {
-            $this->print_debug_log("Update user info to DB adminpassword=$adminpassword");
-            $unit_time_start = microtime(true);
-            $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'password', 'update_val' => $adminpassword]);
-            $this->print_debug_log($kernel->output());
-            $unit_exec_time = (microtime(true) - $unit_time_start);
-            $this->print_install_log('artisan rvsitebuilder:updateuserinfo-run timeusage '.$unit_exec_time);
-        }
-        if($adminfirstname != '') {
-            $this->print_debug_log("Update user info to DB adminfirstname=$adminfirstname");
-            $unit_time_start = microtime(true);
-            $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'first_name', 'update_val' => $adminfirstname]);
-            $this->print_debug_log($kernel->output());
-            $unit_exec_time = (microtime(true) - $unit_time_start);
-            $this->print_install_log('artisan rvsitebuilder:updateuserinfo-run timeusage '.$unit_exec_time);
-        }
-        if($adminlastname != '') {
-            $this->print_debug_log("Update user info to DB adminlastname=$adminlastname");
-            $unit_time_start = microtime(true);
-            $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'last_name', 'update_val' => $adminlastname]);
-            $this->print_debug_log($kernel->output());
-            $unit_exec_time = (microtime(true) - $unit_time_start);
-            $this->print_install_log('artisan rvsitebuilder:updateuserinfo-run timeusage '.$unit_exec_time);
-        }
-        
-        
-        //email notify to admin $unit_time_start = microtime(true);
-        $kernel->call('rvsitebuilder:notifynewinstall', []);
-        $this->print_debug_log($kernel->output());
-        $unit_exec_time = (microtime(true) - $unit_time_start);
-        $this->print_install_log('rvsitebuilder:notifynewinstall timeusage'.$unit_exec_time);
-        
-        
         //clear cache
         $unit_time_start = microtime(true);
         $kernel->call('cache:clear', []);
@@ -879,6 +895,21 @@ class RVsitebuilder_Setup_API {
         $unit_exec_time = (microtime(true) - $unit_time_start);
         $this->print_install_log('artisan config:clear timeusage '.$unit_exec_time);
         
+        //update admin info from wizard request
+        if($adminemail != '' && $adminpassword != '') {
+            $this->print_debug_log("Update user info to DB adminemail=$adminemail adminpassword=$adminpassword adminfirstname=$adminfirstname adminlastname=$adminlastname");
+            $unit_time_start = microtime(true);
+            $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'email', 'update_val' => $adminemail]);
+            $this->print_debug_log($kernel->output());
+            $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'password', 'update_val' => $adminpassword]);
+            $this->print_debug_log($kernel->output());
+            $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'first_name', 'update_val' => $adminfirstname]);
+            $this->print_debug_log($kernel->output());
+            $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'last_name', 'update_val' => $adminlastname]);
+            $this->print_debug_log($kernel->output());
+            $unit_exec_time = (microtime(true) - $unit_time_start);
+            $this->print_install_log('artisan rvsitebuilder:updateuserinfo-run timeusage '.$unit_exec_time);
+        }
         
         /*
          $unit_time_start = microtime(true);
@@ -1147,10 +1178,6 @@ class RVsitebuilder_Setup_API {
         $this->print_debug_log('======'.__METHOD__.'======');
         
         
-        $src_dir = $publicpath.'/rvsitebuilder/tmp';
-        $ftp_remote_dir = '/rvsitebuildercms/'.$domainname;
-        $this->print_debug_log("Copy FTP $src_dir To $ftp_remote_dir");
-        
         $ftpHandler = new FTP_Handler();
         $result = $ftpHandler->connect($ftpserver);
         if(!$result['success']){
@@ -1180,15 +1207,17 @@ class RVsitebuilder_Setup_API {
         }
         
         #copy file to framework path
-        $ftpHandler->ftp_copy($src_dir, $ftp_remote_dir);
-        $this->print_debug_log("FTP copy framework $src_dir To $ftp_remote_dir");
+//         $src_dir = $publicpath.'/rvsitebuilder/tmp';
+//         $ftp_remote_dir = '/rvsitebuildercms/'.$domainname;
+//         $ftpHandler->ftp_copy($src_dir, $ftp_remote_dir);
+//         $this->print_debug_log("FTP copy framework $src_dir To $ftp_remote_dir");
         
         #copy file to public path
-        $src_dir = $homeuser.'/rvsitebuildercms/'.$domainname.'/public';
-        $exploded = explode('/',$publicpath);
-        $public_html = '/'.end($exploded);
-        $ftpHandler->ftp_copy($src_dir, $public_html , ['.htaccess']);
-        $this->print_debug_log("FTP copy public $src_dir To $public_html");
+//         $src_dir = $homeuser.'/rvsitebuildercms/'.$domainname.'/public';
+//         $exploded = explode('/',$publicpath);
+//         $public_html = '/'.end($exploded);
+//         $ftpHandler->ftp_copy($src_dir, $public_html , ['.htaccess']);
+//         $this->print_debug_log("FTP copy public $src_dir To $public_html");
         
         //write .htaccess to domain'docroot
         $frameworkhtaccess = '';
@@ -1263,36 +1292,36 @@ class RVsitebuilder_Setup_API {
         $files =  new Filesystem();
         
         //remove first if /home/<user>/rvsitebuildercms/$domainname
-        if(file_exists($homeuser.'/rvsitebuildercms/'.$domainname)) {
-            $files->remove($homeuser.'/rvsitebuildercms/'.$domainname);
-            $this->print_debug_log("Removed old framwork path ".$homeuser.'/rvsitebuildercms/'.$domainname);
-        }
+//         if($files->exists($homeuser.'/rvsitebuildercms/'.$domainname)) {
+//             $files->remove($homeuser.'/rvsitebuildercms/'.$domainname);
+//             $this->print_debug_log("Removed old framwork path ".$homeuser.'/rvsitebuildercms/'.$domainname);
+//         }
         
         
         //move temp to freamwork path
-        $source = dirname(__FILE__).'/tmp';
-        $destination = $homeuser.'/rvsitebuildercms/'.$domainname ;
-        $moved = $files->rename($source , $destination ,true);
-        $this->print_debug_log("Moved $source To $destination");
+//         $source = dirname(__FILE__).'/tmp';
+//         $destination = $homeuser.'/rvsitebuildercms/'.$domainname ;
+//         $moved = $files->rename($source , $destination ,true);
+//         $this->print_debug_log("Moved $source To $destination");
         
         
         //old htaccess
         $oldhtaccess = '';
-        if (file_exists($publicpath.'/.htaccess')) {
+        if ($files->exists($publicpath.'/.htaccess')) {
             $oldhtaccess = file_get_contents($publicpath.'/.htaccess');
             $this->print_debug_log("Has Old .htaccess $publicpath/.htaccess");
         }
         
-        //copy framework/public to public path
-        $source = $homeuser.'/rvsitebuildercms/'.$domainname.'/public';
-        $destination = $publicpath;
-        $copy = $files->mirror($source, $destination,null,['override' => true]);
-        $this->print_debug_log("Copy $source To $destination");
+//         //copy framework/public to public path
+//         $source = $homeuser.'/rvsitebuildercms/'.$domainname.'/public';
+//         $destination = $publicpath;
+//         $copy = $files->mirror($source, $destination,null,['override' => true]);
+//         $this->print_debug_log("Copy $source To $destination");
         
         
         //write new .htaccess to docroot
         $frameworkhtaccess = '';
-        if (file_exists($homeuser.'/rvsitebuildercms/'.$domainname.'/public/.htaccess')) {
+        if ($files->exists($homeuser.'/rvsitebuildercms/'.$domainname.'/public/.htaccess')) {
             $frameworkhtaccess = file_get_contents($homeuser.'/rvsitebuildercms/'.$domainname.'/public/.htaccess');
             $frameworkhtaccess = "#Start Rvsitebuilder7 htaccess\n".
                 $frameworkhtaccess."\n".
