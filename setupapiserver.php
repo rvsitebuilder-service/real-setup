@@ -104,15 +104,15 @@ if($action == 'pre_check_php'){
 }
 
 if($action == 'download_framework'){
-    $setupObj->download_framework($homeuser,$domainname,$publicpath);
+    $setupObj->download_framework($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport);
 }
 
 if($action == 'download_vendor'){
-    $setupObj->download_vendor($homeuser,$domainname);
+    $setupObj->download_vendor($homeuser,$domainname,$ftpaccount,$ftppassword,$ftpserver,$ftpport);
 }
 
 if($action == 'setup_env'){
-    $setupObj->setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname,$ftpserver,$ftpport,$domainport,$devtokenkey,$welcomeemailtype);
+    $setupObj->setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname,$ftpserver,$ftpport,$domainport,$devtokenkey,$welcomeemailtype,$homeuser);
 }
 
 if($action == 'download_common_pkg'){
@@ -440,6 +440,16 @@ class RVsitebuilder_Setup_API {
             $this->print_debug_log("PHP parse_ini_file false");
         }
         
+        // proc_open
+        $this->response['check_pre_require']['proc_open']['check'] = true;
+        if(! function_exists('proc_open')){
+            $this->response['check_pre_require']['proc_open']['check'] = false;
+            $this->response['check_pre_require']['proc_open']['reason'] = 'Can not load PHP Function (proc_open)';
+            $this->response['message'] = $this->response['message'].' / Can not load PHP Function (proc_open)';
+            $this->response['status'] = false;
+            $this->print_debug_log("PHP parse_ini_file false");
+        }
+        
         //http as user
         $this->response['httpasuser'] = $this->httpasuser;
         
@@ -458,9 +468,32 @@ class RVsitebuilder_Setup_API {
         
     }
     
-    public function download_framework($homeuser,$domainname,$publicpath) {
+    public function download_framework($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport) {
         $time_start = microtime(true);
         $this->print_debug_log('======'.__METHOD__.'======');
+        
+        
+        if($this->httpasuser) {
+            $res = $this->download_framework_httpasuser($homeuser,$domainname,$publicpath);
+        } else {
+            $res = $this->download_framework_no_httpasuser($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport);
+        }
+        
+        $this->response['exectime'] = (microtime(true) - $time_start);
+        $this->response['status'] = $res['status'];
+        $this->response['message'] = $res['message'];
+        $this->print_install_log(__METHOD__.' status: '.$this->response['status'].' message: '.$this->response['message'].' timeusage: '.$this->response['exectime']);
+        return $this->print_response($this->response);
+       
+    }
+    
+    public function download_framework_httpasuser($homeuser,$domainname,$publicpath) {
+        $this->print_debug_log('======'.__METHOD__.'======');
+        
+        $res = [
+            'status'    => false,
+            'message'   => '',
+        ];
         
         $files =  new Filesystem();
         
@@ -482,11 +515,12 @@ class RVsitebuilder_Setup_API {
         //download framework
         $downloadframework = $this->doDownload('GET' , $downloadurl , dirname(__FILE__).'/framework.tar.gz');
         if($downloadframework['success'] == false){
-            $this->response['message'] = 'Can not download framework '.$downloadframework['message'];
-            $this->response['exectime'] = (microtime(true) - $time_start);
-            $this->print_install_log(__METHOD__.' status FALSE (Download Framework  Failed) '.$downloadframework['message'].' '.$downloadurl.' timeusage '.$this->response['exectime']);
+            if(file_exists(dirname(__FILE__).'/framework.tar.gz')){
+                $files->remove(dirname(__FILE__).'/framework.tar.gz');
+            }
+            $res['message'] = 'Download Framework  Failed '.$downloadframework['message'];
             $this->print_debug_log("Download Framework  Failed ".$downloadframework['message']);
-            return $this->print_response($this->response);
+            return $res;
         }
         
         //extract framework
@@ -495,11 +529,9 @@ class RVsitebuilder_Setup_API {
             if(file_exists(dirname(__FILE__).'/framework.tar.gz')){
                 $files->remove(dirname(__FILE__).'/framework.tar.gz');
             }
-            $this->response['message'] = 'Can not extract framework.tar.gz '.$extractframework['message'];
-            $this->response['exectime'] = (microtime(true) - $time_start);
-            $this->print_install_log(__METHOD__.' status FALSE (Extract Framework Failed) '.$extractframework['message'].' timeusage '.$this->response['exectime']);
+            $res['message'] = 'Extract Framework Failed  '.$extractframework['message'];
             $this->print_debug_log("Extract Framework Failed ".$extractframework['message']);
-            return $this->print_response($this->response);
+            return $res;
         }
         
         //copy framework/public to public path
@@ -520,25 +552,56 @@ class RVsitebuilder_Setup_API {
             $this->print_debug_log("Removed ".dirname(__FILE__).'/framework.tar.gz');
         }
         
-        $this->response['exectime'] = (microtime(true) - $time_start);
-        $this->response['status'] = true;
-        $this->response['message'] = 'Download Framework Success';
-        $this->print_install_log(__METHOD__.' status TRUE'.' timeusage '.$this->response['exectime']);
-        return $this->print_response($this->response);
+        $res['status'] = true;
+        $res['message'] = 'Download Framework Success.';
+        return $res;
+    }
+    
+    public function download_framework_no_httpasuser($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport) {
+        $this->print_debug_log('======'.__METHOD__.'======');
+        
+        //TODO
+        $res = [
+            'status'    => false,
+            'message'   => '',
+        ];
+        
+        $res['status'] = false;
+        $res['message'] = 'Will be supported in the future soon.';
+        return $res;
     }
     
     public function download_vendor($homeuser,$domainname) {
         $time_start = microtime(true);
         $this->print_debug_log('======'.__METHOD__.'======');
         
+        if($this->httpasuser) {
+            $res = $this->download_vendor_httpasuser($homeuser,$domainname,$publicpath);
+        } else {
+            $res = $this->download_vendor_no_httpasuser($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport);
+        }
+        
+        $this->response['exectime'] = (microtime(true) - $time_start);
+        $this->response['status'] = $res['status'];
+        $this->response['message'] = $res['message'];
+        $this->print_install_log(__METHOD__.' status: '.$this->response['status'].' message: '.$this->response['message'].' timeusage: '.$this->response['exectime']);
+        return $this->print_response($this->response);
+    }
+    
+    public function download_vendor_httpasuser($homeuser,$domainname,$publicpath){
+        $this->print_debug_log('======'.__METHOD__.'======');
+        
+        $res = [
+            'status'    => false,
+            'message'   => '',
+        ];
+        
         $files = new Filesystem();
         
         //check rvsitebuilder.json
         if(! $files->exists($homeuser.'/rvsitebuildercms/'.$domainname.'/rvsitebuilder.json')){
-            $this->response['message'] = 'Can not open file rvsitebuilder.json';
-            $this->response['exectime'] = (microtime(true) - $time_start);
-            $this->print_install_log(__METHOD__.' status FALSE'."Not found ".$homeuser.'/rvsitebuildercms/'.$domainname.'/rvsitebuilder.json'.' timeusage '.$this->response['exectime']);
-            return $this->print_response($this->response);
+            $res['message'] = "Not found ".$homeuser.'/rvsitebuildercms/'.$domainname.'/rvsitebuilder.json';
+            return $res;
         }
         
         //read rvsitebuilder.json
@@ -560,22 +623,18 @@ class RVsitebuilder_Setup_API {
                 if($files->exists(dirname(__FILE__).'/bundle_vendor.tar.gz')) {
                     $files->remove(dirname(__FILE__).'/bundle_vendor.tar.gz');
                 }
-                $this->response['message'] = 'Can not download vendor '.$downloadvendor['message'];
-                $this->response['exectime'] = (microtime(true) - $time_start);
-                $this->print_install_log(__METHOD__.' status FALSE (Can not download vendor) '.$downloadvendor['message'].' '.$downloadvendorurl.' timeusage '.$this->response['exectime']);
+                $res['message'] = 'Download vendor Failed'.$downloadvendor['message'];
                 $this->print_debug_log("Can not download ".$downloadvendorurl.' '.$downloadvendor['message']);
-                return $this->print_response($this->response);
+                return $res;
             }
             $extractvendor = $this->doExtract(dirname(__FILE__).'/bundle_vendor.tar.gz',$homeuser.'/rvsitebuildercms/'.$domainname.'/');
             if($extractvendor['success'] == false) {
                 if($files->exists(dirname(__FILE__).'/bundle_vendor.tar.gz')) {
                     $files->remove(dirname(__FILE__).'/bundle_vendor.tar.gz');
                 }
-                $this->response['message'] = 'Can not extract bundle_vendor.tar.gz '.$extractvendor['message'];
-                $this->response['exectime'] = (microtime(true) - $time_start);
-                $this->print_install_log(__METHOD__.' status FALSE (Can not extract bundle_vendor.tar.gz) '.$extractvendor['message'].' timeusage '.$this->response['exectime']);
-                $this->print_debug_log("Can not extract ".$homeuser.'/rvsitebuildercms/'.$domainname.'/bundle_vendor.tar.gz');
-                return $this->print_response($this->response);
+                $res['message'] = 'Extract bundle_vendor.tar.gz Failed '.$extractvendor['message'];
+                $this->print_debug_log("Extract bundle_vendor.tar.gz Failed ".dirname(__FILE__).'/bundle_vendor.tar.gz'.' to '.$homeuser.'/rvsitebuildercms/'.$domainname.'/bundle_vendor.tar.gz '.$extractvendor['message']);
+                return $res;
             }
             
             //remove bundle_vendor.tar.gz
@@ -605,22 +664,18 @@ class RVsitebuilder_Setup_API {
                     if($files->exists(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz')) {
                         $files->remove(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
                     }
-                    $this->response['message'] = 'Can not download vendor '.$downloadvendorurl.' '.$downloadvendor['message'];
-                    $this->response['exectime'] = (microtime(true) - $time_start);
-                    $this->print_install_log(__METHOD__.' status FALSE (Can not download vendor) '.$downloadvendor['message'].' '.$downloadvendorurl.' timeusage '.$this->response['exectime']);
-                    $this->print_debug_log("Can not download ".$downloadvendorurl.' '.$downloadvendor['message']);
-                    return $this->print_response($this->response);
+                    $res['message'] = 'Download vendor Failed'.$downloadvendorurl.' '.$downloadvendor['message'];
+                    $this->print_debug_log("Download vendor Failed ".$downloadvendorurl.' '.$downloadvendor['message']);
+                    return $res;
                 }
                 $extractvendor = $this->doExtract(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz',$homeuser.'/rvsitebuildercms/'.$domainname.'/vendor/');
                 if($extractvendor['success'] == false) {
                     if($files->exists(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz')) {
                         $files->remove(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
                     }
-                    $this->response['message'] = 'Can not extract vendor '.$package_name_encoded.' '.$extractvendor['message'];
-                    $this->response['exectime'] = (microtime(true) - $time_start);
-                    $this->print_install_log(__METHOD__.' status FALSE (Can not extract vendor) '.$package_name_encoded.' '.$extractvendor['message'].' timeusage '.$this->response['exectime']);
-                    $this->print_debug_log("Can not extract ".dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz '.$extractvendor['message']);
-                    return $this->print_response($this->response);
+                    $res['message'] = 'Extract vendor Failed '.$package_name_encoded.' '.$extractvendor['message'];
+                    $this->print_debug_log("Extract vendor Failed ".dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz '.$extractvendor['message']);
+                    return $res;
                 }
                 
                 if($files->exists(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz')) {
@@ -630,17 +685,26 @@ class RVsitebuilder_Setup_API {
             }
             
         }
-     
-        $this->response['status'] = true;
-        $this->response['message'] = 'Download Vendor Success';
-        $this->response['exectime'] = (microtime(true) - $time_start);
-        $this->print_install_log(__METHOD__.' status TRUE'.' timeusage '.$this->response['exectime']);
-        return $this->print_response($this->response);
+        
+        $res['status'] = true;
+        $res['message'] = 'Download Vendor Success';
+        return $res;
         
     }
     
+    public function download_vendor_no_httpasuser($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport){
+        //TODO
+        $res = [
+            'status'    => false,
+            'message'   => '',
+        ];
+        
+        $res['status'] = false;
+        $res['message'] = 'Will be supported in the future soon.';
+        return $res;
+    }
     
-    public function setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname,$ftpserver,$ftpport,$domainport,$devtokenkey,$welcomeemailtype) {
+    public function setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname,$ftpserver,$ftpport,$domainport,$devtokenkey,$welcomeemailtype,$homeuser) {
         $time_start = microtime(true);
         $this->print_debug_log('======'.__METHOD__.'======');
         
@@ -670,19 +734,16 @@ class RVsitebuilder_Setup_API {
         
         $this->print_debug_log("ENV data ".json_encode($env_data));
         
-        $setupenv = $this->setEnv($homeuser.'/rvsitebuildercms/'.$domainname.'/env.example',$env_data,true);
-        
-        if($setupenv) {
-            $this->response['status'] = true;
-            $this->response['message'] = 'Setup .env Success';
-            $this->response['exectime'] = (microtime(true) - $time_start);
-            $this->print_install_log(__METHOD__.' status TRUE'.' timeusage '.$this->response['exectime']);
-            return $this->print_response($this->response);
+        if($this->httpasuser) {
+            $res = $this->setEnv_httpasuser($homeuser.'/rvsitebuildercms/'.$domainname,$env_data,true);
+        }else {
+            $res = $this->setEnv_no_httpasuser($homeuser.'/rvsitebuildercms/'.$domainname,$env_data,true);
         }
         
-        $this->response['message'] = 'Setup .env Failed';
+        $this->response['status'] = $res['status'];
+        $this->response['message'] = $res['message'];
         $this->response['exectime'] = (microtime(true) - $time_start);
-        $this->print_install_log(__METHOD__.' status FALSE (Can not setup env)'.' timeusage '.$this->response['exectime']);
+        $this->print_install_log(__METHOD__.' status:'.$this->response['status'].' message: '.$this->response['message'].' timeusage: '.$this->response['exectime']);
         return $this->print_response($this->response);
     }
     
@@ -711,7 +772,45 @@ class RVsitebuilder_Setup_API {
             }
         }
         
-        $this->print_debug_log("Common Package ".json_encode($commonpkg));
+        $this->print_debug_log("Common Package list ".json_encode($commonpkg));
+        
+        if($this->httpasuser) {
+            $res = $this->download_common_pkg_httpasuser($commonpkg,$homeuser,$domainname);
+        } else {
+            $res = $this->download_common_pkg_no_httpasuser($commonpkg);
+        }
+        
+       
+        $this->response['status'] = $res['status'];
+        $this->response['message'] = $res['message'];
+        $this->response['exectime'] = (microtime(true) - $time_start);
+        $this->print_install_log(__METHOD__.' status: '.$this->response['status'].' message: '.$this->response['message'].' timeusage: '.$this->response['exectime']);
+        return $this->print_response($this->response);
+        
+    }
+    
+    public function download_common_pkg_no_httpasuser($commonpkg) {
+        $this->print_debug_log('======'.__METHOD__.'======');
+        
+        //TODO
+        $res = [
+            'status'    => false,
+            'message'   => '',
+        ];
+        
+        $res['status'] = false;
+        $res['message'] = 'Will be supported in the future soon.';
+        return $res;
+        
+    }
+    
+    public function download_common_pkg_httpasuser($commonpkg,$homeuser,$domainname) {
+        $this->print_debug_log('======'.__METHOD__.'======');
+        
+        $res = [
+            'status' => false,
+            'message' => ''
+        ];
         
         foreach ($commonpkg as $pkg) {
             
@@ -729,11 +828,9 @@ class RVsitebuilder_Setup_API {
                 if($files->exists(dirname(__FILE__).'/'.$pkg.'.tar.gz')) {
                     $files->remove(dirname(__FILE__).'/'.$pkg.'.tar.gz');
                 }
-                $this->response['message'] = 'Can not download package '.$pkg.' '.$downloadpkg['message'];
-                $this->response['exectime'] = (microtime(true) - $time_start);
-                $this->print_install_log(__METHOD__.' status FALSE (Can not download package) '.$pkg.' '.$downloadpkg['message'].' timeusage '.$this->response['exectime']);
+                $res['message'] = 'Can not download package '.$pkg.' '.$downloadpkg['message'];
                 $this->print_debug_log("Can not download package ".$pkg.' '.$downloadpkg['message']);
-                return $this->print_response($this->response);
+                return $res;
             }
             
             //extract package
@@ -742,11 +839,9 @@ class RVsitebuilder_Setup_API {
                 if($files->exists(dirname(__FILE__).'/'.$pkg.'.tar.gz')) {
                     $files->remove(dirname(__FILE__).'/'.$pkg.'.tar.gz');
                 }
-                $this->response['message'] = 'Can not extract package '.$pkg.' '.$extractpkg['message'];
-                $this->response['exectime'] = (microtime(true) - $time_start);
-                $this->print_install_log(__METHOD__.' status FALSE (Can not extract package) '.$pkg.' '.$extractpkg['message'].' timeusage '.$this->response['exectime']);
+                $res['message'] = 'Can not extract package '.$pkg.' '.$extractpkg['message'];
                 $this->print_debug_log("Can not extract package ".$pkg.' '.$extractpkg['message']);
-                return $this->print_response($this->response);
+                return $res;
             }
             
             $rvsbjson = json_decode(file_get_contents($homeuser.'/rvsitebuildercms/'.$domainname.'/packages/rvsitebuilder/'.$pkg.'/rvsitebuilder.json'), true);
@@ -776,22 +871,18 @@ class RVsitebuilder_Setup_API {
                     if($files->exists(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz')) {
                         $files->remove(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
                     }
-                    $this->response['message'] = 'Can not download vendor '.$downloadvendorurl.' '.$downloadvendor['message'];
-                    $this->response['exectime'] = (microtime(true) - $time_start);
-                    $this->print_install_log(__METHOD__.' status FALSE (Can not download vendor) '.$downloadvendorurl.' '.$downloadvendor['message'].' timeusage '.$this->response['exectime']);
+                    $res['message'] = 'Can not download vendor '.$downloadvendorurl.' '.$downloadvendor['message'];
                     $this->print_debug_log("Can not download vendor URL ".$downloadvendorurl.' '.$downloadvendor['message']);
-                    return $this->print_response($this->response);
+                    return $res;
                 }
                 $extractvendor = $this->doExtract(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz' , $homeuser.'/rvsitebuildercms/'.$domainname.'/');
                 if($extractvendor['success'] == false) {
                     if($files->exists(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz')) {
                         $files->remove(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
                     }
-                    $this->response['message'] = 'Can not extract vendor '.$package_name_encoded.' '.$extractvendor['message'];
-                    $this->response['exectime'] = (microtime(true) - $time_start);
-                    $this->print_install_log(__METHOD__.' status FALSE (Can not extract vendor) '.$package_name_encoded.' '.$extractvendor['message'].' timeusage '.$this->response['exectime']);
+                    $res['message'] = 'Can not extract vendor '.$package_name_encoded.' '.$extractvendor['message'];
                     $this->print_debug_log("Can not extract ".dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz '.$extractvendor['message']);
-                    return $this->print_response($this->response);
+                    return $res;
                 }
                 
                 $files->remove(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
@@ -802,12 +893,9 @@ class RVsitebuilder_Setup_API {
             $this->print_debug_log("Removed ".dirname(__FILE__).'/'.$pkg.'.tar.gz');
         }
         
-        $this->response['status'] = true;
-        $this->response['message'] = 'Install Common Package(s) Success';
-        $this->response['exectime'] = (microtime(true) - $time_start);
-        $this->print_install_log(__METHOD__.' status TRUE'.' timeusage '.$this->response['exectime']);
-        return $this->print_response($this->response);
-        
+        $res['status'] =  true;
+        $res['message'] = 'Download common package success.';
+        return $res;
     }
     
     
@@ -942,7 +1030,6 @@ class RVsitebuilder_Setup_API {
     
     public function artisan_cmd_run($homeuser,$domainname,$artisancmd,$artisanparam){
         //called from tryout
-        
         $time_start = microtime(true);
         $this->print_debug_log('======'.__METHOD__.'======');
         
@@ -978,8 +1065,6 @@ class RVsitebuilder_Setup_API {
             $kernel->call($artisancmd, $param);
             $this->print_debug_log($kernel->output());
         }
-        
-        
         
         //clear cache
         $unit_time_start = microtime(true);
@@ -1022,69 +1107,100 @@ class RVsitebuilder_Setup_API {
         //default
         if($this->httpasuser){
             //touch install completed
-            $this->print_debug_log("TOUCH INSTALL_COMPLETED");
-            file_put_contents($homeuser.'/rvsitebuildercms/'.$domainname.'/INSTALL_COMPLETED', '');
-            
-            //install_log , error_log , rvdebug
-            if(file_exists($publicpath.'/rvsitebuilder/install_log.txt')){
-                copy($publicpath.'/rvsitebuilder/install_log.txt', $publicpath.'/rvsitebuilder_install_log.txt');
-            }
-            if(file_exists($publicpath.'/rvsitebuilder/error_log')){
-                copy($publicpath.'/rvsitebuilder/error_log', $publicpath.'/rvsitebuilder_install_error_log.txt');
-            }
-            if(file_exists($publicpath.'/rvsitebuilder/rvdebug.php')){
-                copy($publicpath.'/rvsitebuilder/rvdebug.php', $publicpath.'/rvdebug.php');
-            }
-            
-            $this->response['status'] = true;
-            $this->response['message'] = 'Finished Setup (Default)';
-            $this->response['exectime'] = (microtime(true) - $time_start);
-            $this->print_install_log(__METHOD__.' status TRUE'.' timeusage '.$this->response['exectime']);
-            return $this->print_response($this->response);
+            $res =  $this->finished_setup_httpasuser($homeuser,$domainname,$publicpath);
         }
         //ftp
         else {
             //install completed
-            $this->print_debug_log("FTP INSTALL_COMPLETED");
-            $ftpHandler = new FTP_Handler();
-            $result = $ftpHandler->connect($ftpserver);
-            if(!$result['success']){
-                $this->response['message'] = 'Error '.$result['msg'];
-                $this->print_install_log(__METHOD__.' status FALSE (FTP connect ) '.$result['msg']);
-                return $this->print_response($this->response);
-            }
-            $result = $ftpHandler->login($ftpaccount, $ftppassword);
-            if(!$result['success']){
-                $this->response['message'] = 'Error '.$result['msg'];
-                $this->print_install_log(__METHOD__.' status FALSE (FTP login ) '.$result['msg']);
-                return $this->print_response($this->response);
-            }
-            $result = $ftpHandler->put($publicpath.'/rvsitebuilder/INSTALL_COMPLETED','/rvsitebuildercms/'.$domainname.'/INSTALL_COMPLETED',FTP_BINARY);
-            
-            //install_log , error_log
-            $exploded = explode('/',$publicpath);
-            $public_html = '/'.end($exploded);
-            if(file_exists($publicpath.'/rvsitebuilder/install_log.txt')){
-                $result = $ftpHandler->put($publicpath.'/rvsitebuilder/install_log.txt' , '/'.$public_html.'/rvsitebuilder_install_log.txt',FTP_BINARY);
-            }
-            if(file_exists($publicpath.'/rvsitebuilder/error_log')){
-                $result = $ftpHandler->put($publicpath.'/rvsitebuilder/error_log' , '/'.$public_html.'/rvsitebuilder_install_error_log.txt' ,FTP_BINARY);
-            }
-            if(file_exists($publicpath.'/rvsitebuilder/rvdebug.php')){
-                $result = $ftpHandler->put($publicpath.'/rvsitebuilder/rvdebug.php' , '/'.$public_html.'/rvdebug.php' ,FTP_BINARY);
-            }
-            
-            $ftpHandler->close();
-            
-            $this->response['status'] = true;
-            $this->response['message'] = 'Finished Setup (FTP)';
-            $this->response['exectime'] = (microtime(true) - $time_start);
-            $this->print_install_log(__METHOD__.' status TRUE'.' timeusage '.$this->response['exectime']);
-            return $this->print_response($this->response);
+            $res = $this->finished_setup_no_httpasuser($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport);
         }
+        
+        $this->response['status'] = $res['status'];
+        $this->response['message'] = $res['message'];
+        $this->response['exectime'] = (microtime(true) - $time_start);
+        $this->print_install_log(__METHOD__.' status: '.$this->response['status'].' message: '.$this->response['message'].' timeusage: '.$this->response['exectime']);
+        return $this->print_response($this->response);
         
     }
     
+    public function finished_setup_httpasuser($homeuser,$domainname,$publicpath){
+        $this->print_debug_log('======'.__METHOD__.'======');
+        
+        $res = [
+            'status' => false,
+            'message' => ''
+        ];
+        
+        $files = new Filesystem();
+        
+        $this->print_debug_log("TOUCH INSTALL_COMPLETED");
+        
+        //touch install complete
+        $files->touch($homeuser.'/rvsitebuildercms/'.$domainname.'/INSTALL_COMPLETED');
+        //install_log , error_log , rvdebug
+        if(file_exists($publicpath.'/rvsitebuilder/install_log.txt')){
+            $files->copy($publicpath.'/rvsitebuilder/install_log.txt', $publicpath.'/rvsitebuilder_install_log.txt');
+        }
+        if(file_exists($publicpath.'/rvsitebuilder/error_log')){
+            $files->copy($publicpath.'/rvsitebuilder/error_log', $publicpath.'/rvsitebuilder_install_error_log.txt');
+        }
+        if(file_exists($publicpath.'/rvsitebuilder/rvdebug.php')){
+            $files->copy($publicpath.'/rvsitebuilder/rvdebug.php', $publicpath.'/rvdebug.php');
+        }
+        
+        $res['status'] = true;
+        $res['message'] = 'Make finished Setup (Default)';
+        $this->print_debug_log('Make finished Setup (Default)');
+        return $res;
+    }
+    
+    public function finished_setup_no_httpasuser($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport){
+        $this->print_debug_log('======'.__METHOD__.'======');
+        
+        $res = [
+            'status' => false,
+            'message' => ''
+        ];
+        
+        $this->print_debug_log("FTP INSTALL_COMPLETED");
+        
+        $ftpHandler = new FTP_Handler();
+        $result = $ftpHandler->connect($ftpserver);
+        if(!$result['success']){
+            $res['message'] = 'Error '.$result['msg'];
+            $this->print_debug_log($res['message']);
+            return $res;
+        }
+        $result = $ftpHandler->login($ftpaccount, $ftppassword);
+        if(!$result['success']){
+            $res['message'] = 'Error '.$result['msg'];
+            $this->print_debug_log($res['message']);
+            return $res;
+        }
+        
+        $result = $ftpHandler->put($publicpath.'/rvsitebuilder/INSTALL_COMPLETED','/rvsitebuildercms/'.$domainname.'/INSTALL_COMPLETED',FTP_BINARY);
+        
+        //install_log , error_log
+        $exploded = explode('/',$publicpath);
+        $public_html = '/'.end($exploded);
+        if(file_exists($publicpath.'/rvsitebuilder/install_log.txt')){
+            $result = $ftpHandler->put($publicpath.'/rvsitebuilder/install_log.txt' , '/'.$public_html.'/rvsitebuilder_install_log.txt',FTP_BINARY);
+        }
+        if(file_exists($publicpath.'/rvsitebuilder/error_log')){
+            $result = $ftpHandler->put($publicpath.'/rvsitebuilder/error_log' , '/'.$public_html.'/rvsitebuilder_install_error_log.txt' ,FTP_BINARY);
+        }
+        if(file_exists($publicpath.'/rvsitebuilder/rvdebug.php')){
+            $result = $ftpHandler->put($publicpath.'/rvsitebuilder/rvdebug.php' , '/'.$public_html.'/rvdebug.php' ,FTP_BINARY);
+        }
+        
+        $ftpHandler->close();
+        
+        $res['status'] = true;
+        $res['message'] = 'Make finished Setup (FTP)';
+        $this->print_debug_log('Make finished Setup (FTP)');
+        return $res;
+        
+    }
     
     public function remove_installer_api() {
         $time_start = microtime(true);
@@ -1156,76 +1272,177 @@ class RVsitebuilder_Setup_API {
     
     
     
-    
-    
     public function install_all_pkg($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport) {
-        $this->print_debug_log('======'.__METHOD__.'======');
-        
-        if($this->httpasuser == true) {
-            $this->print_debug_log("Copy Framework Default");
-            $this->copyFileDefault($homeuser,$domainname,$publicpath);
-        } else {
-            $this->print_debug_log("Copy Framework FTP");
-            $this->copyFileFTP($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport);
-        }
-        
-        return;
-        
-    }
-    
-    function copyFileFTP($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport) {
         $time_start = microtime(true);
         $this->print_debug_log('======'.__METHOD__.'======');
         
+        $moveby = '';
+        $joinresmsg = '';
+        if($this->httpasuser == true) {
+            $moveby = 'default';
+            $res = $this->create_htaccess_httpasuser($homeuser,$domainname,$publicpath);
+        } else {
+            $moveby = 'FTP';
+            $res = $this->move_to_app_path_no_httpasuser($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport);
+            $joinresmsg = $res['message'];
+            $res = $this->create_htaccess_no_httpasuser($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport);
+            $joinresmsg = $joinresmsg . $res['message'];
+            $res = $this->chmod_no_httpasuser($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport);
+            $joinresmsg = $joinresmsg . $res['message'];
+        }
+        
+        $this->response['status'] = $res['status'];
+        $this->response['message'] = $res['message'].' '.$joinresmsg.' by'.$moveby;
+        $this->response['exectime'] = (microtime(true) - $time_start);
+        $this->print_install_log(__METHOD__.' status: '.$this->response['status'].' message: '.$this->response['message'].' timeusage: '.$this->response['exectime']);
+        return $this->print_response($this->response);
+        
+    }
+    
+    function create_htaccess_httpasuser($homeuser,$domainname,$publicpath) {
+        $this->print_debug_log('======'.__METHOD__.'======');
+        
+        $res = [
+            'status' =>  true,
+            'message' => ''
+        ];
+        
+        $files =  new Filesystem();
+        
+        //old htaccess
+        $oldhtaccess = '';
+        if ($files->exists($publicpath.'/.htaccess')) {
+            $oldhtaccess = file_get_contents($publicpath.'/.htaccess');
+            $this->print_debug_log("Has Old .htaccess $publicpath/.htaccess");
+        }
+        
+        //write new .htaccess to docroot
+        $frameworkhtaccess = '';
+        if ($files->exists($homeuser.'/rvsitebuildercms/'.$domainname.'/public/.htaccess')) {
+            $frameworkhtaccess = file_get_contents($homeuser.'/rvsitebuildercms/'.$domainname.'/public/.htaccess');
+            $frameworkhtaccess = "#Start Rvsitebuilder7 htaccess\n".
+                                 $frameworkhtaccess."\n".
+                                 "#End Rvsitebuilder7 htaccess\n";
+        }
+        
+        if ($oldhtaccess == '') {
+            $writehtaccess =  file_put_contents($publicpath.'/.htaccess' , $frameworkhtaccess);
+            $this->print_debug_log("file put new .htaccess ".$publicpath.'/.htaccess');
+        }
+        elseif ($oldhtaccess != '' && !preg_match('/^#Start Rvsitebuilder7 htaccess$/im', $oldhtaccess)) {
+            $writeoldhtaccess = file_put_contents($publicpath.'/.htaccess.backup' , $oldhtaccess);
+            $this->print_debug_log("file put backup .htaccess ".$publicpath.'/.htaccess.backup');
+            $writehtaccess =  file_put_contents($publicpath.'/.htaccess' , $frameworkhtaccess."\n".$oldhtaccess);
+            $this->print_debug_log("file put prepend .htaccess ".$publicpath.'/.htaccess');
+        }
+        else {
+            //htaccess has rvsitebuilder content , write old htaccess.
+            $writehtaccess =  file_put_contents($publicpath.'/.htaccess' , $oldhtaccess);
+            $this->print_debug_log("write old htaccess  ,cause it already has a rvsitebuilder7 htaccess content");
+        }
+        
+        if($writehtaccess) {
+            $res['status'] = true;
+            $res['message'] = 'Write htaccess success.';
+            $this->print_debug_log("Write htaccess success.");
+        } else {
+            $res['message'] = 'Write htaccess failed.';
+            $this->print_debug_log("Write htaccess failed.");
+        }
+        
+        return $res;
+        
+    }
+    
+    function move_to_app_path_no_httpasuser($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport) {
+        $this->print_debug_log('======'.__METHOD__.'======');
+        
+        $res = [
+            'status' => false,
+            'message' => ''
+        ];
         
         $ftpHandler = new FTP_Handler();
         $result = $ftpHandler->connect($ftpserver);
         if(!$result['success']){
-            $this->response['message'] = 'Error '.$result['msg'];
-            $this->response['exectime'] = (microtime(true) - $time_start);
+            $res['message'] = 'Error '.$result['msg'];
             $this->print_debug_log("Can not connect FTP ".$result['msg']);
-            $this->print_install_log(__METHOD__.' status FALSE (Can not connect FTP) '.$result['msg'].' timeusage '.$this->response['exectime']);
-            return $this->print_response($this->response);
+            return $res;
         }
         $result = $ftpHandler->login($ftpaccount, $ftppassword);
         if(!$result['success']){
-            $this->response['message'] = 'Error '.$result['msg'];
-            $this->response['exectime'] = (microtime(true) - $time_start);
+            $res['message'] = 'Error '.$result['msg'];
             $this->print_debug_log("Can not login FTP ".$result['msg']);
-            $this->print_install_log(__METHOD__.' status FALSE (Can not login FTP) '.$result['msg'].' timeusage '.$this->response['exectime']);
-            return $this->print_response($this->response);
+            return $res;
         }
         if(!file_exists($ftp_remote_dir)){
             $result = $ftpHandler->ftp_make_dir($homeuser,$ftp_remote_dir);
             if(!$result['success']) {
-                $this->response['message'] = 'Error '.$result['msg'];
-                $this->response['exectime'] = (microtime(true) - $time_start);
+                $res['message'] = 'Error '.$result['msg'];
                 $this->print_debug_log("Can make dir  FTP $homeuser , $ftp_remote_dir ".$result['msg']);
-                $this->print_install_log(__METHOD__.' status FALSE (Can not make dir FTP) '.$result['msg'].' timeusage '.$this->response['exectime']);
-                return $this->print_response($this->response);
+                return $res;
             }
         }
         
         #copy file to framework path
-//         $src_dir = $publicpath.'/rvsitebuilder/tmp';
-//         $ftp_remote_dir = '/rvsitebuildercms/'.$domainname;
-//         $ftpHandler->ftp_copy($src_dir, $ftp_remote_dir);
-//         $this->print_debug_log("FTP copy framework $src_dir To $ftp_remote_dir");
+        $src_dir = $publicpath.'/rvsitebuilder/tmp';
+        $ftp_remote_dir = '/rvsitebuildercms/'.$domainname;
+        $ftpHandler->ftp_copy($src_dir, $ftp_remote_dir);
+        $this->print_debug_log("FTP copy framework $src_dir To $ftp_remote_dir");
         
         #copy file to public path
-//         $src_dir = $homeuser.'/rvsitebuildercms/'.$domainname.'/public';
-//         $exploded = explode('/',$publicpath);
-//         $public_html = '/'.end($exploded);
-//         $ftpHandler->ftp_copy($src_dir, $public_html , ['.htaccess']);
-//         $this->print_debug_log("FTP copy public $src_dir To $public_html");
+        $src_dir = $homeuser.'/rvsitebuildercms/'.$domainname.'/public';
+        $exploded = explode('/',$publicpath);
+        $public_html = '/'.end($exploded);
+        $ftpHandler->ftp_copy($src_dir, $public_html , ['.htaccess']);
+        $this->print_debug_log("FTP copy public $src_dir To $public_html");
+       
+        #close connect
+        $ftpHandler->close();
+        
+        $res['status'] = true;
+        $res['message'] = 'Move Freamwork and Public success (FTP)';
+        return $res;
+        
+    }
+    
+    public function create_htaccess_no_httpasuser($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport) {
+        $this->print_debug_log('======'.__METHOD__.'======');
+        
+        $res = [
+            'status' => false,
+            'message' => ''
+        ];
+        
+        $ftpHandler = new FTP_Handler();
+        $result = $ftpHandler->connect($ftpserver);
+        if(!$result['success']){
+            $res['message'] = 'Error '.$result['msg'];
+            $this->print_debug_log("Can not connect FTP ".$result['msg']);
+            return $res;
+        }
+        $result = $ftpHandler->login($ftpaccount, $ftppassword);
+        if(!$result['success']){
+            $res['message'] = 'Error '.$result['msg'];
+            $this->print_debug_log("Can not login FTP ".$result['msg']);
+            return $res;
+        }
+        if(!file_exists($ftp_remote_dir)){
+            $result = $ftpHandler->ftp_make_dir($homeuser,$ftp_remote_dir);
+            if(!$result['success']) {
+                $res['message'] = 'Error '.$result['msg'];
+                $this->print_debug_log("Can make dir  FTP $homeuser , $ftp_remote_dir ".$result['msg']);
+                return $res;
+            }
+        }
         
         //write .htaccess to domain'docroot
         $frameworkhtaccess = '';
         if (file_exists($homeuser.'/rvsitebuildercms/'.$domainname.'/public/.htaccess')) {
             $frameworkhtaccess = file_get_contents($homeuser.'/rvsitebuildercms/'.$domainname.'/public/.htaccess');
             $frameworkhtaccess = "#Start Rvsitebuilder7 htaccess\n".
-                $frameworkhtaccess."\n".
-                "#End Rvsitebuilder7 htaccess\n";
+                                 $frameworkhtaccess."\n".
+                                 "#End Rvsitebuilder7 htaccess\n";
         }
         $oldhtaccess = '';
         if (file_exists($publicpath.'/.htaccess')) {
@@ -1258,6 +1475,46 @@ class RVsitebuilder_Setup_API {
             $this->print_debug_log("write old htaccess  ,cause it already has a rvsitebuilder7 htaccess content");
         }
         
+        #close connect
+        $ftpHandler->close();
+        
+        $res['status'] = true;
+        $res['message'] = 'Create .htaccess Success (FTP)';
+        
+        return $res;
+        
+    }
+    
+    public function chmod_no_httpasuser($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport) {
+        $this->print_debug_log('======'.__METHOD__.'======');
+        
+        $res = [
+            'status' => false,
+            'message' => ''
+        ];
+        
+        $ftpHandler = new FTP_Handler();
+        $result = $ftpHandler->connect($ftpserver);
+        if(!$result['success']){
+            $res['message'] = 'Error '.$result['msg'];
+            $this->print_debug_log("Can not connect FTP ".$result['msg']);
+            return $res;
+        }
+        $result = $ftpHandler->login($ftpaccount, $ftppassword);
+        if(!$result['success']){
+            $res['message'] = 'Error '.$result['msg'];
+            $this->print_debug_log("Can not login FTP ".$result['msg']);
+            return $res;
+        }
+        if(!file_exists($ftp_remote_dir)){
+            $result = $ftpHandler->ftp_make_dir($homeuser,$ftp_remote_dir);
+            if(!$result['success']) {
+                $res['message'] = 'Error '.$result['msg'];
+                $this->print_debug_log("Can make dir  FTP $homeuser , $ftp_remote_dir ".$result['msg']);
+                return $res;
+            }
+        }
+        
         #chmod folder
         $ftpHandler->ftp_change_mod_r($publicpath.'/storage',$public_html.'/storage' , 0777);
         $this->print_debug_log("FTP change mod ".$publicpath.'/storage'.'  '.$public_html.'/storage'. '0777');
@@ -1277,85 +1534,12 @@ class RVsitebuilder_Setup_API {
         #close connect
         $ftpHandler->close();
         
-        $this->response['status'] = true;
-        $this->response['message'] = 'Move Freamwork and Public success (FTP)';
-        $this->response['exectime'] = (microtime(true) - $time_start);
-        $this->print_install_log(__METHOD__.' TRUE (By FTP)'.' timeusage '.$this->response['exectime']);
+        $res['status'] = true;
+        $res['message'] = 'Chmod app directory Success (FTP)';
         
-        return $this->print_response($this->response);
+        return $res;
+        
     }
-    
-    function copyFileDefault($homeuser,$domainname,$publicpath) {
-        $time_start = microtime(true);
-        $this->print_debug_log('======'.__METHOD__.'======');
-        
-        $files =  new Filesystem();
-        
-        //remove first if /home/<user>/rvsitebuildercms/$domainname
-//         if($files->exists($homeuser.'/rvsitebuildercms/'.$domainname)) {
-//             $files->remove($homeuser.'/rvsitebuildercms/'.$domainname);
-//             $this->print_debug_log("Removed old framwork path ".$homeuser.'/rvsitebuildercms/'.$domainname);
-//         }
-        
-        
-        //move temp to freamwork path
-//         $source = dirname(__FILE__).'/tmp';
-//         $destination = $homeuser.'/rvsitebuildercms/'.$domainname ;
-//         $moved = $files->rename($source , $destination ,true);
-//         $this->print_debug_log("Moved $source To $destination");
-        
-        
-        //old htaccess
-        $oldhtaccess = '';
-        if ($files->exists($publicpath.'/.htaccess')) {
-            $oldhtaccess = file_get_contents($publicpath.'/.htaccess');
-            $this->print_debug_log("Has Old .htaccess $publicpath/.htaccess");
-        }
-        
-//         //copy framework/public to public path
-//         $source = $homeuser.'/rvsitebuildercms/'.$domainname.'/public';
-//         $destination = $publicpath;
-//         $copy = $files->mirror($source, $destination,null,['override' => true]);
-//         $this->print_debug_log("Copy $source To $destination");
-        
-        
-        //write new .htaccess to docroot
-        $frameworkhtaccess = '';
-        if ($files->exists($homeuser.'/rvsitebuildercms/'.$domainname.'/public/.htaccess')) {
-            $frameworkhtaccess = file_get_contents($homeuser.'/rvsitebuildercms/'.$domainname.'/public/.htaccess');
-            $frameworkhtaccess = "#Start Rvsitebuilder7 htaccess\n".
-                $frameworkhtaccess."\n".
-                "#End Rvsitebuilder7 htaccess\n";
-        }
-        
-        if ($oldhtaccess == '') {
-            $writehtaccess =  file_put_contents($publicpath.'/.htaccess' , $frameworkhtaccess);
-            $this->print_debug_log("file put new .htaccess ".$publicpath.'/.htaccess');
-        }
-        elseif ($oldhtaccess != '' && !preg_match('/^#Start Rvsitebuilder7 htaccess$/im', $oldhtaccess)) {
-            $writeoldhtaccess = file_put_contents($publicpath.'/.htaccess.backup' , $oldhtaccess);
-            $this->print_debug_log("file put backup .htaccess ".$publicpath.'/.htaccess.backup');
-            $writehtaccess =  file_put_contents($publicpath.'/.htaccess' , $frameworkhtaccess."\n".$oldhtaccess);
-            $this->print_debug_log("file put prepend .htaccess ".$publicpath.'/.htaccess');
-        }
-        else {
-            //htaccess has rvsitebuilder content , write old htaccess.
-            $writehtaccess =  file_put_contents($publicpath.'/.htaccess' , $oldhtaccess);
-            $this->print_debug_log("write old htaccess  ,cause it already has a rvsitebuilder7 htaccess content");
-        }
-        
-        
-        
-        $this->response['status'] = true;
-        $this->response['message'] = 'Move Freamwork and Public success (default)';
-        $this->response['exectime'] = (microtime(true) - $time_start);
-        $this->print_install_log(__METHOD__.' TRUE (By Default)'.' timeusage '.$this->response['exectime']);
-        return $this->print_response($this->response);
-    }
-    
-    
-    
-    
     
     public function doDownload($type, $url, $sink) {
         $time_start = microtime(true);
@@ -1414,7 +1598,7 @@ class RVsitebuilder_Setup_API {
             $response['success'] = true;
         }
         $this->response['exectime'] = (microtime(true) - $time_start);
-        $this->print_install_log(__METHOD__.' TRUE (By Default)' . $url .' timeusage '.$this->response['exectime']);
+        $this->print_install_log(__METHOD__.' status: true url: ' . $url .' timeusage: '.$this->response['exectime']);
         return $response;
     }
     
@@ -1560,14 +1744,19 @@ class RVsitebuilder_Setup_API {
         return $valuefromkey;
     }
     
-    public function setEnv($env_file,$env_data = [],$force = false){
+    public function setEnv_httpasuser($env_path,$env_data = [],$force = false){
         $this->print_debug_log('======'.__METHOD__.'======');
         
-        $this->print_debug_log("ENV File=$env_file Data=".json_encode($env_data)." Force=$force");
+        $this->print_debug_log("ENV File=$env_path Data=".json_encode($env_data)." Force=$force");
+        
+        $res = [
+            'status' => false,
+            'message' => '',
+        ];
         
         if(count($env_data) > 0){
             // Read .env-file
-            $env = file_get_contents($env_file);
+            $env = file_get_contents($env_path.'/env.example');
             // Split string on every "\n" and write into array
             $env = preg_split('/\n/', $env);
             // Loop through given data
@@ -1595,14 +1784,30 @@ class RVsitebuilder_Setup_API {
             }
             // Turn the array back to an String
             $env = implode("\n", $env);
-            // And overwrite the .env with the new data
-            //file_put_contents($env_file, $env);
-            file_put_contents(dirname(__FILE__).'/tmp/.env', $env);
-            return true;
+            
+            file_put_contents($env_path.'/.env', $env);
+            //file_put_contents(dirname(__FILE__).'/tmp/.env', $env);
+            
+            $res['status'] = true;
+            $res['message'] = 'Update ENV Success';
         } else {
             $this->print_debug_log("Array env_data is empty");
-            return false;
+            $res['message'] = 'Array env_data is empty';
         }
+        
+        return $res;
+    }
+    
+    function setEnv_no_httpasuser($env_file,$env_data = [],$force = false){
+        //TODO
+        $res = [
+            'status'    => false,
+            'message'   => '',
+        ];
+        
+        $res['status'] = false;
+        $res['message'] = 'Will be supported in the future soon.';
+        return $res;
     }
     
     public function get_user_path() {
@@ -1836,21 +2041,6 @@ class FTP_Handler{
             $result['msg'] = 'Fail to connect ' . $ftpserver;
         }
         return $result;
-    }
-    
-    function testftp() {
-        $src_dir = '/home/amarin/public_html/source';
-        $dest = 'dest/dir1';
-        
-        ftp_chdir($this->conn_id, $dest);
-        
-        $pwd =  ftp_pwd($this->conn_id); // /public_html
-        printf("FTP: current directory = %s <br/>", $pwd);
-        
-        $file = 'aaaa.txt';
-        //$upload = ftp_put($this->conn_id, $file, $src_dir."/".$file, FTP_ASCII);
-        $file = 'sub1';
-        @ftp_mkdir($this->conn_id, $file);
     }
     
     function login($ftp_user_name, $ftp_user_pass) {
