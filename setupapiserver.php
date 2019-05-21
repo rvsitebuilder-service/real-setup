@@ -752,8 +752,6 @@ class RVsitebuilder_Setup_API {
         $time_start = microtime(true);
         $this->print_debug_log('======'.__METHOD__.'======');
         
-        $files = new Filesystem();
-        
         $commonpkg = [
             'blog',
             'core',
@@ -811,6 +809,8 @@ class RVsitebuilder_Setup_API {
             'status' => false,
             'message' => ''
         ];
+        
+        $files = new Filesystem();
         
         foreach ($commonpkg as $pkg) {
             
