@@ -440,15 +440,7 @@ class RVsitebuilder_Setup_API {
             $this->print_debug_log("PHP parse_ini_file false");
         }
         
-        // proc_open
-        $this->response['check_pre_require']['proc_open']['check'] = true;
-        if(! function_exists('proc_open')){
-            $this->response['check_pre_require']['proc_open']['check'] = false;
-            $this->response['check_pre_require']['proc_open']['reason'] = 'Can not load PHP Function (proc_open)';
-            $this->response['message'] = $this->response['message'].' / Can not load PHP Function (proc_open)';
-            $this->response['status'] = false;
-            $this->print_debug_log("PHP parse_ini_file false");
-        }
+        
         
         //http as user
         $this->response['httpasuser'] = $this->httpasuser;
