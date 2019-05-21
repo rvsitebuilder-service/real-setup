@@ -1815,17 +1815,18 @@ class RVsitebuilder_Setup_API {
             $this->print_debug_log('Download Success ,file '.$sink);
             $response['success'] = true;
         }
-        $this->response['exectime'] = (microtime(true) - $time_start);
-        $this->print_install_log(__METHOD__.' status: true url: ' . $url .' timeusage: '.$this->response['exectime']);
+        $exectime = (microtime(true) - $time_start);
+        $this->print_install_log(__METHOD__.' status: '.$response['success'].' url: ' . $url .' timeusage: '.$exectime);
         return $response;
     }
     
     public function doExtract($file,$path) {
+        $time_start = microtime(true);
         $this->print_debug_log('======'.__METHOD__.'======');
         
         $response['message'] = '';
         $response['success'] = false;
-        $this->print_debug_log("Do Extract $file $path");
+        $this->print_debug_log("Extract $file $path");
         
         try {
             $tar = new Tar();
@@ -1833,10 +1834,14 @@ class RVsitebuilder_Setup_API {
             $tar->extract($path);
             $this->print_debug_log("Do Extract Success $file $path");
             $response['success'] = true;
+            $exectime = (microtime(true) - $time_start);
+            $this->print_install_log(__METHOD__.' status: '.$response['success'].' file: ' . $file .' path: '.$path.' timeusage: '.$exectime);
             return $response;
         } catch (Exception $e) {
             $this->print_debug_log("Do Extract Error ".$e->getMessage());
             $response['message'] = $e->getMessage();
+            $exectime = (microtime(true) - $time_start);
+            $this->print_install_log(__METHOD__.' status: '.$response['success'].' file: ' . $file .' path: '.$path.' timeusage: '.$exectime);
             return $response;
         }
         
