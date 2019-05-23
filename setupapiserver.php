@@ -1167,12 +1167,6 @@ class RVsitebuilder_Setup_API {
         $unit_exec_time = (microtime(true) - $unit_time_start);
         $this->print_install_log('artisan db:seed --force timeusage '.$unit_exec_time);
         
-        $unit_time_start = microtime(true);
-        $kernel->call('rvsitebuilder:notifynewinstall', []);
-        $this->print_debug_log($kernel->output());
-        $unit_exec_time = (microtime(true) - $unit_time_start);
-        $this->print_install_log('rvsitebuilder:notifynewinstall timeusage'.$unit_exec_time);
-        
         //user secret key
         $unit_time_start = microtime(true);
         $kernel->call('rvsitebuilder:updateenduserdb-run', ['dbkey'=>'secretkey','dbvalue'=>$this->generateSecretKey()]);
@@ -1187,6 +1181,50 @@ class RVsitebuilder_Setup_API {
         $unit_exec_time = (microtime(true) - $unit_time_start);
         $this->print_install_log('artisan vendor:publish timeusage '.$unit_exec_time);
         
+        //update user admin information
+        if($adminemail != '') {
+            $this->print_debug_log("Update user info to DB adminemail=$adminemail");
+            $unit_time_start = microtime(true);
+            $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'email', 'update_val' => $adminemail]);
+            $this->print_debug_log($kernel->output());
+            $unit_exec_time = (microtime(true) - $unit_time_start);
+            $this->print_install_log('artisan rvsitebuilder:updateuserinfo-run timeusage '.$unit_exec_time);
+        }
+        if($adminpassword != '') {
+            $this->print_debug_log("Update user info to DB adminpassword=$adminpassword");
+            $unit_time_start = microtime(true);
+            $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'password', 'update_val' => $adminpassword]);
+            $this->print_debug_log($kernel->output());
+            $unit_exec_time = (microtime(true) - $unit_time_start);
+            $this->print_install_log('artisan rvsitebuilder:updateuserinfo-run timeusage '.$unit_exec_time);
+        }
+        if($adminfirstname != '') {
+            $this->print_debug_log("Update user info to DB adminfirstname=$adminfirstname");
+            $unit_time_start = microtime(true);
+            $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'first_name', 'update_val' => $adminfirstname]);
+            $this->print_debug_log($kernel->output());
+            $unit_exec_time = (microtime(true) - $unit_time_start);
+            $this->print_install_log('artisan rvsitebuilder:updateuserinfo-run timeusage '.$unit_exec_time);
+        }
+        if($adminlastname != '') {
+            $this->print_debug_log("Update user info to DB adminlastname=$adminlastname");
+            $unit_time_start = microtime(true);
+            $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'last_name', 'update_val' => $adminlastname]);
+            $this->print_debug_log($kernel->output());
+            $unit_exec_time = (microtime(true) - $unit_time_start);
+            $this->print_install_log('artisan rvsitebuilder:updateuserinfo-run timeusage '.$unit_exec_time);
+        }
+        
+        
+        //TODO error proc_open proc_close
+        //email notify to admin $unit_time_start = microtime(true);
+        /*
+         $kernel->call('rvsitebuilder:notifynewinstall', []);
+         $this->print_debug_log($kernel->output());
+         $unit_exec_time = (microtime(true) - $unit_time_start);
+         $this->print_install_log('rvsitebuilder:notifynewinstall timeusage'.$unit_exec_time);
+         */
+        
         //clear cache
         $unit_time_start = microtime(true);
         $kernel->call('cache:clear', []);
@@ -1200,21 +1238,6 @@ class RVsitebuilder_Setup_API {
         $unit_exec_time = (microtime(true) - $unit_time_start);
         $this->print_install_log('artisan config:clear timeusage '.$unit_exec_time);
         
-        //update admin info from wizard request
-        if($adminemail != '' && $adminpassword != '') {
-            $this->print_debug_log("Update user info to DB adminemail=$adminemail adminpassword=$adminpassword adminfirstname=$adminfirstname adminlastname=$adminlastname");
-            $unit_time_start = microtime(true);
-            $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'email', 'update_val' => $adminemail]);
-            $this->print_debug_log($kernel->output());
-            $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'password', 'update_val' => $adminpassword]);
-            $this->print_debug_log($kernel->output());
-            $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'first_name', 'update_val' => $adminfirstname]);
-            $this->print_debug_log($kernel->output());
-            $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1,'update_key' => 'last_name', 'update_val' => $adminlastname]);
-            $this->print_debug_log($kernel->output());
-            $unit_exec_time = (microtime(true) - $unit_time_start);
-            $this->print_install_log('artisan rvsitebuilder:updateuserinfo-run timeusage '.$unit_exec_time);
-        }
         
         /*
          $unit_time_start = microtime(true);
