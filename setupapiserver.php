@@ -1215,15 +1215,15 @@ class RVsitebuilder_Setup_API {
             $this->print_install_log('artisan rvsitebuilder:updateuserinfo-run timeusage '.$unit_exec_time);
         }
         
-        
-        //TODO error proc_open proc_close
-        //email notify to admin $unit_time_start = microtime(true);
-        /*
-         $kernel->call('rvsitebuilder:notifynewinstall', []);
-         $this->print_debug_log($kernel->output());
-         $unit_exec_time = (microtime(true) - $unit_time_start);
-         $this->print_install_log('rvsitebuilder:notifynewinstall timeusage'.$unit_exec_time);
-         */
+        if(function_exists('proc_open') && function_exists('proc_close')){
+            //email notify to admin
+            $this->print_debug_log("Send welcome email to admin");
+            $unit_time_start = microtime(true);
+            $kernel->call('rvsitebuilder:notifynewinstall', []);
+            $this->print_debug_log($kernel->output());
+            $unit_exec_time = (microtime(true) - $unit_time_start);
+            $this->print_install_log('rvsitebuilder:notifynewinstall timeusage'.$unit_exec_time);
+        }
         
         //clear cache
         $unit_time_start = microtime(true);
