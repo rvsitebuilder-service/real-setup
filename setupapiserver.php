@@ -395,6 +395,7 @@ class RVsitebuilder_Setup_API {
             $this->print_debug_log("PHP zip false");
         }
         //php config
+        /*
         $this->response['check_pre_require']['allow_url_fopen']['check'] = true;
         if (ini_get('allow_url_fopen') != 1) {
             $this->response['check_pre_require']['allow_url_fopen']['check'] = false;
@@ -403,6 +404,7 @@ class RVsitebuilder_Setup_API {
             $this->response['status'] = false;
             $this->print_debug_log("PHP allow_url_fopen false");
         }
+        */
         $this->response['check_pre_require']['memory_limit']['check'] = true;
         preg_match('/([0-9]+)/',ini_get('memory_limit'),$match);
         if($match[0] < 64) {
