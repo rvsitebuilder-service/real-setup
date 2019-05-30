@@ -1441,6 +1441,12 @@ class RVsitebuilder_Setup_API {
         if(file_exists($publicpath.'/rvsitebuilder/rvdebug.php')){
             $result = $ftpHandler->put($publicpath.'/rvsitebuilder/rvdebug.php' , '/'.$public_html.'/rvdebug.php' ,FTP_BINARY);
         }
+        if(file_exists($publicpath.'/index.html')){
+            $result = $ftpHandler->rename($publicpath.'/index.html' , '/'.$public_html.'/index.html.bak');
+        }
+        if(file_exists($publicpath.'/index.htm')){
+            $result = $ftpHandler->rename($publicpath.'/index.htm' , '/'.$public_html.'/index.htm.bak');
+        }
         
         $ftpHandler->close();
         
@@ -2316,6 +2322,17 @@ class FTP_Handler{
         }
         return $result;
     }
+
+    function rename($old_file , $new_file){
+        $result = [];
+        $result['success'] = 1;
+        $upload = ftp_rename($this->conn_id , $old_file , $new_file);
+        if(!$upload){
+            $result['success'] = 0;
+            $result['msg'] = 'Fail to rename ftp';
+        }
+    }
+
     /*
      $src_dir = '/home/amarin/public_html/source';
      $ftp_remote_dir = 'dest';
