@@ -1389,6 +1389,13 @@ class RVsitebuilder_Setup_API {
         if($files->exists($publicpath.'/rvsitebuilder/rvdebug.php')){
             $files->copy($publicpath.'/rvsitebuilder/rvdebug.php', $publicpath.'/rvdebug.php');
         }
+        //rename .html,.htm to .html.bak,.htm.bak when exist .html,.htm file
+        if($files->exists($publicpath.'/index.html')){
+            $files->rename($publicpath.'/index.html' , $publicpath.'/index.html.bak');
+        }
+        if($files->exists($publicpath.'/index.htm')){
+            $files->rename($publicpath.'/index.htm' , $publicpath.'/index.htm.bak');
+        }
         
         $res['status'] = true;
         $res['message'] = 'Make finished Setup (Default)';
