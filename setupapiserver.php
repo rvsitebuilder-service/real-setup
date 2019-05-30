@@ -1380,13 +1380,13 @@ class RVsitebuilder_Setup_API {
         //touch install complete
         $files->touch($homeuser.'/rvsitebuildercms/'.$domainname.'/INSTALL_COMPLETED');
         //install_log , error_log , rvdebug
-        if(file_exists($publicpath.'/rvsitebuilder/install_log.txt')){
+        if($files->exists($publicpath.'/rvsitebuilder/install_log.txt')){
             $files->copy($publicpath.'/rvsitebuilder/install_log.txt', $publicpath.'/rvsitebuilder_install_log.txt');
         }
-        if(file_exists($publicpath.'/rvsitebuilder/error_log')){
+        if($files->exists($publicpath.'/rvsitebuilder/error_log')){
             $files->copy($publicpath.'/rvsitebuilder/error_log', $publicpath.'/rvsitebuilder_install_error_log.txt');
         }
-        if(file_exists($publicpath.'/rvsitebuilder/rvdebug.php')){
+        if($files->exists($publicpath.'/rvsitebuilder/rvdebug.php')){
             $files->copy($publicpath.'/rvsitebuilder/rvdebug.php', $publicpath.'/rvdebug.php');
         }
         
