@@ -378,14 +378,14 @@ class RVsitebuilder_Setup_API {
             $this->response['status'] = false;
             $this->print_debug_log("PHP fileinfo false");
         }
-        $this->response['check_pre_require']['exif']['check'] = true;
+        /* $this->response['check_pre_require']['exif']['check'] = true;
         if (!extension_loaded('exif')) {
             $this->response['check_pre_require']['exif']['check'] = false;
             $this->response['check_pre_require']['exif']['reason'] = 'Can not load PHP Extension (exif)';
             $this->response['message'] = $this->response['message'].' / Can not load PHP Extension (exif)';
             $this->response['status'] = false;
             $this->print_debug_log("PHP exif false");
-        }
+        } */
         $this->response['check_pre_require']['zip']['check'] = true;
         if (!extension_loaded('zip')) {
             $this->response['check_pre_require']['zip']['check'] = false;
