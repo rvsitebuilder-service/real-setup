@@ -441,8 +441,15 @@ class RVsitebuilder_Setup_API {
             $this->response['status'] = false;
             $this->print_debug_log("PHP parse_ini_file false");
         }
-        
-        
+        // php function file_put_contents
+        $this->response['check_pre_require']['file_put_contents']['check'] = true;
+        if(! function_exists('file_put_contents')){
+            $this->response['check_pre_require']['file_put_contents']['check'] = false;
+            $this->response['check_pre_require']['file_put_contents']['reason'] = 'Can not load PHP Function (file_put_contents)';
+            $this->response['message'] = $this->response['message'].' / Can not load PHP Function (file_put_contents)';
+            $this->response['status'] = false;
+            $this->print_debug_log("PHP file_put_contents false");
+        }
         
         //http as user
         $this->response['httpasuser'] = $this->httpasuser;
