@@ -371,14 +371,12 @@ class RVsitebuilder_Setup_API {
             $this->print_debug_log("PHP fileinfo false");
         }
         $this->response['check_pre_require']['image_lib']['check'] = true;
-        if (!extension_loaded('imagick')){
-            if(!extension_loaded('gd') || !extension_loaded('exif')){
-                $this->response['check_pre_require']['image_lib']['check'] = false;
-                $this->response['check_pre_require']['image_lib']['reason'] = 'Can not load PHP Extension (imagick or gd + exif)';
-                $this->response['message'] = $this->response['message'].' / Can not load PHP Extension (imagick or gd + exif)';
-                $this->response['status'] = false;
-                $this->print_debug_log("PHP imagick or gd + exif false");
-            }
+        if (!extension_loaded('imagick') && !extension_loaded('gd')){
+            $this->response['check_pre_require']['image_lib']['check'] = false;
+            $this->response['check_pre_require']['image_lib']['reason'] = 'Can not load PHP Extension (imagick or gd)';
+            $this->response['message'] = $this->response['message'].' / Can not load PHP Extension (imagick or gd)';
+            $this->response['status'] = false;
+            $this->print_debug_log("PHP imagick or gd false");
         }
         $this->response['check_pre_require']['zip']['check'] = true;
         if (!extension_loaded('zip')) {
