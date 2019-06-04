@@ -338,14 +338,6 @@ class RVsitebuilder_Setup_API {
             $this->response['status'] = false;
             $this->print_debug_log("PHP pdo false");
         }
-        $this->response['check_pre_require']['gd']['check'] = true;
-        if (!extension_loaded('gd')) {
-            $this->response['check_pre_require']['gd']['check'] = false;
-            $this->response['check_pre_require']['gd']['reason'] = 'Can not load PHP Extension (gd)';
-            $this->response['message'] = $this->response['message'].' / Can not load PHP Extension (gd)';
-            $this->response['status'] = false;
-            $this->print_debug_log("PHP gd false");
-        }
         $this->response['check_pre_require']['curl']['check'] = true;
         if (!extension_loaded('curl')) {
             $this->response['check_pre_require']['curl']['check'] = false;
@@ -378,14 +370,14 @@ class RVsitebuilder_Setup_API {
             $this->response['status'] = false;
             $this->print_debug_log("PHP fileinfo false");
         }
-        /* $this->response['check_pre_require']['exif']['check'] = true;
-        if (!extension_loaded('exif')) {
-            $this->response['check_pre_require']['exif']['check'] = false;
-            $this->response['check_pre_require']['exif']['reason'] = 'Can not load PHP Extension (exif)';
-            $this->response['message'] = $this->response['message'].' / Can not load PHP Extension (exif)';
+        $this->response['check_pre_require']['image_lib']['check'] = true;
+        if (!extension_loaded('imagick') || (!extension_loaded('gd') && !extension_loaded('exif')) ){
+            $this->response['check_pre_require']['image_lib']['check'] = false;
+            $this->response['check_pre_require']['image_lib']['reason'] = 'Can not load PHP Extension (imagick or gd + exif)';
+            $this->response['message'] = $this->response['message'].' / Can not load PHP Extension (imagick or gd + exif)';
             $this->response['status'] = false;
-            $this->print_debug_log("PHP exif false");
-        } */
+            $this->print_debug_log("PHP imagick or gd + exif false");
+        }
         $this->response['check_pre_require']['zip']['check'] = true;
         if (!extension_loaded('zip')) {
             $this->response['check_pre_require']['zip']['check'] = false;
