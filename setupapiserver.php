@@ -372,7 +372,7 @@ class RVsitebuilder_Setup_API {
         }
         $this->response['check_pre_require']['image_lib']['check'] = true;
         if (!extension_loaded('imagick')){
-            if(!extension_loaded('gd') && !extension_loaded('exif')){
+            if(!extension_loaded('gd') || !extension_loaded('exif')){
                 $this->response['check_pre_require']['image_lib']['check'] = false;
                 $this->response['check_pre_require']['image_lib']['reason'] = 'Can not load PHP Extension (imagick or gd + exif)';
                 $this->response['message'] = $this->response['message'].' / Can not load PHP Extension (imagick or gd + exif)';
