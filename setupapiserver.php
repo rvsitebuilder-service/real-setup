@@ -321,6 +321,7 @@ class RVsitebuilder_Setup_API {
             $this->response['status'] = false;
             $this->print_debug_log("PHP version falase ".PHP_VERSION);
         }
+        
         //php extension
         $this->response['check_pre_require']['mysqlnd']['check'] = true;
         if (!extension_loaded('mysqlnd')) {
@@ -337,6 +338,14 @@ class RVsitebuilder_Setup_API {
             $this->response['message'] = $this->response['message'].' / Can not load PHP Extension (pdo)';
             $this->response['status'] = false;
             $this->print_debug_log("PHP pdo false");
+        }
+        $this->response['check_pre_require']['image_lib']['check'] = true;
+        if (!extension_loaded('imagick') && !extension_loaded('gd')){
+            $this->response['check_pre_require']['image_lib']['check'] = false;
+            $this->response['check_pre_require']['image_lib']['reason'] = 'Can not load PHP Image Extension (GD  or  ImageMagick)';
+            $this->response['message'] = $this->response['message'].' / Can not load PHP Image Extension (GD  or  ImageMagick)';
+            $this->response['status'] = false;
+            $this->print_debug_log("PHP ImageMagick or GD false");
         }
         $this->response['check_pre_require']['curl']['check'] = true;
         if (!extension_loaded('curl')) {
@@ -362,21 +371,13 @@ class RVsitebuilder_Setup_API {
             $this->response['status'] = false;
             $this->print_debug_log("PHP mbstring false");
         }
-        $this->response['check_pre_require']['fileinfo']['check'] = true;
-        if (!extension_loaded('fileinfo')) {
-            $this->response['check_pre_require']['fileinfo']['check'] = false;
-            $this->response['check_pre_require']['fileinfo']['reason'] = '';
-            $this->response['message'] = $this->response['message'].' / Can not load PHP Extension (fileinfo)';
+        $this->response['check_pre_require']['json']['check'] = true;
+        if(! extension_loaded('json')){
+            $this->response['check_pre_require']['json']['check'] = false;
+            $this->response['check_pre_require']['json']['reason'] = 'Can not load PHP Function (json)';
+            $this->response['message'] = $this->response['message'].' / Can not load PHP Function (json)';
             $this->response['status'] = false;
-            $this->print_debug_log("PHP fileinfo false");
-        }
-        $this->response['check_pre_require']['image_lib']['check'] = true;
-        if (!extension_loaded('imagick') && !extension_loaded('gd')){
-            $this->response['check_pre_require']['image_lib']['check'] = false;
-            $this->response['check_pre_require']['image_lib']['reason'] = 'Can not load PHP Extension (imagick or gd)';
-            $this->response['message'] = $this->response['message'].' / Can not load PHP Extension (imagick or gd)';
-            $this->response['status'] = false;
-            $this->print_debug_log("PHP imagick or gd false");
+            $this->print_debug_log("PHP json false");
         }
         $this->response['check_pre_require']['zip']['check'] = true;
         if (!extension_loaded('zip')) {
@@ -386,17 +387,19 @@ class RVsitebuilder_Setup_API {
             $this->response['status'] = false;
             $this->print_debug_log("PHP zip false");
         }
-        //php config
         /*
-        $this->response['check_pre_require']['allow_url_fopen']['check'] = true;
-        if (ini_get('allow_url_fopen') != 1) {
-            $this->response['check_pre_require']['allow_url_fopen']['check'] = false;
-            $this->response['check_pre_require']['allow_url_fopen']['reason'] = 'php.ini, Must set allow_url_fopen=ON';
-            $this->response['message'] = $this->response['message'].' / php.ini, Must set allow_url_fopen=ON';
+        $this->response['check_pre_require']['fileinfo']['check'] = true;
+        if (!extension_loaded('fileinfo')) {
+            $this->response['check_pre_require']['fileinfo']['check'] = false;
+            $this->response['check_pre_require']['fileinfo']['reason'] = '';
+            $this->response['message'] = $this->response['message'].' / Can not load PHP Extension (fileinfo)';
             $this->response['status'] = false;
-            $this->print_debug_log("PHP allow_url_fopen false");
+            $this->print_debug_log("PHP fileinfo false");
         }
         */
+        
+        
+        //php config
         $this->response['check_pre_require']['memory_limit']['check'] = true;
         preg_match('/([0-9]+)/',ini_get('memory_limit'),$match);
         if($match[0] < 64) {
@@ -406,25 +409,18 @@ class RVsitebuilder_Setup_API {
             $this->response['status'] = false;
             $this->print_debug_log("PHP memory_limit false ".$match[0]);
         }
-        //php function posix_getpwuid
-        $this->response['check_pre_require']['posix_getpwuid']['check'] = true;
-        if(! function_exists('posix_getpwuid')){
-            $this->response['check_pre_require']['posix_getpwuid']['check'] = false;
-            $this->response['check_pre_require']['posix_getpwuid']['reason'] = 'Can not load PHP Function (posix_getpwuid)';
-            $this->response['message'] = $this->response['message'].' / Can not load PHP Function (posix_getpwuid)';
-            $this->response['status'] = false;
-            $this->print_debug_log("PHP posix_getpwuid false");
-        }
-        //php function json
-        $this->response['check_pre_require']['json']['check'] = true;
-        if(! extension_loaded('json')){
-            $this->response['check_pre_require']['json']['check'] = false;
-            $this->response['check_pre_require']['json']['reason'] = 'Can not load PHP Function (json)';
-            $this->response['message'] = $this->response['message'].' / Can not load PHP Function (json)';
-            $this->response['status'] = false;
-            $this->print_debug_log("PHP json false");
-        }
-        //php function parse_ini_file
+        /*
+         $this->response['check_pre_require']['allow_url_fopen']['check'] = true;
+         if (ini_get('allow_url_fopen') != 1) {
+         $this->response['check_pre_require']['allow_url_fopen']['check'] = false;
+         $this->response['check_pre_require']['allow_url_fopen']['reason'] = 'php.ini, Must set allow_url_fopen=ON';
+         $this->response['message'] = $this->response['message'].' / php.ini, Must set allow_url_fopen=ON';
+         $this->response['status'] = false;
+         $this->print_debug_log("PHP allow_url_fopen false");
+         }
+         */
+        
+        //php function
         $this->response['check_pre_require']['parse_ini_file']['check'] = true;
         if(! function_exists('parse_ini_file')){
             $this->response['check_pre_require']['parse_ini_file']['check'] = false;
@@ -433,7 +429,6 @@ class RVsitebuilder_Setup_API {
             $this->response['status'] = false;
             $this->print_debug_log("PHP parse_ini_file false");
         }
-        // php function file_put_contents
         $this->response['check_pre_require']['file_put_contents']['check'] = true;
         if(! function_exists('file_put_contents')){
             $this->response['check_pre_require']['file_put_contents']['check'] = false;
@@ -442,6 +437,7 @@ class RVsitebuilder_Setup_API {
             $this->response['status'] = false;
             $this->print_debug_log("PHP file_put_contents false");
         }
+        
         
         //http as user
         $this->response['httpasuser'] = $this->httpasuser;
