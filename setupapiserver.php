@@ -526,7 +526,10 @@ class RVsitebuilder_Setup_API {
         //copy framework/public to public path
         $source = $homeuser.'/rvsitebuildercms/'.$domainname.'/public';
         $destination = $publicpath;
-        $copy = $files->mirror($source, $destination,null,['override' => true]);
+        $copy = $files->copy($source.'/favicon.ico' , $destination.'/favicon.ico' , true);
+        $copy = $files->copy($source.'/index.php' , $destination.'/index.php' , true);
+        $copy = $files->copy($source.'/robots.txt' , $destination.'/robots.txt' , true);
+        $copy = $files->mirror($source.'/storage' , $destination.'/storage' , null ,['override' => true]);
         $this->print_debug_log("Copy $source To $destination");
         
         //delete appsconfig.json
