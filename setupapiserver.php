@@ -321,7 +321,6 @@ class RVsitebuilder_Setup_API {
             $this->response['status'] = false;
             $this->print_debug_log("PHP version falase ".PHP_VERSION);
         }
-        
         //php extension
         $this->response['check_pre_require']['mysqlnd']['check'] = true;
         if (!extension_loaded('mysqlnd')) {
@@ -338,14 +337,6 @@ class RVsitebuilder_Setup_API {
             $this->response['message'] = $this->response['message'].' / Can not load PHP Extension (pdo)';
             $this->response['status'] = false;
             $this->print_debug_log("PHP pdo false");
-        }
-        $this->response['check_pre_require']['image_lib']['check'] = true;
-        if (!extension_loaded('imagick') && !extension_loaded('gd')){
-            $this->response['check_pre_require']['image_lib']['check'] = false;
-            $this->response['check_pre_require']['image_lib']['reason'] = 'Can not load PHP Image Extension (GD  or  ImageMagick)';
-            $this->response['message'] = $this->response['message'].' / Can not load PHP Image Extension (GD  or  ImageMagick)';
-            $this->response['status'] = false;
-            $this->print_debug_log("PHP ImageMagick or GD false");
         }
         $this->response['check_pre_require']['curl']['check'] = true;
         if (!extension_loaded('curl')) {
@@ -371,13 +362,21 @@ class RVsitebuilder_Setup_API {
             $this->response['status'] = false;
             $this->print_debug_log("PHP mbstring false");
         }
-        $this->response['check_pre_require']['json']['check'] = true;
-        if(! extension_loaded('json')){
-            $this->response['check_pre_require']['json']['check'] = false;
-            $this->response['check_pre_require']['json']['reason'] = 'Can not load PHP Function (json)';
-            $this->response['message'] = $this->response['message'].' / Can not load PHP Function (json)';
+        $this->response['check_pre_require']['fileinfo']['check'] = true;
+        if (!extension_loaded('fileinfo')) {
+            $this->response['check_pre_require']['fileinfo']['check'] = false;
+            $this->response['check_pre_require']['fileinfo']['reason'] = '';
+            $this->response['message'] = $this->response['message'].' / Can not load PHP Extension (fileinfo)';
             $this->response['status'] = false;
-            $this->print_debug_log("PHP json false");
+            $this->print_debug_log("PHP fileinfo false");
+        }
+        $this->response['check_pre_require']['image_lib']['check'] = true;
+        if (!extension_loaded('imagick') && !extension_loaded('gd')){
+            $this->response['check_pre_require']['image_lib']['check'] = false;
+            $this->response['check_pre_require']['image_lib']['reason'] = 'Can not load PHP Extension (imagick or gd)';
+            $this->response['message'] = $this->response['message'].' / Can not load PHP Extension (imagick or gd)';
+            $this->response['status'] = false;
+            $this->print_debug_log("PHP imagick or gd false");
         }
         $this->response['check_pre_require']['zip']['check'] = true;
         if (!extension_loaded('zip')) {
@@ -387,19 +386,17 @@ class RVsitebuilder_Setup_API {
             $this->response['status'] = false;
             $this->print_debug_log("PHP zip false");
         }
+        //php config
         /*
-        $this->response['check_pre_require']['fileinfo']['check'] = true;
-        if (!extension_loaded('fileinfo')) {
-            $this->response['check_pre_require']['fileinfo']['check'] = false;
-            $this->response['check_pre_require']['fileinfo']['reason'] = '';
-            $this->response['message'] = $this->response['message'].' / Can not load PHP Extension (fileinfo)';
+        $this->response['check_pre_require']['allow_url_fopen']['check'] = true;
+        if (ini_get('allow_url_fopen') != 1) {
+            $this->response['check_pre_require']['allow_url_fopen']['check'] = false;
+            $this->response['check_pre_require']['allow_url_fopen']['reason'] = 'php.ini, Must set allow_url_fopen=ON';
+            $this->response['message'] = $this->response['message'].' / php.ini, Must set allow_url_fopen=ON';
             $this->response['status'] = false;
-            $this->print_debug_log("PHP fileinfo false");
+            $this->print_debug_log("PHP allow_url_fopen false");
         }
         */
-        
-        
-        //php config
         $this->response['check_pre_require']['memory_limit']['check'] = true;
         preg_match('/([0-9]+)/',ini_get('memory_limit'),$match);
         if($match[0] < 64) {
@@ -409,18 +406,25 @@ class RVsitebuilder_Setup_API {
             $this->response['status'] = false;
             $this->print_debug_log("PHP memory_limit false ".$match[0]);
         }
-        /*
-         $this->response['check_pre_require']['allow_url_fopen']['check'] = true;
-         if (ini_get('allow_url_fopen') != 1) {
-         $this->response['check_pre_require']['allow_url_fopen']['check'] = false;
-         $this->response['check_pre_require']['allow_url_fopen']['reason'] = 'php.ini, Must set allow_url_fopen=ON';
-         $this->response['message'] = $this->response['message'].' / php.ini, Must set allow_url_fopen=ON';
-         $this->response['status'] = false;
-         $this->print_debug_log("PHP allow_url_fopen false");
-         }
-         */
-        
-        //php function
+        //php function posix_getpwuid
+        $this->response['check_pre_require']['posix_getpwuid']['check'] = true;
+        if(! function_exists('posix_getpwuid')){
+            $this->response['check_pre_require']['posix_getpwuid']['check'] = false;
+            $this->response['check_pre_require']['posix_getpwuid']['reason'] = 'Can not load PHP Function (posix_getpwuid)';
+            $this->response['message'] = $this->response['message'].' / Can not load PHP Function (posix_getpwuid)';
+            $this->response['status'] = false;
+            $this->print_debug_log("PHP posix_getpwuid false");
+        }
+        //php function json
+        $this->response['check_pre_require']['json']['check'] = true;
+        if(! extension_loaded('json')){
+            $this->response['check_pre_require']['json']['check'] = false;
+            $this->response['check_pre_require']['json']['reason'] = 'Can not load PHP Function (json)';
+            $this->response['message'] = $this->response['message'].' / Can not load PHP Function (json)';
+            $this->response['status'] = false;
+            $this->print_debug_log("PHP json false");
+        }
+        //php function parse_ini_file
         $this->response['check_pre_require']['parse_ini_file']['check'] = true;
         if(! function_exists('parse_ini_file')){
             $this->response['check_pre_require']['parse_ini_file']['check'] = false;
@@ -429,6 +433,7 @@ class RVsitebuilder_Setup_API {
             $this->response['status'] = false;
             $this->print_debug_log("PHP parse_ini_file false");
         }
+        // php function file_put_contents
         $this->response['check_pre_require']['file_put_contents']['check'] = true;
         if(! function_exists('file_put_contents')){
             $this->response['check_pre_require']['file_put_contents']['check'] = false;
@@ -437,7 +442,6 @@ class RVsitebuilder_Setup_API {
             $this->response['status'] = false;
             $this->print_debug_log("PHP file_put_contents false");
         }
-        
         
         //http as user
         $this->response['httpasuser'] = $this->httpasuser;
@@ -457,10 +461,37 @@ class RVsitebuilder_Setup_API {
         
     }
     
+    public function file_validation_sha512($type , $url , $downloadpath , $unarraypath){
+        
+        $client = new Client([
+            'curl'            => [CURLOPT_SSL_VERIFYPEER => false, CURLOPT_SSL_VERIFYHOST => false],
+            'allow_redirects' => false,
+            'cookies'         => true,
+            'verify'          => false
+        ]);
+        
+        $arr_request = $client->request('GET' , $url);
+        
+        $verify_arr = json_decode($arr_request->getBody() , true);
+        
+        if($type=='vendor'){
+            $url_exploded = explode('/' , $url);
+            $downloadurl_sha512 = $verify_arr[$unarraypath]['version'][end($url_exploded)]['sha_512'];
+        }else{
+            $downloadurl_sha512 = $verify_arr[$unarraypath]['sha_512'];
+        }
+        
+        $file_sha512 = hash_file('sha512', $downloadpath);
+        
+        if($file_sha512 !== $downloadurl_sha512){
+            return 'fail';
+        }else{
+            return 'success';
+        }
+    
     public function download_framework($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport) {
         $time_start = microtime(true);
         $this->print_debug_log('======'.__METHOD__.'======');
-        
         
         if($this->httpasuser) {
             $res = $this->download_framework_httpasuser($homeuser,$domainname,$publicpath);
@@ -492,17 +523,29 @@ class RVsitebuilder_Setup_API {
             $this->print_debug_log("Removed old framwork path ".$homeuser.'/rvsitebuildercms/'.$domainname);
         }
         
+        $sha512verify = array(
+            'type' => 'framework',
+            'unarraypath' => 'rvsitebuilder/framework'
+        );
         //download framework url
         $downloadurl =  $this->mirror.'/download/rvsitebuilder/framework';
+        $sha512verify['getversionurl'] = 'https://getversion.rvsitebuilder.com/getversion/rvsitebuilder/framework';
         if(isset($this->installerconfig['framework']['getversion']) && $this->installerconfig['framework']['getversion'] == 'latest')
-        { $downloadurl = $this->mirror.'/download/rvsitebuilder/framework/tier/latest'; }
+        {
+            $downloadurl = $this->mirror.'/download/rvsitebuilder/framework/tier/latest';
+            $sha512verify['getversionurl'] = 'https://getversion.rvsitebuilder.com/getversion/rvsitebuilder/framework/tier/latest';
+        }
         if(isset($this->installerconfig['framework']['getversion']) && preg_match('/[0-9]+\.[0-9]+\.[0-9]+/',$this->installerconfig['framework']['getversion']))
-        { $downloadurl = $this->mirror.'/download/rvsitebuilder/framework/version/'.$this->installerconfig['framework']['getversion']; }
-        
+        {
+            $downloadurl = $this->mirror.'/download/rvsitebuilder/framework/version/'.$this->installerconfig['framework']['getversion'];
+            $sha512verify['getversionurl'] = 'https://getversion.rvsitebuilder.com/getversion/rvsitebuilder/framework/version/'.$this->installerconfig['framework']['getversion'];
+        }
+
         $this->print_debug_log("Download Framework URL ".$downloadurl);
         
         //download framework
-        $downloadframework = $this->doDownload('GET' , $downloadurl , dirname(__FILE__).'/framework.tar.gz');
+        $downloadframework = $this->doDownload('GET' , $downloadurl , dirname(__FILE__).'/framework.tar.gz' , $sha512verify);
+        
         if($downloadframework['success'] == false){
             if(file_exists(dirname(__FILE__).'/framework.tar.gz')){
                 $files->remove(dirname(__FILE__).'/framework.tar.gz');
@@ -526,10 +569,7 @@ class RVsitebuilder_Setup_API {
         //copy framework/public to public path
         $source = $homeuser.'/rvsitebuildercms/'.$domainname.'/public';
         $destination = $publicpath;
-        $copy = $files->copy($source.'/favicon.ico' , $destination.'/favicon.ico' , true);
-        $copy = $files->copy($source.'/index.php' , $destination.'/index.php' , true);
-        $copy = $files->copy($source.'/robots.txt' , $destination.'/robots.txt' , true);
-        $copy = $files->mirror($source.'/storage' , $destination.'/storage' , null ,['override' => true]);
+        $copy = $files->mirror($source, $destination,null,['override' => true]);
         $this->print_debug_log("Copy $source To $destination");
         
         //delete appsconfig.json
@@ -559,16 +599,27 @@ class RVsitebuilder_Setup_API {
         
         $files =  new Filesystem();
         
+        $sha512verify = array(
+            'type' => 'framework',
+            'unarraypath' => 'rvsitebuilder/framework'
+        );
         $downloadurl =  $this->mirror.'/download/rvsitebuilder/framework';
+        $sha512verify['getversionurl'] = 'https://getversion.rvsitebuilder.com/getversion/rvsitebuilder/framework';
         if(isset($this->installerconfig['framework']['getversion']) && $this->installerconfig['framework']['getversion'] == 'latest')
-        { $downloadurl = $this->mirror.'/download/rvsitebuilder/framework/tier/latest'; }
+        {
+            $downloadurl = $this->mirror.'/download/rvsitebuilder/framework/tier/latest';
+            $sha512verify['getversionurl'] = 'https://getversion.rvsitebuilder.com/getversion/rvsitebuilder/framework/tier/latest';
+        }
         if(isset($this->installerconfig['framework']['getversion']) && preg_match('/[0-9]+\.[0-9]+\.[0-9]+/',$this->installerconfig['framework']['getversion']))
-        { $downloadurl = $this->mirror.'/download/rvsitebuilder/framework/version/'.$this->installerconfig['framework']['getversion']; }
+        {
+            $downloadurl = $this->mirror.'/download/rvsitebuilder/framework/version/'.$this->installerconfig['framework']['getversion'];
+            $sha512verify['getversionurl'] = 'https://getversion.rvsitebuilder.com/getversion/rvsitebuilder/framework/version/'.$this->installerconfig['framework']['getversion'];
+        }
         
         $this->print_debug_log("Download Framework URL ".$downloadurl);
         
         //download framework
-        $downloadframework = $this->doDownload('GET' , $downloadurl , dirname(__FILE__).'/framework.tar.gz');
+        $downloadframework = $this->doDownload('GET' , $downloadurl , dirname(__FILE__).'/framework.tar.gz' , $sha512verify);
         if($downloadframework['success'] == false){
             if(file_exists(dirname(__FILE__).'/framework.tar.gz')){
                 $files->remove(dirname(__FILE__).'/framework.tar.gz');
@@ -611,7 +662,6 @@ class RVsitebuilder_Setup_API {
     public function download_vendor($homeuser,$domainname) {
         $time_start = microtime(true);
         $this->print_debug_log('======'.__METHOD__.'======');
-        
         if($this->httpasuser) {
             $res = $this->download_vendor_httpasuser($homeuser,$domainname,$publicpath);
         } else {
@@ -644,6 +694,7 @@ class RVsitebuilder_Setup_API {
         //read rvsitebuilder.json
         $rvsbjson = json_decode(file_get_contents($homeuser.'/rvsitebuildercms/'.$domainname.'/rvsitebuilder.json'), true);
         
+        // unset($rvsbjson['vendor-packages']);
         // first download from key vendor-packages (bundle_vendor) if key exists
         // link download = http://files.mirror1.rvsitebuilder.com/download/rvsitebuilder/framework%2Fbundle_vendor/version/0.0.8
         // vendor-packages = rvsitebuilder\/framework\/bundle_vendor
@@ -654,8 +705,15 @@ class RVsitebuilder_Setup_API {
             $package_name_encoded = '/'.$product_name.'/'.urlencode($app_name);
             $version = '/version/'.$rvsbjson['version'];
             $downloadvendorurl = $this->mirror.'/download'.$package_name_encoded.$version;
+            $getversionurl = 'https://getversion.rvsitebuilder.com/getversion/vendor/'.urlencode($app_name).$version;
+            $sha512verify = array(
+                'type' => 'vendor',
+                'getversionurl' => $getversionurl,
+                'version' => $rvsbjson['version'],
+                'unarraypath' => urlencode($app_name)
+            );
             $this->print_debug_log("Vendor URL download ".$downloadvendorurl);
-            $downloadvendor = $this->doDownload('GET' , $downloadvendorurl , dirname(__FILE__).'/bundle_vendor.tar.gz');
+            $downloadvendor = $this->doDownload('GET' , $downloadvendorurl , dirname(__FILE__).'/bundle_vendor.tar.gz' , $sha512verify);
             if($downloadvendor['success'] == false) {
                 if($files->exists(dirname(__FILE__).'/bundle_vendor.tar.gz')) {
                     $files->remove(dirname(__FILE__).'/bundle_vendor.tar.gz');
@@ -696,7 +754,14 @@ class RVsitebuilder_Setup_API {
                 
                 $downloadvendorurl = $this->mirror.'/download/'.$product_name.'/'.urlencode($app_name).$update_package_version;
                 $this->print_debug_log("Package URL Download ".$downloadvendorurl);
-                $downloadvendor = $this->doDownload('GET' , $downloadvendorurl , dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
+                $getversionurl = 'https://getversion.rvsitebuilder.com/getversion/vendor/'.urlencode($app_name).$update_package_version;
+                $sha512verify = array(
+                    'type' => 'vendor',
+                    'getversionurl' => $getversionurl,
+                    'version' => $rvsbjson['packages'][$package_key]['version'],
+                    'unarraypath' => $product_name.'/'.urlencode($app_name)
+                );
+                $downloadvendor = $this->doDownload('GET' , $downloadvendorurl , dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz' , $sha512verify);
                 if($downloadvendor['success'] == false) {
                     if($files->exists(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz')) {
                         $files->remove(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
@@ -716,7 +781,7 @@ class RVsitebuilder_Setup_API {
                 }
                 
                 if($files->exists(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz')) {
-                    $$files->remove(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
+                    $files->remove(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
                     $this->print_debug_log("Removed ".dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
                 }
             }
@@ -758,8 +823,15 @@ class RVsitebuilder_Setup_API {
             $package_name_encoded = '/'.$product_name.'/'.urlencode($app_name);
             $version = '/version/'.$rvsbjson['version'];
             $downloadvendorurl = $this->mirror.'/download'.$package_name_encoded.$version;
+            $getversionurl = 'https://getversion.rvsitebuilder.com/getversion/vendor/'.urlencode($app_name).$version;
+            $sha512verify = array(
+                'type' => 'vendor',
+                'getversionurl' => $getversionurl,
+                'version' => $rvsbjson['version'],
+                'unarraypath' => urlencode($app_name)
+            );
             $this->print_debug_log("Vendor URL download ".$downloadvendorurl);
-            $downloadvendor = $this->doDownload('GET' , $downloadvendorurl , dirname(__FILE__).'/bundle_vendor.tar.gz');
+            $downloadvendor = $this->doDownload('GET' , $downloadvendorurl , dirname(__FILE__).'/bundle_vendor.tar.gz' , $sha512verify);
             if($downloadvendor['success'] == false) {
                 if($files->exists(dirname(__FILE__).'/bundle_vendor.tar.gz')) {
                     $files->remove(dirname(__FILE__).'/bundle_vendor.tar.gz');
@@ -797,10 +869,16 @@ class RVsitebuilder_Setup_API {
                 if ($update_package_version != '') {
                     $update_package_version = '/version/' . $update_package_version;
                 }
-                
-                $downloadvendorurl = $this->mirror.'/download/'.$product_name.'/'.urlencode($app_name).$update_package_version;
                 $this->print_debug_log("Package URL Download ".$downloadvendorurl);
-                $downloadvendor = $this->doDownload('GET' , $downloadvendorurl , dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
+                $downloadvendorurl = $this->mirror.'/download/'.$product_name.'/'.urlencode($app_name).$update_package_version;
+                $getversionurl = 'https://getversion.rvsitebuilder.com/getversion/vendor/'.urlencode($app_name).$update_package_version;
+                $sha512verify = array(
+                    'type' => 'vendor',
+                    'getversionurl' => $getversionurl,
+                    'version' => $rvsbjson['packages'][$package_key]['version'],
+                    'unarraypath' => $product_name.'/'.urlencode($app_name)
+                );
+                $downloadvendor = $this->doDownload('GET' , $downloadvendorurl , dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz' , $sha512verify);
                 if($downloadvendor['success'] == false) {
                     if($files->exists(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz')) {
                         $files->remove(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
@@ -905,7 +983,7 @@ class RVsitebuilder_Setup_API {
                 array_push($commonpkg , $package);
             }
         }
-        
+
         $this->print_debug_log("Common Package list ".json_encode($commonpkg));
         
         if($this->httpasuser) {
@@ -913,8 +991,7 @@ class RVsitebuilder_Setup_API {
         } else {
             $res = $this->download_common_pkg_no_httpasuser($commonpkg);
         }
-        
-        
+    
         $this->response['status'] = $res['status'];
         $this->response['message'] = $res['message'];
         $this->response['exectime'] = (microtime(true) - $time_start);
@@ -932,19 +1009,28 @@ class RVsitebuilder_Setup_API {
         ];
         
         $files = new Filesystem();
-        
         foreach ($commonpkg as $pkg) {
-            
+            $sha512verify = array(
+                'type' => 'commonkpg',
+                'unarraypath' => 'rvsitebuilder/'.$pkg
+            );
             $downloadurl = $this->mirror.'/download/rvsitebuilder/'.$pkg ;
+            $sha512verify['getversionurl'] = 'https://getversion.rvsitebuilder.com/getversion/rvsitebuilder/'.$pkg;
             if(isset($this->installerconfig[$pkg]['getversion']) && $this->installerconfig[$pkg]['getversion'] == 'latest')
-            { $downloadurl = $this->mirror.'/download/rvsitebuilder/'.$pkg.'/tier/latest'; }
+            {
+                $downloadurl = $this->mirror.'/download/rvsitebuilder/'.$pkg.'/tier/latest';
+                $sha512verify['getversionurl'] = 'https://getversion.rvsitebuilder.com/getversion/rvsitebuilder/'.$pkg.'/tier/latest';
+            }
             if(isset($this->installerconfig[$pkg]['getversion']) && preg_match('/[0-9]+\.[0-9]+\.[0-9]+/',$this->installerconfig[$pkg]['getversion']))
-            { $downloadurl = $this->mirror.'/download/rvsitebuilder/'.$pkg.'/version/'.$this->installerconfig[$pkg]['getversion']; }
+            {
+                $downloadurl = $this->mirror.'/download/rvsitebuilder/'.$pkg.'/version/'.$this->installerconfig[$pkg]['getversion'];
+                $sha512verify['getversionurl'] = 'https://getversion.rvsitebuilder.com/getversion/rvsitebuilder/'.$pkg.'/version/'.$this->installerconfig[$pkg]['getversion'];
+            }
             
             $this->print_debug_log("Download Common Package URL ".$downloadurl);
             
             //download package
-            $downloadpkg = $this->doDownload('GET' , $downloadurl , dirname(__FILE__).'/'.$pkg.'.tar.gz');
+            return $downloadpkg = $this->doDownload('GET' , $downloadurl , dirname(__FILE__).'/'.$pkg.'.tar.gz' , $sha512verify);
             if($downloadpkg['success'] == false){
                 if($files->exists(dirname(__FILE__).'/'.$pkg.'.tar.gz')) {
                     $files->remove(dirname(__FILE__).'/'.$pkg.'.tar.gz');
@@ -980,12 +1066,19 @@ class RVsitebuilder_Setup_API {
                 if ($update_package_version != '') {
                     $update_package_version = '/version/' . $update_package_version;
                 }
-                
-                $downloadvendorurl = $this->mirror.'/download/'.$product_name.'/'.urlencode($app_name).$update_package_version;
+
+                return $downloadvendorurl = $this->mirror.'/download/'.$product_name.'/'.urlencode($app_name).$update_package_version;
+                $getversionurl = 'https://getversion.rvsitebuilder.com/getversion/vendor/'.urlencode($app_name).$version;
+                $sha512vendorverify = array(
+                    'type' => 'vendor',
+                    'getversionurl' => $getvendorversionurl,
+                    'version' => $rvsbjson['packages'][$package_key]['version'],
+                    'unarraypath' => urlencode($app_name)
+                );                
                 
                 $this->print_debug_log("Download vendor URL ".$downloadvendorurl);
                 
-                $downloadvendor = $this->doDownload('GET' , $downloadvendorurl , dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
+                $downloadvendor = $this->doDownload('GET' , $downloadvendorurl , dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz' , $sha512vendorverify);
                 if($downloadvendor['success'] == false) {
                     if($files->exists(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz')) {
                         $files->remove(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
@@ -1030,17 +1123,27 @@ class RVsitebuilder_Setup_API {
         $files = new Filesystem();
         
         foreach ($commonpkg as $pkg) {
-            
+            $sha512verify = array(
+                'type' => 'commonkpg',
+                'unarraypath' => 'rvsitebuilder/'.$pkg
+            );
             $downloadurl = $this->mirror.'/download/rvsitebuilder/'.$pkg ;
+            $sha512verify['getversionurl'] = 'https://getversion.rvsitebuilder.com/getversion/rvsitebuilder/'.$pkg;
             if(isset($this->installerconfig[$pkg]['getversion']) && $this->installerconfig[$pkg]['getversion'] == 'latest')
-            { $downloadurl = $this->mirror.'/download/rvsitebuilder/'.$pkg.'/tier/latest'; }
+            {
+                $downloadurl = $this->mirror.'/download/rvsitebuilder/'.$pkg.'/tier/latest';
+                $sha512verify['getversionurl'] = 'https://getversion.rvsitebuilder.com/getversion/rvsitebuilder/'.$pkg.'/tier/latest';
+            }
             if(isset($this->installerconfig[$pkg]['getversion']) && preg_match('/[0-9]+\.[0-9]+\.[0-9]+/',$this->installerconfig[$pkg]['getversion']))
-            { $downloadurl = $this->mirror.'/download/rvsitebuilder/'.$pkg.'/version/'.$this->installerconfig[$pkg]['getversion']; }
+            {
+                $downloadurl = $this->mirror.'/download/rvsitebuilder/'.$pkg.'/version/'.$this->installerconfig[$pkg]['getversion'];
+                $sha512verify['getversionurl'] = 'https://getversion.rvsitebuilder.com/getversion/rvsitebuilder/'.$pkg.'/version/'.$this->installerconfig[$pkg]['getversion'];
+            }
             
             $this->print_debug_log("Download Common Package URL ".$downloadurl);
             
             //download package
-            $downloadpkg = $this->doDownload('GET' , $downloadurl , dirname(__FILE__).'/'.$pkg.'.tar.gz');
+            $downloadpkg = $this->doDownload('GET' , $downloadurl , dirname(__FILE__).'/'.$pkg.'.tar.gz' , $sha512verify);
             if($downloadpkg['success'] == false){
                 if($files->exists(dirname(__FILE__).'/'.$pkg.'.tar.gz')) {
                     $files->remove(dirname(__FILE__).'/'.$pkg.'.tar.gz');
@@ -1080,10 +1183,16 @@ class RVsitebuilder_Setup_API {
                 }
                 
                 $downloadvendorurl = $this->mirror.'/download/'.$product_name.'/'.urlencode($app_name).$update_package_version;
+                $getversionurl = 'https://getversion.rvsitebuilder.com/getversion/vendor/'.urlencode($app_name).$version;
+                $sha512vendorverify = array(
+                    'type' => 'vendor',
+                    'getversionurl' => $getvendorversionurl,
+                    'version' => $rvsbjson['packages'][$package_key]['version'],
+                    'unarraypath' => urlencode($app_name)
+                );                
                 
                 $this->print_debug_log("Download vendor URL ".$downloadvendorurl);
-                
-                $downloadvendor = $this->doDownload('GET' , $downloadvendorurl , dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
+                $downloadvendor = $this->doDownload('GET' , $downloadvendorurl , dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz' , $sha512vendorverify);
                 if($downloadvendor['success'] == false) {
                     if($files->exists(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz')) {
                         $files->remove(dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz');
@@ -1795,7 +1904,7 @@ class RVsitebuilder_Setup_API {
         
     }
     
-    public function doDownload($type, $url, $sink) {
+    public function doDownload($type, $url, $sink , $sha512verify=[]) {
         $time_start = microtime(true);
         $this->print_debug_log('======'.__METHOD__.'======');
         
@@ -1837,7 +1946,7 @@ class RVsitebuilder_Setup_API {
                 'timeout'   => 180
             ]
             );
-        
+            
         $this->print_debug_log('Server Response Status '.$res->getStatusCode());
         $this->print_debug_log('Server Response Header '.json_encode((array) $res->getHeaders()));
         
@@ -1845,12 +1954,33 @@ class RVsitebuilder_Setup_API {
             $this->print_debug_log("Download Error, Server Header Response : ".$res->getHeaderLine('RV-DOWNLOAD-RESPONSE-MESSAGE'));
             $response['message'] = $res->getHeaderLine('RV-DOWNLOAD-RESPONSE-MESSAGE');
         }else if(!file_exists($sink)) {
-            $this->print_debug_log('Download Error ,file '.$sink.' not exists');
+            $this->print_debug_log('Download Error ,file '.$sink.' not exists');    
             $response['message'] = 'Download Error ,file '.$sink.' not exists';
         }else {
             $this->print_debug_log('Download Success ,file '.$sink);
             $response['success'] = true;
         }
+        
+        //sha_512 verify
+        if(!empty($sha512verify)){
+            $arr_request = $client->request('GET' , $sha512verify['getversionurl']);
+            $verify_arr = json_decode($arr_request->getBody() , true);
+            if($sha512verify['type']=='vendor'){
+                if(isset($verify_arr[$sha512verify['unarraypath']])){
+                    $downloadurl = $verify_arr[$sha512verify['unarraypath']]['versions'][$sha512verify['version']]['sha512'];    
+                }else{
+                    $downloadurl = $verify_arr[urldecode($sha512verify['unarraypath'])]['versions'][$sha512verify['version']]['sha512'];
+                }
+            }else{
+                $downloadurl = $verify_arr[$sha512verify['unarraypath']]['sha512'];
+            }
+            $file_sha512 = hash_file('sha512' , $sink);
+            if($file_sha512!=$downloadurl){
+                $response['success'] = false;
+                $response['message'] = 'Download error , File validation incorret.';
+            }
+        }
+        
         $exectime = (microtime(true) - $time_start);
         $this->print_install_log(__METHOD__.' status: '.$response['success'].' url: ' . $url .' timeusage: '.$exectime);
         return $response;
@@ -2461,9 +2591,8 @@ class FTP_Handler{
         }
         return true;
     }
+    
 }
-
-
 
 function getFrameworkVendorPath($filePath = ''){
     $vendorDir = realpath(dirname($filePath) . '/../../../../../') . '/vendor';
