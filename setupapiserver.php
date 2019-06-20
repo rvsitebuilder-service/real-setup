@@ -760,7 +760,7 @@ class RVsitebuilder_Setup_API {
                     'type' => 'vendor',
                     'getversionurl' => $getversionurl,
                     'version' => $rvsbjson['packages'][$package_key]['version'],
-                    'unarraypath' => $product_name.'/'.urlencode($app_name)
+                    'unarraypath' => $rvsbjson['packages'][$package_key]['name']
                 );
                 $downloadvendor = $this->doDownload('GET' , $downloadvendorurl , dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz' , $sha512verify);
                 if($downloadvendor['success'] == false) {
@@ -1184,12 +1184,12 @@ class RVsitebuilder_Setup_API {
                 }
                 
                 $downloadvendorurl = $this->mirror.'/download/'.$product_name.'/'.urlencode($app_name).$update_package_version;
-                $getversionurl = 'https://getversion.rvsitebuilder.com/getversion/vendor/'.urlencode($app_name).$version;
+                $getvendorversionurl = 'https://getversion.rvsitebuilder.com/getversion/'.$product_name.'/'.urlencode($app_name).$update_package_version;
                 $sha512vendorverify = array(
                     'type' => 'vendor',
                     'getversionurl' => $getvendorversionurl,
                     'version' => $rvsbjson['packages'][$package_key]['version'],
-                    'unarraypath' => urlencode($app_name)
+                    'unarraypath' => $rvsbjson['packages'][$package_key]['name']
                 );                
                 
                 $this->print_debug_log("Download vendor URL ".$downloadvendorurl);
@@ -1966,6 +1966,7 @@ class RVsitebuilder_Setup_API {
         if(!empty($sha512verify)){
             $arr_request = $client->request('GET' , $sha512verify['getversionurl']);
             $verify_arr = json_decode($arr_request->getBody() , true);
+            $file_sha512 = hash_file('sha512' , $sink);
             if($sha512verify['type']=='vendor'){
                 if(isset($verify_arr[$sha512verify['unarraypath']])){
                     $downloadurl = $verify_arr[$sha512verify['unarraypath']]['versions'][$sha512verify['version']]['sha512'];    
@@ -1975,7 +1976,6 @@ class RVsitebuilder_Setup_API {
             }else{
                 $downloadurl = $verify_arr[$sha512verify['unarraypath']]['sha512'];
             }
-            $file_sha512 = hash_file('sha512' , $sink);
             if($file_sha512!=$downloadurl){
                 $response['success'] = false;
                 $response['message'] = 'Download error , File validation incorret.';
