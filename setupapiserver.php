@@ -488,6 +488,7 @@ class RVsitebuilder_Setup_API {
         }else{
             return 'success';
         }
+    }
     
     public function download_framework($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport) {
         $time_start = microtime(true);
