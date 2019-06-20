@@ -714,7 +714,7 @@ class RVsitebuilder_Setup_API {
                 'unarraypath' => urlencode($app_name)
             );
             $this->print_debug_log("Vendor URL download ".$downloadvendorurl);
-            $downloadvendor = $this->doDownload('GET' , $downloadvendorurl , dirname(__FILE__).'/bundle_vendor.tar.gz' , $sha512verify);
+            $downloadvendor = $this->doDownload('GET' , $downloadvendorurl , dirname(__FILE__).'/bundle_vendor.tar.gz');
             if($downloadvendor['success'] == false) {
                 if($files->exists(dirname(__FILE__).'/bundle_vendor.tar.gz')) {
                     $files->remove(dirname(__FILE__).'/bundle_vendor.tar.gz');
