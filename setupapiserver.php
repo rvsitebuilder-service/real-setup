@@ -461,35 +461,6 @@ class RVsitebuilder_Setup_API {
         
     }
     
-    public function file_validation_sha512($type , $url , $downloadpath , $unarraypath){
-        
-        $client = new Client([
-            'curl'            => [CURLOPT_SSL_VERIFYPEER => false, CURLOPT_SSL_VERIFYHOST => false],
-            'allow_redirects' => false,
-            'cookies'         => true,
-            'verify'          => false
-        ]);
-        
-        $arr_request = $client->request('GET' , $url);
-        
-        $verify_arr = json_decode($arr_request->getBody() , true);
-        
-        if($type=='vendor'){
-            $url_exploded = explode('/' , $url);
-            $downloadurl_sha512 = $verify_arr[$unarraypath]['version'][end($url_exploded)]['sha_512'];
-        }else{
-            $downloadurl_sha512 = $verify_arr[$unarraypath]['sha_512'];
-        }
-        
-        $file_sha512 = hash_file('sha512', $downloadpath);
-        
-        if($file_sha512 !== $downloadurl_sha512){
-            return 'fail';
-        }else{
-            return 'success';
-        }
-    }
-    
     public function download_framework($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport) {
         $time_start = microtime(true);
         $this->print_debug_log('======'.__METHOD__.'======');
@@ -570,7 +541,10 @@ class RVsitebuilder_Setup_API {
         //copy framework/public to public path
         $source = $homeuser.'/rvsitebuildercms/'.$domainname.'/public';
         $destination = $publicpath;
-        $copy = $files->mirror($source, $destination,null,['override' => true]);
+        $copy = $files->copy($source.'/favicon.ico' , $destination.'/favicon.ico' , true);
+        $copy = $files->copy($source.'/index.php' , $destination.'/index.php' , true);
+        $copy = $files->copy($source.'/robots.txt' , $destination.'/robots.txt' , true);
+        $copy = $files->mirror($source.'/storage' , $destination.'/storage' , null ,['override' => true]);
         $this->print_debug_log("Copy $source To $destination");
         
         //delete appsconfig.json
@@ -695,7 +669,6 @@ class RVsitebuilder_Setup_API {
         //read rvsitebuilder.json
         $rvsbjson = json_decode(file_get_contents($homeuser.'/rvsitebuildercms/'.$domainname.'/rvsitebuilder.json'), true);
         
-        // unset($rvsbjson['vendor-packages']);
         // first download from key vendor-packages (bundle_vendor) if key exists
         // link download = http://files.mirror1.rvsitebuilder.com/download/rvsitebuilder/framework%2Fbundle_vendor/version/0.0.8
         // vendor-packages = rvsitebuilder\/framework\/bundle_vendor
@@ -870,8 +843,9 @@ class RVsitebuilder_Setup_API {
                 if ($update_package_version != '') {
                     $update_package_version = '/version/' . $update_package_version;
                 }
-                $this->print_debug_log("Package URL Download ".$downloadvendorurl);
+                
                 $downloadvendorurl = $this->mirror.'/download/'.$product_name.'/'.urlencode($app_name).$update_package_version;
+                $this->print_debug_log("Package URL Download ".$downloadvendorurl);
                 $getversionurl = 'https://getversion.rvsitebuilder.com/getversion/vendor/'.urlencode($app_name).$update_package_version;
                 $sha512verify = array(
                     'type' => 'vendor',
@@ -1031,7 +1005,7 @@ class RVsitebuilder_Setup_API {
             $this->print_debug_log("Download Common Package URL ".$downloadurl);
             
             //download package
-            return $downloadpkg = $this->doDownload('GET' , $downloadurl , dirname(__FILE__).'/'.$pkg.'.tar.gz' , $sha512verify);
+            $downloadpkg = $this->doDownload('GET' , $downloadurl , dirname(__FILE__).'/'.$pkg.'.tar.gz' , $sha512verify);
             if($downloadpkg['success'] == false){
                 if($files->exists(dirname(__FILE__).'/'.$pkg.'.tar.gz')) {
                     $files->remove(dirname(__FILE__).'/'.$pkg.'.tar.gz');
@@ -1068,7 +1042,7 @@ class RVsitebuilder_Setup_API {
                     $update_package_version = '/version/' . $update_package_version;
                 }
 
-                return $downloadvendorurl = $this->mirror.'/download/'.$product_name.'/'.urlencode($app_name).$update_package_version;
+                $downloadvendorurl = $this->mirror.'/download/'.$product_name.'/'.urlencode($app_name).$update_package_version;
                 $getversionurl = 'https://getversion.rvsitebuilder.com/getversion/vendor/'.urlencode($app_name).$version;
                 $sha512vendorverify = array(
                     'type' => 'vendor',
