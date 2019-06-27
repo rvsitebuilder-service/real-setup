@@ -512,6 +512,7 @@ class RVsitebuilder_Setup_API {
             $downloadurl = $this->mirror.'/download/rvsitebuilder/framework/version/'.$this->installerconfig['framework']['getversion'];
             $sha512verify['version_type'] = 'version';
             $sha512verify['version'] = $this->installerconfig['framework']['getversion'];
+            $sha512verify['getversionurl'] = 'https://getversion.rvsitebuilder.com/getversion/rvsitebuilder/framework';
         }
 
         $this->print_debug_log("Download Framework URL ".$downloadurl);
@@ -579,19 +580,22 @@ class RVsitebuilder_Setup_API {
             'type' => 'framework',
             'unarraypath' => 'rvsitebuilder/framework'
         );
+        //download framework url
         $downloadurl =  $this->mirror.'/download/rvsitebuilder/framework';
-        $sha512verify['version_type'] = '/tier/stable';
+        $sha512verify['version_type'] = 'stable';
         if(isset($this->installerconfig['framework']['getversion']) && $this->installerconfig['framework']['getversion'] == 'latest')
         {
             $downloadurl = $this->mirror.'/download/rvsitebuilder/framework/tier/latest';
-            $sha512verify['version_type'] = '/tier/latest';
+            $sha512verify['version_type'] = 'latest';
         }
         if(isset($this->installerconfig['framework']['getversion']) && preg_match('/[0-9]+\.[0-9]+\.[0-9]+/',$this->installerconfig['framework']['getversion']))
         {
             $downloadurl = $this->mirror.'/download/rvsitebuilder/framework/version/'.$this->installerconfig['framework']['getversion'];
-            $sha512verify['version_type'] = '/version/'.$this->installerconfig['framework']['getversion'];
+            $sha512verify['version_type'] = 'version';
+            $sha512verify['version'] = $this->installerconfig['framework']['getversion'];
+            $sha512verify['getversionurl'] = 'https://getversion.rvsitebuilder.com/getversion/rvsitebuilder/framework';
         }
-        
+
         $this->print_debug_log("Download Framework URL ".$downloadurl);
         
         //download framework
@@ -837,7 +841,7 @@ class RVsitebuilder_Setup_API {
                     'type' => 'vendor',
                     'getversionurl' => $getversionurl,
                     'version' => $rvsbjson['packages'][$package_key]['version'],
-                    'unarraypath' => $product_name.'/'.urlencode($app_name)
+                    'unarraypath' => $rvsbjson['packages'][$package_key]['name']
                 );
                 $downloadvendor = $this->doDownload('GET' , $downloadvendorurl , dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz' , $sha512verify);
                 if($downloadvendor['success'] == false) {
@@ -976,15 +980,17 @@ class RVsitebuilder_Setup_API {
                 'unarraypath' => 'rvsitebuilder/'.$pkg
             );
             $downloadurl = $this->mirror.'/download/rvsitebuilder/'.$pkg ;
-            $sha512verify['getversionurl'] = 'https://getversion.rvsitebuilder.com/getversion/rvsitebuilder/'.$pkg;
+            $sha512verify['version_type'] = 'stable';
             if(isset($this->installerconfig[$pkg]['getversion']) && $this->installerconfig[$pkg]['getversion'] == 'latest')
             {
                 $downloadurl = $this->mirror.'/download/rvsitebuilder/'.$pkg.'/tier/latest';
-                $sha512verify['getversionurl'] = 'https://getversion.rvsitebuilder.com/getversion/rvsitebuilder/'.$pkg.'/tier/latest';
+                $sha512verify['version_type'] = 'latest';
             }
             if(isset($this->installerconfig[$pkg]['getversion']) && preg_match('/[0-9]+\.[0-9]+\.[0-9]+/',$this->installerconfig[$pkg]['getversion']))
             {
                 $downloadurl = $this->mirror.'/download/rvsitebuilder/'.$pkg.'/version/'.$this->installerconfig[$pkg]['getversion'];
+                $sha512verify['version_type'] = 'version';
+                $sha512verify['version'] = $this->installerconfig[$pkg]['getversion'];
                 $sha512verify['getversionurl'] = 'https://getversion.rvsitebuilder.com/getversion/rvsitebuilder/'.$pkg.'/version/'.$this->installerconfig[$pkg]['getversion'];
             }
             
@@ -1100,6 +1106,7 @@ class RVsitebuilder_Setup_API {
                 $downloadurl = $this->mirror.'/download/rvsitebuilder/'.$pkg.'/version/'.$this->installerconfig[$pkg]['getversion'];
                 $sha512verify['version_type'] = 'version';
                 $sha512verify['version'] = $this->installerconfig[$pkg]['getversion'];
+                $sha512verify['getversionurl'] = 'https://getversion.rvsitebuilder.com/getversion/rvsitebuilder/'.$pkg.'/version/'.$this->installerconfig[$pkg]['getversion'];
             }
             
             $this->print_debug_log("Download Common Package URL ".$downloadurl);
