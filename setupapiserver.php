@@ -39,6 +39,8 @@ $artisanparam   = '{}';
 $devtokenkey    = '';
 $additionalpkg  = '';
 $welcomeemailtype = 'default';
+$isrepair         = 0;
+$cptype         = 'none';
 
 //get
 if (isset($_GET['action']))         $action         = $_GET['action'];
@@ -64,6 +66,8 @@ if (isset($_GET['artisanparam']))   $artisanparam   = $_GET['artisanparam'];
 if (isset($_GET['devtokenkey']))    $devtokenkey    = $_GET['devtokenkey'];
 if (isset($_GET['additionalpkg']))  $additionalpkg  = $_GET['additionalpkg'];
 if (isset($_GET['welcomeemailtype']))  $welcomeemailtype  = $_GET['welcomeemailtype'];
+if (isset($_GET['isrepair']))  $isrepair  = $_GET['isrepair'];
+if (isset($_GET['cptype']))  $cptype  = $_GET['cptype'];
 
 //post
 if (isset($_POST['action']))         $action         = $_POST['action'];
@@ -90,6 +94,8 @@ if (isset($_POST['argvalue']))       $argvalue       = $_POST['argvalue'];
 if (isset($_POST['devtokenkey']))    $devtokenkey    = $_POST['devtokenkey'];
 if (isset($_POST['additionalpkg']))  $additionalpkg  = $_POST['additionalpkg'];
 if (isset($_POST['welcomeemailtype']))  $welcomeemailtype  = $_POST['welcomeemailtype'];
+if (isset($_POST['isrepair']))  $isrepair  = $_POST['isrepair'];
+if (isset($_POST['cptype']))  $cptype  = $_POST['cptype'];
 
 
 $setupObj = new RVsitebuilder_Setup_API($responsetype,$rvsb_installing_token,$responsetype,$ignore_token,$rvlicensecode);
@@ -112,7 +118,7 @@ if($action == 'download_vendor'){
 }
 
 if($action == 'setup_env'){
-    $setupObj->setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname,$ftpserver,$ftpport,$domainport,$devtokenkey,$welcomeemailtype,$homeuser);
+    $setupObj->setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname,$ftpserver,$ftpport,$domainport,$devtokenkey,$welcomeemailtype,$homeuser,$cptype);
 }
 
 if($action == 'download_common_pkg'){
@@ -124,7 +130,7 @@ if($action == 'install_all_pkg' && $homeuser != '' && $domainname != '' && $publ
 }
 
 if($action == 'artisan_call'){
-    $setupObj->artisan_call($homeuser,$domainname,$publicpath,$adminemail,$adminpassword,$adminfirstname,$adminlastname);
+    $setupObj->artisan_call($homeuser,$domainname,$publicpath,$adminemail,$adminpassword,$adminfirstname,$adminlastname,$isrepair);
 }
 if($action == 'artisan_cmd_run'){
     $setupObj->artisan_cmd_run($homeuser,$domainname,$artisancmd,$artisanparam);
@@ -883,7 +889,7 @@ class RVsitebuilder_Setup_API {
         
     }
     
-    public function setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname,$ftpserver,$ftpport,$domainport,$devtokenkey,$welcomeemailtype,$homeuser) {
+    public function setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname,$ftpserver,$ftpport,$domainport,$devtokenkey,$welcomeemailtype,$homeuser,$cptype) {
         $time_start = microtime(true);
         $this->print_debug_log('======'.__METHOD__.'======');
         
@@ -905,10 +911,10 @@ class RVsitebuilder_Setup_API {
         $env_data['FTP_SERVER'] = $ftpserver;
         $env_data['FTP_PORT'] = $ftpport;
         $env_data['DOCUMENT_ROOT'] = $publicpath;
-        $env_data['DOCUMENT_ROOT'] = $publicpath;
         $env_data['RV_MIRROR']  = $this->mirror;
         $env_data['DEVELOPER_TOKEN_KEY']  = $devtokenkey;
         $env_data['WELCOME_EMAIL_TYPE']  = $welcomeemailtype;
+        $env_data['CP_TYPE']  = $cptype;
         
         
         $this->print_debug_log("ENV data ".json_encode($env_data));
@@ -1193,7 +1199,7 @@ class RVsitebuilder_Setup_API {
     }
     
     
-    public function artisan_call($homeuser,$domainname,$publicpath,$adminemail,$adminpassword,$adminfirstname,$adminlastname) {
+    public function artisan_call($homeuser,$domainname,$publicpath,$adminemail,$adminpassword,$adminfirstname,$adminlastname,$isrepair) {
         $time_start = microtime(true);
         $this->print_debug_log('======'.__METHOD__.'======');
         
@@ -1224,39 +1230,46 @@ class RVsitebuilder_Setup_API {
         $this->print_debug_log('require_one '.$homeuser.'/rvsitebuildercms/'.$domainname.'/bootstrap/app.php');
         $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
         
+        if(! $isrepair){
+            //Common
+            $unit_time_start = microtime(true);
+            $kernel->call('key:generate', []);
+            $this->print_debug_log($kernel->output());
+            $unit_exec_time = (microtime(true) - $unit_time_start);
+            $this->print_install_log('artisan key:generate timeusage '.$unit_exec_time);
+            
+            $unit_time_start = microtime(true);
+            $kernel->call('migrate', ['--force'=>true]);
+            $this->print_debug_log($kernel->output());
+            $unit_exec_time = (microtime(true) - $unit_time_start);
+            $this->print_install_log('artisan migrate --force timeusage '.$unit_exec_time);
+            
+            $unit_time_start = microtime(true);
+            $kernel->call('db:seed', ['--force'=>true]);
+            $this->print_debug_log($kernel->output());
+            $unit_exec_time = (microtime(true) - $unit_time_start);
+            $this->print_install_log('artisan db:seed --force timeusage '.$unit_exec_time);
+            
+            //user secret key
+            $unit_time_start = microtime(true);
+            $kernel->call('rvsitebuilder:updateenduserdb-run', ['dbkey'=>'secretkey','dbvalue'=>$this->generateSecretKey()]);
+            $this->print_debug_log($kernel->output());
+            $unit_exec_time = (microtime(true) - $unit_time_start);
+            $this->print_install_log('artisan rvsitebuilder:updateenduserdb-run timeusage '.$unit_exec_time);
+            
+            
+            if(function_exists('proc_open') && function_exists('proc_close')){
+                //email notify to admin
+                $this->print_debug_log("Send welcome email to admin");
+                $unit_time_start = microtime(true);
+                $kernel->call('rvsitebuilder:notifynewinstall', []);
+                $this->print_debug_log($kernel->output());
+                $unit_exec_time = (microtime(true) - $unit_time_start);
+                $this->print_install_log('rvsitebuilder:notifynewinstall timeusage'.$unit_exec_time);
+            }
+            
+        }
         
-        //Common
-        $unit_time_start = microtime(true);
-        $kernel->call('key:generate', []);
-        $this->print_debug_log($kernel->output());
-        $unit_exec_time = (microtime(true) - $unit_time_start);
-        $this->print_install_log('artisan key:generate timeusage '.$unit_exec_time);
-        
-        $unit_time_start = microtime(true);
-        $kernel->call('migrate', ['--force'=>true]);
-        $this->print_debug_log($kernel->output());
-        $unit_exec_time = (microtime(true) - $unit_time_start);
-        $this->print_install_log('artisan migrate --force timeusage '.$unit_exec_time);
-        
-        $unit_time_start = microtime(true);
-        $kernel->call('db:seed', ['--force'=>true]);
-        $this->print_debug_log($kernel->output());
-        $unit_exec_time = (microtime(true) - $unit_time_start);
-        $this->print_install_log('artisan db:seed --force timeusage '.$unit_exec_time);
-        
-        //user secret key
-        $unit_time_start = microtime(true);
-        $kernel->call('rvsitebuilder:updateenduserdb-run', ['dbkey'=>'secretkey','dbvalue'=>$this->generateSecretKey()]);
-        $this->print_debug_log($kernel->output());
-        $unit_exec_time = (microtime(true) - $unit_time_start);
-        $this->print_install_log('artisan rvsitebuilder:updateenduserdb-run timeusage '.$unit_exec_time);
-        
-        //vendor publish
-        $unit_time_start = microtime(true);
-        $kernel->call('vendor:publish', ['--tag'=> 'public','--force' => true]);
-        $this->print_debug_log($kernel->output());
-        $unit_exec_time = (microtime(true) - $unit_time_start);
-        $this->print_install_log('artisan vendor:publish timeusage '.$unit_exec_time);
         
         //update user admin information
         if($adminemail != '') {
@@ -1292,15 +1305,13 @@ class RVsitebuilder_Setup_API {
             $this->print_install_log('artisan rvsitebuilder:updateuserinfo-run timeusage '.$unit_exec_time);
         }
         
-        if(function_exists('proc_open') && function_exists('proc_close')){
-            //email notify to admin
-            $this->print_debug_log("Send welcome email to admin");
-            $unit_time_start = microtime(true);
-            $kernel->call('rvsitebuilder:notifynewinstall', []);
-            $this->print_debug_log($kernel->output());
-            $unit_exec_time = (microtime(true) - $unit_time_start);
-            $this->print_install_log('rvsitebuilder:notifynewinstall timeusage'.$unit_exec_time);
-        }
+        
+        //vendor publish
+        $unit_time_start = microtime(true);
+        $kernel->call('vendor:publish', ['--tag'=> 'public','--force' => true]);
+        $this->print_debug_log($kernel->output());
+        $unit_exec_time = (microtime(true) - $unit_time_start);
+        $this->print_install_log('artisan vendor:publish timeusage '.$unit_exec_time);
         
         //clear cache
         $unit_time_start = microtime(true);
