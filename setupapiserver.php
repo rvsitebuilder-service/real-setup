@@ -496,10 +496,10 @@ class RVsitebuilder_Setup_API {
         $files =  new Filesystem();
         
         //remove first if /home/<user>/rvsitebuildercms/$domainname
-        if(file_exists($homeuser.'/rvsitebuildercms/'.$domainname)) {
-            $files->remove($homeuser.'/rvsitebuildercms/'.$domainname);
-            $this->print_debug_log("Removed old framwork path ".$homeuser.'/rvsitebuildercms/'.$domainname);
-        }
+//         if(file_exists($homeuser.'/rvsitebuildercms/'.$domainname)) {
+//             $files->remove($homeuser.'/rvsitebuildercms/'.$domainname);
+//             $this->print_debug_log("Removed old framwork path ".$homeuser.'/rvsitebuildercms/'.$domainname);
+//         }
         
         $sha512verify = array(
             'type' => 'framework',
