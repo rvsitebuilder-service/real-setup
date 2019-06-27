@@ -790,14 +790,8 @@ class RVsitebuilder_Setup_API {
             $version = '/version/'.$rvsbjson['version'];
             $downloadvendorurl = $this->mirror.'/download'.$package_name_encoded.$version;
             $getversionurl = 'https://getversion.rvsitebuilder.com/getversion/vendor/'.urlencode($app_name).$version;
-            $sha512verify = array(
-                'type' => 'vendor',
-                'getversionurl' => $getversionurl,
-                'version' => $rvsbjson['version'],
-                'unarraypath' => urlencode($app_name)
-            );
             $this->print_debug_log("Vendor URL download ".$downloadvendorurl);
-            $downloadvendor = $this->doDownload('GET' , $downloadvendorurl , dirname(__FILE__).'/bundle_vendor.tar.gz' , $sha512verify);
+            $downloadvendor = $this->doDownload('GET' , $downloadvendorurl , dirname(__FILE__).'/bundle_vendor.tar.gz' );
             if($downloadvendor['success'] == false) {
                 if($files->exists(dirname(__FILE__).'/bundle_vendor.tar.gz')) {
                     $files->remove(dirname(__FILE__).'/bundle_vendor.tar.gz');
@@ -1938,10 +1932,11 @@ class RVsitebuilder_Setup_API {
                 $verify_arr = json_decode($arr_request->getBody() , true);
                 $verify_arr = array_change_key_case($verify_arr,CASE_LOWER);
                 if(isset($verify_arr[$sha512verify['unarraypath']])){
-                    $downloadurl = $verify_arr[$sha512verify['unarraypath']]['versions'][$sha512verify['version']]['sha512'];    
+                    $versionsha512 = $verify_arr[$sha512verify['unarraypath']]['versions'][$sha512verify['version']]['sha512'];    
                 }else{
-                    $downloadurl = $verify_arr[urldecode($sha512verify['unarraypath'])]['versions'][$sha512verify['version']]['sha512'];
+                    $versionsha512 = $verify_arr[urldecode($sha512verify['unarraypath'])]['versions'][$sha512verify['version']]['sha512'];
                 }
+            // stable|latest
             }else{
                 $versions_path = dirname(__FILE__).'/'.$sha512verify['version_type'].'versions.json';
                 if(file_exists($versions_path)){
@@ -1952,9 +1947,9 @@ class RVsitebuilder_Setup_API {
                     file_put_contents($versions_path , $getversions->getBody());
                     $verify_arr = json_decode($getversions->getBody() , true);
                 }
-                $downloadurl = $verify_arr[$sha512verify['unarraypath']]['sha512'];
+                $versionsha512 = $verify_arr[$sha512verify['unarraypath']]['sha512'];
             }
-            if($file_sha512!=$downloadurl){
+            if($file_sha512!=$versionsha512){
                 $response['success'] = false;
                 $response['message'] = 'Download error , File validation incorret.';
             }
