@@ -497,7 +497,7 @@ class RVsitebuilder_Setup_API {
         
         $sha512verify = array(
             'type' => 'framework',
-            'unarraypath' => 'rvsitebuilder/framework'
+            'name' => 'rvsitebuilder/framework'
         );
         //download framework url
         $downloadurl =  $this->mirror.'/download/rvsitebuilder/framework';
@@ -578,7 +578,7 @@ class RVsitebuilder_Setup_API {
         
         $sha512verify = array(
             'type' => 'framework',
-            'unarraypath' => 'rvsitebuilder/framework'
+            'name' => 'rvsitebuilder/framework'
         );
         //download framework url
         $downloadurl =  $this->mirror.'/download/rvsitebuilder/framework';
@@ -730,7 +730,7 @@ class RVsitebuilder_Setup_API {
                     'type' => 'vendor',
                     'getversionurl' => $getversionurl,
                     'version' => $rvsbjson['packages'][$package_key]['version'],
-                    'unarraypath' => $rvsbjson['packages'][$package_key]['name']
+                    'name' => $rvsbjson['packages'][$package_key]['name']
                 );
                 $downloadvendor = $this->doDownload('GET' , $downloadvendorurl , dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz' , $sha512verify);
                 if($downloadvendor['success'] == false) {
@@ -841,7 +841,7 @@ class RVsitebuilder_Setup_API {
                     'type' => 'vendor',
                     'getversionurl' => $getversionurl,
                     'version' => $rvsbjson['packages'][$package_key]['version'],
-                    'unarraypath' => $rvsbjson['packages'][$package_key]['name']
+                    'name' => $rvsbjson['packages'][$package_key]['name']
                 );
                 $downloadvendor = $this->doDownload('GET' , $downloadvendorurl , dirname(__FILE__).'/'.$package_name_encoded.'.tar.gz' , $sha512verify);
                 if($downloadvendor['success'] == false) {
@@ -977,7 +977,7 @@ class RVsitebuilder_Setup_API {
         foreach ($commonpkg as $pkg) {
             $sha512verify = array(
                 'type' => 'commonkpg',
-                'unarraypath' => 'rvsitebuilder/'.$pkg
+                'name' => 'rvsitebuilder/'.$pkg
             );
             $downloadurl = $this->mirror.'/download/rvsitebuilder/'.$pkg ;
             $sha512verify['version_type'] = 'stable';
@@ -1040,7 +1040,7 @@ class RVsitebuilder_Setup_API {
                     'type' => 'vendor',
                     'getversionurl' => $getvendorversionurl,
                     'version' => $rvsbjson['packages'][$package_key]['version'],
-                    'unarraypath' => urlencode($app_name)
+                    'name' => urlencode($app_name)
                 );                
                 
                 $this->print_debug_log("Download vendor URL ".$downloadvendorurl);
@@ -1092,7 +1092,7 @@ class RVsitebuilder_Setup_API {
         foreach ($commonpkg as $pkg) {
             $sha512verify = array(
                 'type' => 'commonkpg',
-                'unarraypath' => 'rvsitebuilder/'.$pkg
+                'name' => 'rvsitebuilder/'.$pkg
             );
             $downloadurl = $this->mirror.'/download/rvsitebuilder/'.$pkg ;
             $sha512verify['version_type'] = 'stable';
@@ -1157,7 +1157,7 @@ class RVsitebuilder_Setup_API {
                     'type' => 'vendor',
                     'getversionurl' => $getvendorversionurl,
                     'version' => $rvsbjson['packages'][$package_key]['version'],
-                    'unarraypath' => $rvsbjson['packages'][$package_key]['name']
+                    'name' => $rvsbjson['packages'][$package_key]['name']
                 );                
                 
                 $this->print_debug_log("Download vendor URL ".$downloadvendorurl);
@@ -1938,10 +1938,10 @@ class RVsitebuilder_Setup_API {
                 $arr_request = $client->request('GET' , $sha512verify['getversionurl']);
                 $verify_arr = json_decode($arr_request->getBody() , true);
                 $verify_arr = array_change_key_case($verify_arr,CASE_LOWER);
-                if(isset($verify_arr[$sha512verify['unarraypath']])){
-                    $versionsha512 = $verify_arr[$sha512verify['unarraypath']]['versions'][$sha512verify['version']]['sha512'];    
+                if(isset($verify_arr[$sha512verify['name']])){
+                    $versionsha512 = $verify_arr[$sha512verify['name']]['versions'][$sha512verify['version']]['sha512'];    
                 }else{
-                    $versionsha512 = $verify_arr[urldecode($sha512verify['unarraypath'])]['versions'][$sha512verify['version']]['sha512'];
+                    $versionsha512 = $verify_arr[urldecode($sha512verify['name'])]['versions'][$sha512verify['version']]['sha512'];
                 }
             // stable|latest
             }else{
@@ -1954,7 +1954,7 @@ class RVsitebuilder_Setup_API {
                     file_put_contents($versions_path , $getversions->getBody());
                     $verify_arr = json_decode($getversions->getBody() , true);
                 }
-                $versionsha512 = $verify_arr[$sha512verify['unarraypath']]['sha512'];
+                $versionsha512 = $verify_arr[$sha512verify['name']]['sha512'];
             }
             if($file_sha512!=$versionsha512){
                 $response['success'] = false;
