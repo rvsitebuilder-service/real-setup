@@ -942,6 +942,7 @@
                                                 		'appname': $('#websitename').val(),
                                                 		'ftpport': $('#ftpport').val(),
                                                 		'devtokenkey' : $('#devtokenkey').val(),
+                                                		'homeuser' : $('#homepath').val(),
                                                 		};
                                                 doAnAjax('setupapiserver.php',param,'POST', function(error, data) {
                                                     console.log(data);

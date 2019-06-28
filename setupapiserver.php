@@ -1230,20 +1230,21 @@ class RVsitebuilder_Setup_API {
         $this->print_debug_log('require_one '.$homeuser.'/rvsitebuildercms/'.$domainname.'/bootstrap/app.php');
         $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
         
-        if(! $isrepair){
-            //Common
-            $unit_time_start = microtime(true);
-            $kernel->call('key:generate', []);
-            $this->print_debug_log($kernel->output());
-            $unit_exec_time = (microtime(true) - $unit_time_start);
-            $this->print_install_log('artisan key:generate timeusage '.$unit_exec_time);
-            
-            $unit_time_start = microtime(true);
-            $kernel->call('migrate', ['--force'=>true]);
-            $this->print_debug_log($kernel->output());
-            $unit_exec_time = (microtime(true) - $unit_time_start);
-            $this->print_install_log('artisan migrate --force timeusage '.$unit_exec_time);
-            
+        
+        //Common
+        $unit_time_start = microtime(true);
+        $kernel->call('key:generate', []);
+        $this->print_debug_log($kernel->output());
+        $unit_exec_time = (microtime(true) - $unit_time_start);
+        $this->print_install_log('artisan key:generate timeusage '.$unit_exec_time);
+        
+        $unit_time_start = microtime(true);
+        $kernel->call('migrate', ['--force'=>true]);
+        $this->print_debug_log($kernel->output());
+        $unit_exec_time = (microtime(true) - $unit_time_start);
+        $this->print_install_log('artisan migrate --force timeusage '.$unit_exec_time);
+        
+        if(! $isrepair) {
             $unit_time_start = microtime(true);
             $kernel->call('db:seed', ['--force'=>true]);
             $this->print_debug_log($kernel->output());
