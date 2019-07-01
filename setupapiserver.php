@@ -518,6 +518,7 @@ class RVsitebuilder_Setup_API {
             $downloadurl = $this->mirror.'/download/rvsitebuilder/framework/version/'.$this->installerconfig['framework']['getversion'];
             $sha512verify['version_type'] = 'version';
             $sha512verify['version'] = $this->installerconfig['framework']['getversion'];
+            #TODO change getversion.rvsitebuilder.com to variable
             $sha512verify['getversionurl'] = 'https://getversion.rvsitebuilder.com/getversion/rvsitebuilder/framework';
         }
 
