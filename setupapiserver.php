@@ -216,6 +216,7 @@ class RVsitebuilder_Setup_API {
         $this->install_log =  $this->installerconfig['install_log'];
         //remove installer path
         $this->removeinstallerpath = $this->installerconfig['removeinstallerpath'];
+        $this->debugmode = $this->installerconfig['debug_log'];
         //rvlicensecode
         $this->rvlicensecode = $rvlicensecode;
         //getversion url
@@ -584,8 +585,8 @@ class RVsitebuilder_Setup_API {
         
         $files =  new Filesystem();
         
-        $sha512verify = ['type'] = 'framework';
-        $sha512verify = ['name'] = 'rvsitebuilder/framework';
+        $sha512verify['type'] = 'framework';
+        $sha512verify['name'] = 'rvsitebuilder/framework';
         
         //download framework url
         $downloadurl =  $this->mirror.'/download/rvsitebuilder/framework';
@@ -1463,13 +1464,13 @@ class RVsitebuilder_Setup_API {
         //touch install complete
         $files->touch($homeuser.'/rvsitebuildercms/'.$domainname.'/INSTALL_COMPLETED');
         //install_log , error_log , rvdebug
-        if($files->exists($publicpath.'/rvsitebuilder/install_log.txt')){
+        if($files->exists($publicpath.'/rvsitebuilder/install_log.txt') && $this->debugmode){
             $files->copy($publicpath.'/rvsitebuilder/install_log.txt', $publicpath.'/rvsitebuilder_install_log.txt');
         }
-        if($files->exists($publicpath.'/rvsitebuilder/error_log')){
+        if($files->exists($publicpath.'/rvsitebuilder/error_log') && $this->debugmode){
             $files->copy($publicpath.'/rvsitebuilder/error_log', $publicpath.'/rvsitebuilder_install_error_log.txt');
         }
-        if($files->exists($publicpath.'/rvsitebuilder/rvdebug.php')){
+        if($files->exists($publicpath.'/rvsitebuilder/rvdebug.php') && $this->debugmode){
             $files->copy($publicpath.'/rvsitebuilder/rvdebug.php', $publicpath.'/rvdebug.php');
         }
         //rename .html,.htm to .html.bak,.htm.bak when exist .html,.htm file
@@ -1661,23 +1662,27 @@ class RVsitebuilder_Setup_API {
         if ($files->exists($homeuser.'/rvsitebuildercms/'.$domainname.'/public/.htaccess')) {
             $frameworkhtaccess = file_get_contents($homeuser.'/rvsitebuildercms/'.$domainname.'/public/.htaccess');
             $frameworkhtaccess = "#Start Rvsitebuilder7 htaccess\n".
-                $frameworkhtaccess."\n".
-                "#End Rvsitebuilder7 htaccess\n";
+                                 $frameworkhtaccess."\n".
+                                 "#End Rvsitebuilder7 htaccess\n";
         }
         
+        //case not old htaccess
         if ($oldhtaccess == '') {
             $writehtaccess =  file_put_contents($publicpath.'/.htaccess' , $frameworkhtaccess);
             $this->print_debug_log("file put new .htaccess ".$publicpath.'/.htaccess');
         }
+        //case old htaccess to prepend
         elseif ($oldhtaccess != '' && !preg_match('/^#Start Rvsitebuilder7 htaccess$/im', $oldhtaccess)) {
             $writeoldhtaccess = file_put_contents($publicpath.'/.htaccess.backup' , $oldhtaccess);
             $this->print_debug_log("file put backup .htaccess ".$publicpath.'/.htaccess.backup');
             $writehtaccess =  file_put_contents($publicpath.'/.htaccess' , $frameworkhtaccess."\n".$oldhtaccess);
             $this->print_debug_log("file put prepend .htaccess ".$publicpath.'/.htaccess');
         }
+        //case old htaccess and has old rvsb htaccess
         else {
-            //htaccess has rvsitebuilder content , write old htaccess.
-            $writehtaccess =  file_put_contents($publicpath.'/.htaccess' , $oldhtaccess);
+            //htaccess has rvsitebuilder content , write new rvsb htaccess
+            $newhtaccess = preg_replace('/#Start Rvsitebuilder7 htaccess.*?#End Rvsitebuilder7 htaccess/mis', $frameworkhtaccess ,$oldhtaccess);
+            $writehtaccess =  file_put_contents($publicpath.'/.htaccess' , $newhtaccess);
             $this->print_debug_log("write old htaccess  ,cause it already has a rvsitebuilder7 htaccess content");
         }
         
@@ -1780,14 +1785,14 @@ class RVsitebuilder_Setup_API {
         if (file_exists($homeuser.'/rvsitebuildercms/'.$domainname.'/public/.htaccess')) {
             $frameworkhtaccess = file_get_contents($homeuser.'/rvsitebuildercms/'.$domainname.'/public/.htaccess');
             $frameworkhtaccess = "#Start Rvsitebuilder7 htaccess\n".
-                                    $frameworkhtaccess."\n".
+                                 $frameworkhtaccess."\n".
                                  "#End Rvsitebuilder7 htaccess\n";
         }
         $oldhtaccess = '';
         if (file_exists($publicpath.'/.htaccess')) {
             $oldhtaccess = file_get_contents($publicpath.'/.htaccess');
         }
-        
+        //case not old htaccess
         if ($oldhtaccess == '') {
             //write new htaccess
             $writehtaccess =  file_put_contents(dirname(__FILE__).'/htaccess.tmp' , $frameworkhtaccess);
@@ -1795,6 +1800,7 @@ class RVsitebuilder_Setup_API {
             $result = $ftpHandler->put(dirname(__FILE__).'/htaccess.tmp',$public_html.'/.htaccess',FTP_BINARY);
             $this->print_debug_log("FTP put new ".dirname(__FILE__).'/htaccess.tmp'.' To '.$public_html.'/.htaccess');
         }
+        //case old htaccess to prepend
         elseif ($oldhtaccess != '' && !preg_match('/^#Start Rvsitebuilder7 htaccess$/im', $oldhtaccess)) {
             //backup old htaccess
             $writeoldhtaccess = file_put_contents(dirname(__FILE__).'/htaccess.backup' , $oldhtaccess);
@@ -1807,9 +1813,11 @@ class RVsitebuilder_Setup_API {
             $result = $ftpHandler->put(dirname(__FILE__).'/htaccess.tmp',$public_html.'/.htaccess',FTP_BINARY);
             $this->print_debug_log("FTP put prepend ".dirname(__FILE__).'/htaccess.tmp'.' To '.$public_html.'/.htaccess');
         }
+        //case old htaccess and has old rvsb htaccess
         else {
-            //htaccess has rvsitebuilder content , write old htaccess.
-            $writehtaccess =  file_put_contents(dirname(__FILE__).'/htaccess.tmp' , $oldhtaccess);
+            //htaccess has rvsitebuilder content , write new rvsb htaccess
+            $newhtaccess = preg_replace('/#Start Rvsitebuilder7 htaccess.*?#End Rvsitebuilder7 htaccess/mis', $frameworkhtaccess ,$oldhtaccess);
+            $writehtaccess =  file_put_contents(dirname(__FILE__).'/htaccess.tmp' , $newhtaccess);
             $result = $ftpHandler->put(dirname(__FILE__).'/htaccess.tmp',$public_html.'/.htaccess',FTP_BINARY);
             $this->print_debug_log("write old htaccess  ,cause it already has a rvsitebuilder7 htaccess content");
         }
