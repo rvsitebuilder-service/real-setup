@@ -452,6 +452,16 @@ class RVsitebuilder_Setup_API {
             $this->response['status'] = false;
             $this->print_debug_log("PHP file_put_contents false");
         }
+        //TODO
+        // php function pdo_mysql
+//         $this->response['check_pre_require']['pdo_mysql']['check'] = true;
+//         if(! function_exists('pdo_mysql')){
+//             $this->response['check_pre_require']['pdo_mysql']['check'] = false;
+//             $this->response['check_pre_require']['pdo_mysql']['reason'] = 'Can not load PHP Function (pdo_mysql)';
+//             $this->response['message'] = $this->response['message'].' / Can not load PHP Function (pdo_mysql)';
+//             $this->response['status'] = false;
+//             $this->print_debug_log("PHP pdo_mysql false");
+//         }
         
         //http as user
         $this->response['httpasuser'] = $this->httpasuser;
