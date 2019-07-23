@@ -36,7 +36,6 @@ $adminlastname  = '';
 $domainport     = '';
 $artisancmd     = '';
 $artisanparam   = '{}';
-$devtokenkey    = '';
 $additionalpkg  = '';
 $welcomeemailtype = 'default';
 $isrepair         = 0;
@@ -63,7 +62,6 @@ if (isset($_GET['adminlastname']))  $adminlastname  = $_GET['adminlastname'];
 if (isset($_GET['domainport']))     $domainport     = $_GET['domainport'];
 if (isset($_GET['artisancmd']))     $artisancmd     = $_GET['artisancmd'];
 if (isset($_GET['artisanparam']))   $artisanparam   = $_GET['artisanparam'];
-if (isset($_GET['devtokenkey']))    $devtokenkey    = $_GET['devtokenkey'];
 if (isset($_GET['additionalpkg']))  $additionalpkg  = $_GET['additionalpkg'];
 if (isset($_GET['welcomeemailtype']))  $welcomeemailtype  = $_GET['welcomeemailtype'];
 if (isset($_GET['isrepair']))  $isrepair  = $_GET['isrepair'];
@@ -91,7 +89,6 @@ if (isset($_POST['domainport']))     $domainport     = $_POST['domainport'];
 if (isset($_POST['artisancmd']))     $artisancmd     = $_POST['artisancmd'];
 if (isset($_POST['artisanparam']))   $artisanparam   = $_POST['artisanparam'];
 if (isset($_POST['argvalue']))       $argvalue       = $_POST['argvalue'];
-if (isset($_POST['devtokenkey']))    $devtokenkey    = $_POST['devtokenkey'];
 if (isset($_POST['additionalpkg']))  $additionalpkg  = $_POST['additionalpkg'];
 if (isset($_POST['welcomeemailtype']))  $welcomeemailtype  = $_POST['welcomeemailtype'];
 if (isset($_POST['isrepair']))  $isrepair  = $_POST['isrepair'];
@@ -118,7 +115,7 @@ if($action == 'download_vendor'){
 }
 
 if($action == 'setup_env'){
-    $setupObj->setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname,$ftpserver,$ftpport,$domainport,$devtokenkey,$welcomeemailtype,$homeuser,$cptype);
+    $setupObj->setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname,$ftpserver,$ftpport,$domainport,$welcomeemailtype,$homeuser,$cptype);
 }
 
 if($action == 'download_common_pkg'){
@@ -161,9 +158,9 @@ if($action == 'disk_required') {
 if($action == 'test_database_ftp_connect') {
     $setupObj->test_database_ftp_connect($dbhost,$dbname,$dbuser,$dbpassword,$ftpserver,$ftpaccount,$ftppassword,$ftpport);
 }
-if($action == 'validate_developer_token') {
-    $setupObj->validate_developer_token($devtokenkey);
-}
+// if($action == 'validate_developer_token') {
+//     $setupObj->validate_developer_token($devtokenkey);
+// }
 if($action == 'check_dev_mode') {
     $setupObj->check_dev_mode();
 }
@@ -510,10 +507,10 @@ class RVsitebuilder_Setup_API {
         $files =  new Filesystem();
         
         //remove first if /home/<user>/rvsitebuildercms/$domainname
-//         if(file_exists($homeuser.'/rvsitebuildercms/'.$domainname)) {
-//             $files->remove($homeuser.'/rvsitebuildercms/'.$domainname);
-//             $this->print_debug_log("Removed old framwork path ".$homeuser.'/rvsitebuildercms/'.$domainname);
-//         }
+        if(file_exists($homeuser.'/rvsitebuildercms/'.$domainname.'/bootstrap/cache')) {
+            $files->remove($homeuser.'/rvsitebuildercms/'.$domainname.'/bootstrap/cache');
+            $this->print_debug_log("Removed old framwork path ".$homeuser.'/rvsitebuildercms/'.$domainname.'/bootstrap/cache');
+        }
         
         $sha512verify['type'] = 'framework';
         $sha512verify['name'] = 'rvsitebuilder/framework';
@@ -662,13 +659,13 @@ class RVsitebuilder_Setup_API {
         
     }
     
-    public function download_vendor($homeuser,$domainname) {
+    public function download_vendor($homeuser,$domainname,$ftpaccount,$ftppassword,$ftpserver,$ftpport) {
         $time_start = microtime(true);
         $this->print_debug_log('======'.__METHOD__.'======');
         if($this->httpasuser) {
-            $res = $this->download_vendor_httpasuser($homeuser,$domainname,$publicpath);
+            $res = $this->download_vendor_httpasuser($homeuser,$domainname);
         } else {
-            $res = $this->download_vendor_no_httpasuser($homeuser,$domainname,$publicpath,$ftpaccount,$ftppassword,$ftpserver,$ftpport);
+            $res = $this->download_vendor_no_httpasuser($homeuser,$domainname,$ftpaccount,$ftppassword,$ftpserver,$ftpport);
         }
         
         $this->response['exectime'] = (microtime(true) - $time_start);
@@ -678,7 +675,7 @@ class RVsitebuilder_Setup_API {
         return $this->print_response($this->response);
     }
     
-    public function download_vendor_httpasuser($homeuser,$domainname,$publicpath){
+    public function download_vendor_httpasuser($homeuser,$domainname){
         $this->print_debug_log('======'.__METHOD__.'======');
         
         $res = [
@@ -903,7 +900,7 @@ class RVsitebuilder_Setup_API {
         
     }
     
-    public function setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname,$ftpserver,$ftpport,$domainport,$devtokenkey,$welcomeemailtype,$homeuser,$cptype) {
+    public function setup_env($domainname,$publicpath,$dbhost,$dbname,$dbuser,$dbpassword,$ftpaccount,$ftppassword,$appname,$ftpserver,$ftpport,$domainport,$welcomeemailtype,$homeuser,$cptype) {
         $time_start = microtime(true);
         $this->print_debug_log('======'.__METHOD__.'======');
         
@@ -926,7 +923,7 @@ class RVsitebuilder_Setup_API {
         $env_data['FTP_PORT'] = $ftpport;
         $env_data['DOCUMENT_ROOT'] = $publicpath;
         $env_data['RV_MIRROR']  = $this->mirror;
-        $env_data['DEVELOPER_TOKEN_KEY']  = $devtokenkey;
+        $env_data['DEVELOPER_TOKEN_KEY']  = '';
         $env_data['WELCOME_EMAIL_TYPE']  = $welcomeemailtype;
         $env_data['CP_TYPE']  = $cptype;
         
@@ -1579,38 +1576,38 @@ class RVsitebuilder_Setup_API {
         
     }
     
-    public function validate_developer_token($devtokenkey) {
-        $time_start = microtime(true);
-        $this->print_debug_log('======'.__METHOD__.'======');
+//     public function validate_developer_token($devtokenkey) {
+//         $time_start = microtime(true);
+//         $this->print_debug_log('======'.__METHOD__.'======');
         
-        $this->response['dev_token'] = false;
+//         $this->response['dev_token'] = false;
         
-        try {
-            $client = new Client([
-                'curl'            => [CURLOPT_SSL_VERIFYPEER => false, CURLOPT_SSL_VERIFYHOST => false],
-                'allow_redirects' => false,
-                'cookies'         => true,
-                'verify'          => false
-            ]);
-            $this->print_debug_log("Validate developer token Type=POST URL=http://license3.rvglobalsoft.com/validatetoken Devtoken=$devtokenkey");
-            $form_params = ['devtokenkey'=>$devtokenkey];
-            $res = $client->request('POST', 'http://license3.rvglobalsoft.com/validatetoken' ,['form_params' => $form_params]);
-            $this->print_debug_log('Server Response Status '.$res->getStatusCode());
-            $this->print_debug_log('Server Response Header '.json_encode((array) $res->getHeaders()));
-            $rescontent = json_decode($res->getBody(), true);
-            if (isset($rescontent['status']) && true == $rescontent['status']) {
-                $this->response['dev_token'] = true;
-            } else {
-                $this->response['message'] = $rescontent['message'];
-            }
-        } catch (\Exception $e) {
-            $this->print_debug_log('Validate developer token error '.$e->getMessage());
-            $this->response['message']  = $e->getMessage();
-        }
-        $this->response['status'] = true;
-        $this->response['exectime'] = (microtime(true) - $time_start);
-        return $this->print_response($this->response);
-    }
+//         try {
+//             $client = new Client([
+//                 'curl'            => [CURLOPT_SSL_VERIFYPEER => false, CURLOPT_SSL_VERIFYHOST => false],
+//                 'allow_redirects' => false,
+//                 'cookies'         => true,
+//                 'verify'          => false
+//             ]);
+//             $this->print_debug_log("Validate developer token Type=POST URL=http://license3.rvglobalsoft.com/validatetoken Devtoken=$devtokenkey");
+//             $form_params = ['devtokenkey'=>$devtokenkey];
+//             $res = $client->request('POST', 'http://license3.rvglobalsoft.com/validatetoken' ,['form_params' => $form_params]);
+//             $this->print_debug_log('Server Response Status '.$res->getStatusCode());
+//             $this->print_debug_log('Server Response Header '.json_encode((array) $res->getHeaders()));
+//             $rescontent = json_decode($res->getBody(), true);
+//             if (isset($rescontent['status']) && true == $rescontent['status']) {
+//                 $this->response['dev_token'] = true;
+//             } else {
+//                 $this->response['message'] = $rescontent['message'];
+//             }
+//         } catch (\Exception $e) {
+//             $this->print_debug_log('Validate developer token error '.$e->getMessage());
+//             $this->response['message']  = $e->getMessage();
+//         }
+//         $this->response['status'] = true;
+//         $this->response['exectime'] = (microtime(true) - $time_start);
+//         return $this->print_response($this->response);
+//     }
     
     public function generateSecretKey($length = 64) {
         $this->print_debug_log('======'.__METHOD__.'======');

@@ -308,20 +308,7 @@
 				   
 					<!-- start step block -->
 					<div id="form-step-2" role="form" data-toggle="validator">
-						<div id="devtoken" class="d-none">
-	                        <div class="form-group">
-	                            <div class="row">
-	                                <div class="col col-lg-3">Developer Token Key:</div>
-	                                <div class="col col-lg-4">
-	                                    <input type="text" class="form-control"
-	                                        name="devtokenkey" id="devtokenkey"
-	                                        placeholder="Write your Developer Token Key"  value="">
-	                                </div>
-	                                <div class="help-block with-errors"></div>
-	                            </div>
-	                        </div>
-	                        <span id="devtoken_error" class="d-none list-group-item list-group-item-action list-group-item-warning margin-b" style="margin-bottom:5px;"></span>
-                        </div>
+						
 					    <div class="form-group">
                             <div class="row">
                                 <div class="col col-lg-3">Setup for:</div>
@@ -698,48 +685,11 @@
                     return false;
                 }
                 if(stepNumber == 2 && ajaxInvokeStep2 ==false && stepDirection === 'forward') {
-                	$("#devtoken_error").addClass("d-none");
                 	
                 	ajaxInvokeStep2 = true;
             		
-                	if($("#devtokenkey").attr('required') != 'required') {
-                		console.log('developer token key not required');
-                		$("#smartwizard").smartWizard("next");
-                	}
-                	else {
-                		param = {
-                                'action':'validate_developer_token',
-                                'devtokenkey':$("#devtokenkey").val(),
-                        };
-                        $.ajax({
-                            url : 'setupapiserver.php',
-                            data : param,
-                            cache : false,
-                            type : 'POST',
-                            dataType : "json",
-                            headers : {'Ignore-Token':1},
-                            error : function() {
-                            	console.log('ajax validate developer token connect error');
-                            	$("#smartwizard").smartWizard("next");
-                            },
-                            success : function(data) {
-                                console.log(data);
-                                if (data.status == true){
-                                	if(data.dev_token == true){
-                                		console.log('validate developer token pass');
-                                		$("#smartwizard").smartWizard("next");
-                                	}
-                                	else {
-                                		ajaxInvokeStep2 = false;
-                               			console.log('validate developer token failed');
-                               			$("#devtoken_error").removeClass("d-none").text(data.message);
-                                	}
-                                }
-                            },
-                        }); 
-                	}
-                	
-                    return false;
+            		$("#smartwizard").smartWizard("next");
+
                 }
                 
                 //backward true away
@@ -809,33 +759,6 @@
 	                    $("#ftpusername").attr('required', 'required');
 	                    $("#ftppassword").attr('required', 'required');
 	                    $("#ftpport").attr('required', 'required');
-	                }
-	                else {
-	                    return true;
-	                }
-                } else {
-                    return true;
-                }
-            }); 
-            
-            
-            //check local install (developer)
-            param = {'action':'check_dev_mode'};
-            doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
-                console.log(data);
-                if (data.status == true){
-	                if(data.dev_mode == true) {
-	                	// 10.  0.0.0 –  10.255.255.255 
-	                    //127.  0.0.0 – 127.255.255.255     
-	        			//172. 16.0.0 – 172. 31.255.255    
-	        			//192.168.0.0 – 192.168.255.255
-	                    host = window.location.hostname;
-	                    if(/(^192\.168\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])$)|(^172\.([1][6-9]|[2][0-9]|[3][0-1])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])$)|(^127\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])$)|(^10\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])$)/.test(host)
-	                       || /localhost/.test(host) ){
-	                    	console.log('developer server '+host);
-	                    	$("#devtoken").removeClass("d-none");
-	                        $("#devtokenkey").attr('required', 'required');
-	                    }
 	                }
 	                else {
 	                    return true;
@@ -941,7 +864,6 @@
                                                 		'ftppassword': $('#ftppassword').val(),
                                                 		'appname': $('#websitename').val(),
                                                 		'ftpport': $('#ftpport').val(),
-                                                		'devtokenkey' : $('#devtokenkey').val(),
                                                 		'homeuser' : $('#homepath').val(),
                                                 		};
                                                 doAnAjax('setupapiserver.php',param,'POST', function(error, data) {
