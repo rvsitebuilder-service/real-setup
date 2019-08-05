@@ -460,6 +460,41 @@ class RVsitebuilder_Setup_API {
 //             $this->print_debug_log("PHP pdo_mysql false");
 //         }
         
+        //check path is writeable
+        $this->response['check_pre_require']['path_writable']['check'] = true;
+        $userpathinfo = $this->get_user_path_info();
+        if (!is_writable($userpathinfo[homepath])) {
+            $this->response['check_pre_require']['path_writable']['check'] = false;
+            $this->response['check_pre_require']['path_writable']['reason'] = 'Path not writeable '.$userpathinfo[homepath];
+            $this->response['message'] = $this->response['message'].' / Path not writeable '.$userpathinfo[homepath];
+            $this->response['status'] = false;
+            $this->print_debug_log("Path not writeable $userpathinfo[homepath]");  
+        }
+        if (!is_writable($userpathinfo[publicpath])) {
+            $this->response['check_pre_require']['path_writable']['check'] = false;
+            $this->response['check_pre_require']['path_writable']['reason'] = 'Path not writeable '.$userpathinfo[publicpath];
+            $this->response['message'] = $this->response['message'].' / Path not writeable '.$userpathinfo[publicpath];
+            $this->response['status'] = false;
+            $this->print_debug_log("Path not writeable $userpathinfo[publicpath]");  
+        }
+        if (!is_writable(dirname(__FILE__))) {
+            $this->response['check_pre_require']['path_writable']['check'] = false;
+            $this->response['check_pre_require']['path_writable']['reason'] = 'Path not writeable '.dirname(__FILE__);
+            $this->response['message'] = $this->response['message'].' / Path not writeable '.dirname(__FILE__);
+            $this->response['status'] = false;
+            $this->print_debug_log("Path not writeable ".dirname(__FILE__));  
+        }
+
+
+        
+        if(! function_exists('file_put_contents')){
+            $this->response['check_pre_require']['file_put_contents']['check'] = false;
+            $this->response['check_pre_require']['file_put_contents']['reason'] = 'Can not load PHP Function (file_put_contents)';
+            $this->response['message'] = $this->response['message'].' / Can not load PHP Function (file_put_contents)';
+            $this->response['status'] = false;
+            $this->print_debug_log("PHP file_put_contents false");
+        }
+
         //http as user
         $this->response['httpasuser'] = $this->httpasuser;
         
