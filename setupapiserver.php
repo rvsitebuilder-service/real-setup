@@ -369,6 +369,7 @@ class RVsitebuilder_Setup_API {
             $this->response['status'] = false;
             $this->print_debug_log("PHP mbstring false");
         }
+        /*
         $this->response['check_pre_require']['fileinfo']['check'] = true;
         if (!extension_loaded('fileinfo')) {
             $this->response['check_pre_require']['fileinfo']['check'] = false;
@@ -377,6 +378,7 @@ class RVsitebuilder_Setup_API {
             $this->response['status'] = false;
             $this->print_debug_log("PHP fileinfo false");
         }
+        */
         $this->response['check_pre_require']['image_lib']['check'] = true;
         if (!extension_loaded('imagick') && !extension_loaded('gd')){
             $this->response['check_pre_require']['image_lib']['check'] = false;
