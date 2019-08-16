@@ -2297,14 +2297,13 @@ class RVsitebuilder_Setup_API {
                     }
                 }
             }
-            
             // case  find home path from document_root ( /home/amarin/public_html => /home/amarin )
             if($posix_user_path == '') {
                 $paths = preg_split("/\//", $document_root);
                 $loop_dim = count($paths);
                 for($i=0; $i < $loop_dim; $i++) {
                     $test_path = join('/', $paths);
-                    if(is_dir($testPath)) {
+                    if(is_dir($test_path)) {
                         if (!in_array($test_path, $user_paths)) {
                             array_push($user_paths, $test_path);
                         }
