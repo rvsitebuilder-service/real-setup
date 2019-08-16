@@ -2255,61 +2255,102 @@ class RVsitebuilder_Setup_API {
     
     public function get_user_path_info(){
         $time_start = microtime(true);
-        $this->print_debug_log('======'.__METHOD__.'======');
-        
-        $userpathinfo = [];
-        
-        $mainHome = '';
-        
-        $testPathInput = $_SERVER['DOCUMENT_ROOT'];
-        
-        // case  have posix_getpwuid get uid by owner dir
-        if(function_exists('posix_getpwuid')){
-            $stat = stat($testPathInput);
-            $uid = $stat['uid'];
-            $userinfo = posix_getpwuid($uid);
-            if(is_dir($userinfo['dir'])){
-                $userpathinfo['homepath'] = $userinfo['dir'];
-                $userpathinfo['publicpath'] = $_SERVER['DOCUMENT_ROOT'];
-                $this->print_debug_log("Case posix_getpwuid ".json_encode($userpathinfo));
-                return $userpathinfo;
+        $this->print_debug_log('======'.__METHOD__.'======');        
+        $userpathinfo = []; 
+        $user_path = '';        
+        $document_root = $_SERVER['DOCUMENT_ROOT'];
+        $user_paths = [];
+        $open_basedir_paths = $this->get_open_basedir_paths();
+        if(count($open_basedir_paths)) {            
+            $this->print_debug_log('==== case define open_basedir ====');
+            $user_paths = $open_basedir_paths;
+        } else {
+            $this->print_debug_log('==== case no open_basedir ====');
+            if(isset($_SERVER['HOME'])) {
+                if (!in_array($_SERVER['HOME'], $user_paths)) {
+                    array_push($user_paths, $_SERVER['HOME']);
+                }                
             }
-        }
+            $posix_user_path = '';            
+            if(function_exists('posix_getuid')) {
+                $webuid = posix_getuid();
+                $userinfo = posix_getpwuid($webuid);
+                if(is_dir($userinfo['dir'])){            
+                    if (!in_array($userinfo['dir'], $user_paths)) {
+                        array_push($user_paths, $userinfo['dir']);
+                    }                    
+                }                
+            }    
+            // case  have posix_getpwuid get uid by owner dir
+            if(function_exists('posix_getpwuid')) {
+                $stat = stat($document_root);            
+                $userinfo = posix_getpwuid($stat['uid']);
+                if(is_dir($userinfo['dir'])) {
+                    if (!in_array($userinfo['dir'], $user_paths)) {
+                        array_push($user_paths, $userinfo['dir']);
+                    }
+                }
+                $userinfo = posix_getpwuid($stat['gid']);
+                if(is_dir($userinfo['dir'])) {
+                    if (!in_array($userinfo['dir'], $user_paths)) {
+                        array_push($user_paths, $userinfo['dir']);
+                    }
+                }
+            }
+            
+            // case  find home path from document_root ( /home/amarin/public_html => /home/amarin )
+            if($posix_user_path == '') {
+                $paths = preg_split("/\//", $document_root);
+                $loop_dim = count($paths);
+                for($i=0; $i < $loop_dim; $i++) {
+                    $test_path = join('/', $paths);
+                    if(is_dir($testPath)) {
+                        if (!in_array($test_path, $user_paths)) {
+                            array_push($user_paths, $test_path);
+                        }
+                    }
+                    array_pop($paths);
+                }
+            }            
+        }   
         
-        // case  cpanel have rvsitebuildercms dir in home
-        $paths = preg_split("/\//", $testPathInput);
-        $loopDim = count($paths);
-        for($i=0; $i < $loopDim; $i++) {
-            $testPath = join('/', $paths);
-            if(is_dir($testPath . '/rvsitebuildercms'))
-            {
-                $mainHome = $testPath;
+        foreach($user_paths as $user_path_var) {
+            if(is_file($user_path_var)) {
+                $this->print_debug_log('skip ' . $user_path_var);
+                continue;
+            }
+            if($user_path_var == $document_root) {
+                $this->print_debug_log('skip ' . $user_path_var);
+                continue;
+            }
+            if(preg_match("/(^\/tmp)|(\/tmp$)/",$user_path_var)){
+                $this->print_debug_log('skip ' . $user_path_var);
+                continue;
+            }
+            if(is_writable($user_path_var)) {
+                $user_path = $user_path_var;
                 break;
             }
-            array_pop($paths);
-        }
-        if($mainHome != ''){
-            $userpathinfo['homepath'] = $mainHome;
-            $userpathinfo['publicpath'] = $_SERVER['DOCUMENT_ROOT'];
-            $this->print_debug_log("Case look rvsitebuildercms".json_encode($userpathinfo));
-            return $userpathinfo;
-        }
+        }           
+
+        $userpathinfo['homepath'] = $user_path;
+        $userpathinfo['publicpath'] = $document_root;
         
-        
-        // case other ../
-        if(php_sapi_name() === 'cli'){
-            $mainHome = realpath($testPathInput . '/../../');
-        }else{
-            $mainHome = realpath($testPathInput . '/../');
-        }
-        $userpathinfo['homepath'] = $mainHome;
-        $userpathinfo['publicpath'] = $_SERVER['DOCUMENT_ROOT'];
-        $this->print_debug_log("Case recursive path".json_encode($userpathinfo));
-        return $userpathinfo;
-        
+        return $userpathinfo;        
     }
-    
-    
+
+    public function get_open_basedir_paths() {
+        $open_basedir_paths = [];
+        if(function_exists('ini_get')){
+            $open_basedir_str =  ini_get('open_basedir');
+            $open_basedir_str = trim($open_basedir_str);
+            if($open_basedir_str != ''){
+                $open_basedir_str = strtolower($open_basedir_str);
+                $open_basedir_paths = explode(":", $open_basedir_str);
+            }            
+        }
+        return $open_basedir_paths;
+    }
     
     
     public function check_http_as_user() {
