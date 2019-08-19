@@ -465,14 +465,14 @@ class RVsitebuilder_Setup_API {
         //check path is writeable
         $this->response['check_pre_require']['path_writable']['check'] = true;
         $userpathinfo = $this->get_user_path_info();
-        if (!is_writable($userpathinfo[homepath])) {
+        if (!is_writable($userpathinfo['homepath'])) {
             $this->response['check_pre_require']['path_writable']['check'] = false;
             $this->response['check_pre_require']['path_writable']['reason'] = 'Path not writeable '.$userpathinfo[homepath];
             $this->response['message'] = $this->response['message'].' / Path not writeable '.$userpathinfo[homepath];
             $this->response['status'] = false;
             $this->print_debug_log("Path not writeable $userpathinfo[homepath]");  
         }
-        if (!is_writable($userpathinfo[publicpath])) {
+        if (!is_writable($userpathinfo['publicpath'])) {
             $this->response['check_pre_require']['path_writable']['check'] = false;
             $this->response['check_pre_require']['path_writable']['reason'] = 'Path not writeable '.$userpathinfo[publicpath];
             $this->response['message'] = $this->response['message'].' / Path not writeable '.$userpathinfo[publicpath];
