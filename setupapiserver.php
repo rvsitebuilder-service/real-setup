@@ -257,13 +257,41 @@ class RVsitebuilder_Setup_API {
     
     public function gethttpasuser() {
         $this->print_debug_log('======'.__METHOD__.'======');
-        
+        //get by posix_getpwuid
         if(function_exists('posix_getpwuid')){
             $homepath_owner = posix_getpwuid(fileowner($_SERVER["DOCUMENT_ROOT"]))['name'];
             $site_run_as = posix_getpwuid(posix_geteuid())['name'];
             if($homepath_owner == $site_run_as){
-                $this->print_debug_log("HTTP AS USER   TRUE");
+                $this->print_debug_log("detectby posix_getpwuid HTTP AS USER   TRUE");
                 return true;
+            }
+        }
+        //get by getmyuid and fileowner
+        if(function_exists('getmyuid') && function_exists('fileowner')){
+            $myuid = getmyuid();
+            file_put_contents(dirname(__FILE__).'/testfileowner', '');
+            $fileowner = '';
+            if(file_exists(dirname(__FILE__).'/testfileowner')){
+                $fileowner = fileowner(dirname(__FILE__).'/testfileowner');
+                unlink(dirname(__FILE__).'/testfileowner');
+                if($fileowner == $myuid){
+                    $this->print_debug_log("detectby getmyuid,fileowner HTTP AS USER   TRUE");
+                    return true;
+                }
+            }
+        }
+        //get by getmyuid and stat
+        if(function_exists('getmyuid') && function_exists('stat')){
+            $myuid = getmyuid();
+            file_put_contents(dirname(__FILE__).'/testfileowner', '');
+            $stat = [];
+            if(file_exists(dirname(__FILE__).'/testfileowner')){
+                $stat = stat(dirname(__FILE__).'/testfileowner');
+                unlink(dirname(__FILE__).'/testfileowner');
+                if(isset($stat['uid']) && $stat['uid'] == $myuid){
+                    $this->print_debug_log("detectby getmyuid,stat HTTP AS USER   TRUE");
+                    return true;
+                }
             }
         }
         $this->print_debug_log("HTTP AS USER FALSE");
@@ -415,14 +443,14 @@ class RVsitebuilder_Setup_API {
             $this->response['status'] = false;
             $this->print_debug_log("PHP memory_limit false ".$match[0]);
         }
-        //php function posix_getpwuid
-        $this->response['check_pre_require']['posix_getpwuid']['check'] = true;
-        if(! function_exists('posix_getpwuid')){
-            $this->response['check_pre_require']['posix_getpwuid']['check'] = false;
-            $this->response['check_pre_require']['posix_getpwuid']['reason'] = 'Can not load PHP Function (posix_getpwuid)';
-            $this->response['message'] = $this->response['message'].' / Can not load PHP Function (posix_getpwuid)';
+        //php function get file owner (posix_getpwuid || (getmyuid && (fileowner || stat))
+        $this->response['check_pre_require']['dir_and_file']['check'] = true;
+        if(! function_exists('posix_getpwuid') && (! function_exists('getmyuid') || (! function_exists('fileowner') && ! function_exists('stat')))){
+            $this->response['check_pre_require']['dir_and_file']['check'] = false;
+            $this->response['check_pre_require']['dir_and_file']['reason'] = 'Can not load PHP Function (posix_getpwuid or getmyuid,fileowner)';
+            $this->response['message'] = $this->response['message'].' / Can not load PHP Function (posix_getpwuid or getmyuid,fileowner)';
             $this->response['status'] = false;
-            $this->print_debug_log("PHP posix_getpwuid false");
+            $this->print_debug_log("PHP dir_and_file false");
         }
         //php function json
         $this->response['check_pre_require']['json']['check'] = true;
@@ -1256,7 +1284,6 @@ class RVsitebuilder_Setup_API {
         
         //change path app_path/rvsitebuildercms/storage/packages to app_path/rvsitebuildercms/packages
         $packagesPath = $homeuser.'/rvsitebuildercms/'.$domainname.'/packages';
-        
         $vendor_names = scandir($packagesPath);
         foreach($vendor_names as $vendor_name){
             if($vendor_name === '.' || $vendor_name === '..') {continue;}
