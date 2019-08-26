@@ -1336,8 +1336,12 @@ class RVsitebuilder_Setup_API {
                 //email notify to admin
                 $this->print_debug_log("Send welcome email to admin");
                 $unit_time_start = microtime(true);
-                $kernel->call('rvsitebuilder:notifynewinstall', []);
-                $this->print_debug_log($kernel->output());
+                try{
+                    $kernel->call('rvsitebuilder:notifynewinstall', []);
+                    $this->print_debug_log($kernel->output());
+                } catch (Exception $e){
+                    $this->print_debug_log($e->getMessage());
+                }
                 $unit_exec_time = (microtime(true) - $unit_time_start);
                 $this->print_install_log('rvsitebuilder:notifynewinstall timeusage'.$unit_exec_time);
             }
