@@ -1021,7 +1021,7 @@ class RVsitebuilder_Setup_API {
             'queuesharedhost',
             'scheduler',
             'wysiwyg',
-            'marketing'
+            //'marketing'
         ];
         
         if($additionalpkg != '') {
