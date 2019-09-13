@@ -479,6 +479,7 @@ class RVsitebuilder_Setup_API {
             $this->response['status'] = false;
             $this->print_debug_log("PHP file_put_contents false");
         }
+        
         //TODO
         // php function pdo_mysql
 //         $this->response['check_pre_require']['pdo_mysql']['check'] = true;
@@ -515,15 +516,8 @@ class RVsitebuilder_Setup_API {
             $this->print_debug_log("Path not writeable ".dirname(__FILE__));  
         }
 
-
         
-        if(! function_exists('file_put_contents')){
-            $this->response['check_pre_require']['file_put_contents']['check'] = false;
-            $this->response['check_pre_require']['file_put_contents']['reason'] = 'Can not load PHP Function (file_put_contents)';
-            $this->response['message'] = $this->response['message'].' / Can not load PHP Function (file_put_contents)';
-            $this->response['status'] = false;
-            $this->print_debug_log("PHP file_put_contents false");
-        }
+       
 
         //http as user
         $this->response['httpasuser'] = $this->httpasuser;
@@ -991,6 +985,7 @@ class RVsitebuilder_Setup_API {
         $env_data['DEVELOPER_TOKEN_KEY']  = '';
         $env_data['WELCOME_EMAIL_TYPE']  = $welcomeemailtype;
         $env_data['CP_TYPE']  = $cptype;
+        $env_data['MAIL_FROM_ADDRESS']  = 'admin'.'@'.$domainname;
         
         
         $this->print_debug_log("ENV data ".json_encode($env_data));
