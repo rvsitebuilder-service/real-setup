@@ -1047,7 +1047,8 @@ class RVsitebuilder_Setup_API {
             'queuesharedhost',
             'scheduler',
             'wysiwyg',
-            //'marketing'
+            //TODO เอา marketing ออก พร้อมกับ rvsb release 7.2
+            'marketing'
         ];
         
         if($additionalpkg != '') {
