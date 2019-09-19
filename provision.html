@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>RVsitebuilder 7 - Installer Wizard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- some fone -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+    
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <!-- Include SmartWizard CSS -->
+    <link href="src/css/smart_wizard.css" rel="stylesheet" type="text/css" />
+
+    <!-- Optional SmartWizard theme -->
+    <link href="src/css/smart_wizard_theme_circles.css" rel="stylesheet" type="text/css" />
+    <link href="src/css/smart_wizard_theme_arrows.css" rel="stylesheet" type="text/css" />
+    <link href="src/css/smart_wizard_theme_dots.css" rel="stylesheet" type="text/css" />
+</head>
+
+
+<body>
+<div class="logo">
+   <div class="container">
+   		<img src="logorvsitebuilder.png" height="50">
+		<a id="rvdebug" class="" href="rvdebug.php" target="_blank" style="opacity: 0;">
+			_____rvdebug_____ </a>
+	</div>
+</div>
+	<div class="container">
+		<form action="#" id="myForm" role="form" data-toggle="validator" method="post" accept-charset="utf-8">
+			<!-- SmartWizard html -->
+			<div id="smartwizard">
+			    
+				<!--  start wizard -->
+				<ul>
+					<li><a href="#form-step-0">Provisioning<br /><small>Installing RVsitebuilder</small></a></li>
+				</ul>
+				
+				<div>
+					<!-- start step block -->
+                    <div id="form-step-0" role="form" data-toggle="validator">
+                        <div id="doinstall" class="doinstall">
+                            <div class="row">
+                                <div class="col col-lg-4">Check License</div>
+                                <div class="col col-lg-2">
+                                    <i class="fa fa-sync fa-spin check_license"></i><span class="check_license">Loading...</span>
+                                    <a class="check_license" title="" style="opacity:0;width:30px">tu</a>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-lg-4">Disk space required</div>
+                                <div class="col col-lg-2">
+                                    <i class="fa fa-sync fa-spin disk_required"></i><span class="disk_required">Loading...</span>
+                                    <a class="disk_required" title="" style="opacity:0;width:30px">tu</a>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-lg-4">Download Framework</div>
+                                <div class="col col-lg-2">
+                                    <i class="fa fa-sync fa-spin download_framework"></i><span class="download_framework">Loading...</span>
+                                    <a class="download_framework" title="" style="opacity:0;width:30px">tu</a>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-lg-4">Download Vendor</div>
+                                <div class="col col-lg-2">
+                                    <i class="fa fa-sync fa-spin download_vendor"></i><span class="download_vendor">Loading...</span>
+                                    <a class="download_vendor" title="" style="opacity:0;width:30px">tu</a>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-lg-4">Setup ENV</div>
+                                <div class="col col-lg-2">
+                                    <i class="fa fa-sync fa-spin setup_env"></i><span class="setup_env">Loading...</span>
+                                    <a class="setup_env" title="" style="opacity:0;width:30px">tu</a>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-lg-4">Install Common Package</div>
+                                <div class="col col-lg-2">
+                                    <i class="fa fa-sync fa-spin download_common_pkg"></i><span class="download_common_pkg">Loading...</span>
+                                    <a class="download_common_pkg" title="" style="opacity:0;width:30px">tu</a>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-lg-4">Install Framework</div>
+                                <div class="col col-lg-2">
+                                    <i class="fa fa-sync fa-spin install_all_pkg"></i><span class="install_all_pkg">Loading...</span>
+                                    <a class="install_all_pkg" title="" style="opacity:0;width:30px">tu</a>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-lg-4">Artisan Command</div>
+                                <div class="col col-lg-2">
+                                    <i class="fa fa-sync fa-spin artisan_call"></i><span class="artisan_call">Loading...</span>
+                                    <a class="artisan_call" title="" style="opacity:0;width:30px">tu</a>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-lg-4">Finished setup</div>
+                                <div class="col col-lg-2">
+                                    <i class="fa fa-sync fa-spin finished_setup"></i><span class="finished_setup">Loading...</span>
+                                    <a class="finished_setup" title="" style="opacity:0;width:30px">tu</a>
+                                </div>
+                            </div>
+                            <div class="row" style="opacity:0;">
+                                <div class="col col-lg-4">Total execution time</div>
+                                <div class="col col-lg-2">
+                                    <span class="" id="exectime">0</span><span> Second</span>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    <!-- end step block -->
+			     
+				</div>
+				<!-- end wizard -->
+			         
+			</div>
+		</form>
+	
+	</div>
+
+
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.min.js"
+      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+      crossorigin="anonymous"></script>
+    
+    <!-- Include jQuery Validator plugin -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/1000hz-bootstrap-validator/0.11.5/validator.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <!-- Include SmartWizard JavaScript source -->
+    <script type="text/javascript" src="src/js/jquery.smartWizard.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+            
+        	// Smart Wizard setting
+            $('#smartwizard').smartWizard({
+                selected: 0,
+                theme: 'arrows',
+                transitionEffect:'slide',
+                showStepURLhash: true,
+                toolbarSettings: {
+                   toolbarPosition: 'bottom',
+                   toolbarButtonPosition: 'end',
+                   toolbarExtraButtons: [],
+                   //this is 1 step, do not show next-prev button
+                   showNextButton: false,
+                   showPreviousButton: false, 
+                },
+                anchorSettings: {
+                   markDoneStep: true, // add done css
+                   markAllPreviousStepsAsDone: true, // When a step selected by url hash, all previous steps are marked done
+                   removeDoneStepOnNavigateBack: true, // While navigate back done step after active step will be cleared
+                   enableAnchorOnDoneStep: true // Enable/Disable the done steps navigation
+                }
+                                     
+                   
+            });
+        
+            //home path value
+            param = {'action':'get_user_path'};
+            doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
+                console.log(data);
+            }); 
+            
+            //check pre require value
+            param = {'action':'pre_check_php'};
+            doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
+                console.log(data);
+            }); 
+            
+            
+            //check http as user
+            param = {'action':'check_http_as_user'};
+            doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
+                console.log(data);
+            }); 
+            
+            
+            //start install process
+        	param = {'action':'check_license','installtype':'provision'};
+            doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
+                console.log(data);
+                if (data === null  || typeof data.status === "undefined" || data.status == false){
+                	$('span.check_license').text((typeof data.message == 'undefined') ? 'ERROR' : data.message);
+                    $('i.check_license').removeClass("fa fa-sync fa-spin").addClass("fa fa-exclamation-circle")
+                }
+                else {
+                	$('span.check_license').text('');
+                    $('i.check_license').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
+                    $('a.check_license').attr('title', (typeof data.exectime == 'undefined') ? '0' + ' s' : data.exectime.toString() + ' s');
+                    $('#exectime').text(parseFloat($('#exectime').text()) + parseFloat((typeof data.exectime == 'undefined') ? 0 : data.exectime));
+                    
+                	param = {'action':'disk_required','installtype':'provision'};
+                	doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
+                        console.log(data);
+                        if (data === null  || typeof data.status === "undefined" || data.status == false){
+                        	$('span.disk_required').text((typeof data.message == 'undefined') ? 'ERROR' : data.message);
+                            $('i.disk_required').removeClass("fa fa-sync fa-spin").addClass("fa fa-exclamation-circle")
+                        }
+                        else {
+                        	$('span.disk_required').text('');
+                            $('i.disk_required').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
+                            $('a.disk_required').attr('title', (typeof data.exectime == 'undefined') ? '0' + ' s' : data.exectime.toString() + ' s');
+                            $('#exectime').text(parseFloat($('#exectime').text()) + parseFloat((typeof data.exectime == 'undefined') ? 0 : data.exectime));
+                            
+                            
+                            param = {'action':'download_framework','installtype':'provision'};
+                            doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
+                                console.log(data);
+                                if (data === null  || typeof data.status === "undefined" || data.status == false){
+                                    $('span.download_framework').text((typeof data.message == 'undefined') ? 'ERROR' : data.message);
+                                    $('i.download_framework').removeClass("fa fa-sync fa-spin").addClass("fa fa-exclamation-circle")
+                                }
+                                else {
+                                    $('span.download_framework').text('');
+                                    $('i.download_framework').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
+                                    $('a.download_framework').attr('title', (typeof data.exectime == 'undefined') ? '0' + ' s' : data.exectime.toString() + ' s');
+                                    $('#exectime').text(parseFloat($('#exectime').text()) + parseFloat((typeof data.exectime == 'undefined') ? 0 : data.exectime));
+                                    
+                                    
+                                    param = {'action':'download_vendor','installtype':'provision'};
+                                    doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
+                                        console.log(data);
+                                        if (data === null  || typeof data.status === "undefined" || data.status == false){
+                                            $('span.download_vendor').text((typeof data.message == 'undefined') ? 'ERROR' : data.message);
+                                            $('i.download_vendor').removeClass("fa fa-sync fa-spin").addClass("fa fa-exclamation-circle")
+                                        }
+                                        else {
+                                            $('span.download_vendor').text('');
+                                            $('i.download_vendor').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
+                                            $('a.download_vendor').attr('title', (typeof data.exectime == 'undefined') ? '0' + ' s' : data.exectime.toString() + ' s');
+                                            $('#exectime').text(parseFloat($('#exectime').text()) + parseFloat((typeof data.exectime == 'undefined') ? 0 : data.exectime));
+                                            
+                                            
+                                            param = {'action':'setup_env','installtype':'provision'};
+                                            doAnAjax('setupapiserver.php',param,'POST', function(error, data) {
+                                                console.log(data);
+                                                if (data === null  || typeof data.status === "undefined" || data.status == false){
+                                                    $('span.setup_env').text((typeof data.message == 'undefined') ? 'ERROR' : data.message);
+                                                    $('i.setup_env').removeClass("fa fa-sync fa-spin").addClass("fa fa-exclamation-circle")
+                                                }
+                                                else {
+                                                    $('span.setup_env').text('');
+                                                    $('i.setup_env').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
+                                                    $('a.setup_env').attr('title', (typeof data.exectime == 'undefined') ? '0' + ' s' : data.exectime.toString() + ' s');
+                                                    $('#exectime').text(parseFloat($('#exectime').text()) + parseFloat((typeof data.exectime == 'undefined') ? 0 : data.exectime));
+                                                    
+                                                    
+                                                    param = {'action':'download_common_pkg','installtype':'provision'};
+                                                    doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
+                                                        console.log(data);
+                                                        if (data === null  || typeof data.status === "undefined" || data.status == false){
+                                                            $('span.download_common_pkg').text((typeof data.message == 'undefined') ? 'ERROR' : data.message);
+                                                            $('i.download_common_pkg').removeClass("fa fa-sync fa-spin").addClass("fa fa-exclamation-circle")
+                                                        }
+                                                        else {
+                                                            $('span.download_common_pkg').text('');
+                                                            $('i.download_common_pkg').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
+                                                            $('a.download_common_pkg').attr('title', (typeof data.exectime == 'undefined') ? '0' + ' s' : data.exectime.toString() + ' s');
+                                                            $('#exectime').text(parseFloat($('#exectime').text()) + parseFloat((typeof data.exectime == 'undefined') ? 0 : data.exectime));
+                                                            
+                                                            
+                                                            param = {'action':'install_all_pkg','installtype':'provision'};
+                                                            doAnAjax('setupapiserver.php',param,'POST', function(error, data) {
+                                                                console.log(data);
+                                                                if (data === null  || typeof data.status === "undefined" || data.status == false){
+                                                                    $('span.install_all_pkg').text((typeof data.message == 'undefined') ? 'ERROR' : data.message);
+                                                                    $('i.install_all_pkg').removeClass("fa fa-sync fa-spin").addClass("fa fa-exclamation-circle")
+                                                                }
+                                                                else {
+                                                                    $('span.install_all_pkg').text('');
+                                                                    $('i.install_all_pkg').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
+                                                                    $('a.install_all_pkg').attr('title', (typeof data.exectime == 'undefined') ? '0' + ' s' : data.exectime.toString() + ' s');
+                                                                    $('#exectime').text(parseFloat($('#exectime').text()) + parseFloat((typeof data.exectime == 'undefined') ? 0 : data.exectime));
+                                                                    
+                                                                    
+                                                                    param = {'action':'artisan_call','installtype':'provision'};
+                                                                    doAnAjax('setupapiserver.php',param,'POST', function(error, data) {
+                                                                        console.log(data);
+                                                                        if (data === null  || typeof data.status === "undefined" || data.status == false){
+                                                                            $('span.artisan_call').text((typeof data.message == 'undefined') ? 'ERROR' : data.message);
+                                                                            $('i.artisan_call').removeClass("fa fa-sync fa-spin").addClass("fa fa-exclamation-circle")
+                                                                        }
+                                                                        else {
+                                                                            $('span.artisan_call').text('');
+                                                                            $('i.artisan_call').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
+                                                                            $('a.artisan_call').attr('title', (typeof data.exectime == 'undefined') ? '0' + ' s' : data.exectime.toString() + ' s');
+                                                                            $('#exectime').text(parseFloat($('#exectime').text()) + parseFloat((typeof data.exectime == 'undefined') ? 0 : data.exectime));
+                                                                            
+                                                                            
+                                                                            param = {'action':'finished_setup','installtype':'provision'};
+                                                                            doAnAjax('setupapiserver.php',param,'POST', function(error, data) {
+                                                                                console.log(data);
+                                                                                if (data === null  || typeof data.status === "undefined" || data.status == false){
+                                                                                    $('span.finished_setup').text((typeof data.message == 'undefined') ? 'ERROR' : data.message);
+                                                                                    $('i.finished_setup').removeClass("fa fa-sync fa-spin").addClass("fa fa-exclamation-circle")
+                                                                                }
+                                                                                else {
+                                                                                    $('span.finished_setup').text('');
+                                                                                    $('i.finished_setup').removeClass("fa fa-sync fa-spin").addClass("fa fa-check-circle");
+                                                                                    $('a.finished_setup').attr('title', (typeof data.exectime == 'undefined') ? '0' + ' s' : data.exectime.toString() + ' s');
+                                                                                    $('#exectime').text(parseFloat($('#exectime').text()) + parseFloat((typeof data.exectime == 'undefined') ? 0 : data.exectime));
+                                                                                    
+                                                                                    
+                                                                                }
+                                                                                
+                                                                                param = {'action':'remove_installer_api','installtype':'provision'};
+                                                                                doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
+                                                                                    console.log(data);
+                                                                                    $('#exectime').text(parseFloat($('#exectime').text()) + parseFloat((typeof data.exectime == 'undefined') ? 0 : data.exectime));
+                                                                                    
+                                                                                });
+                                                                                
+                                                                                window.location.href = window.location.origin + '/admin/login';
+                                                                                
+                                                                            });
+                                                                            
+                                                                            
+                                                                            
+                                                                        }
+                                                                    });
+                                                                    
+                                                                }
+                                                            });
+                                                            
+                                                        }
+                                                    });
+                                                    
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+            //end install process
+            
+            
+            
+            //ajax function
+            function doAnAjax(url,param,type,callback) {
+	            $.ajax({
+	                url : url,
+	                data : param,
+	                cache : false,
+	                type : type,
+	                dataType : "json",
+	                headers : {'Ignore-Token':1},
+	                error : function() {
+	                    callback("error", null);
+	                },
+	                success : function(data) {
+	                    callback(null, data);
+	                },
+	                timeout: 300000
+	            }); 
+            }
+            
+        });
+    </script>
+</body>
+
+
+</html>

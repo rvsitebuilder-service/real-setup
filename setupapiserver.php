@@ -24,6 +24,7 @@ $dbhost         = '';
 $dbname         = '';
 $dbuser         = '';
 $dbpassword     = '';
+$dbport         = 3306;
 $ftpaccount     = '';
 $ftppassword    = '';
 $appname        = 'RVsitebuilder';
@@ -40,6 +41,7 @@ $additionalpkg  = '';
 $welcomeemailtype = 'default';
 $isrepair         = 0;
 $cptype         = 'none';
+$installtype    = '';
 
 //get
 if (isset($_GET['action']))         $action         = $_GET['action'];
@@ -50,6 +52,7 @@ if (isset($_GET['dbhost']))         $dbhost         = $_GET['dbhost'];
 if (isset($_GET['dbname']))         $dbname         = $_GET['dbname'];
 if (isset($_GET['dbuser']))         $dbuser         = $_GET['dbuser'];
 if (isset($_GET['dbpass']))         $dbpassword     = $_GET['dbpass'];
+if (isset($_GET['dbport']))         $dbport         = $_GET['dbpass'];
 if (isset($_GET['ftpaccount']))     $ftpaccount     = $_GET['ftpaccount'];
 if (isset($_GET['ftppassword']))    $ftppassword    = $_GET['ftppassword'];
 if (isset($_GET['appname']))        $appname        = $_GET['appname'];
@@ -64,8 +67,9 @@ if (isset($_GET['artisancmd']))     $artisancmd     = $_GET['artisancmd'];
 if (isset($_GET['artisanparam']))   $artisanparam   = $_GET['artisanparam'];
 if (isset($_GET['additionalpkg']))  $additionalpkg  = $_GET['additionalpkg'];
 if (isset($_GET['welcomeemailtype']))  $welcomeemailtype  = $_GET['welcomeemailtype'];
-if (isset($_GET['isrepair']))  $isrepair  = $_GET['isrepair'];
-if (isset($_GET['cptype']))  $cptype  = $_GET['cptype'];
+if (isset($_GET['isrepair']))       $isrepair  = $_GET['isrepair'];
+if (isset($_GET['cptype']))         $cptype  = $_GET['cptype'];
+if (isset($_GET['installtype']))    $installtype= $_GET['installtype'];
 
 //post
 if (isset($_POST['action']))         $action         = $_POST['action'];
@@ -76,6 +80,7 @@ if (isset($_POST['dbhost']))         $dbhost         = $_POST['dbhost'];
 if (isset($_POST['dbname']))         $dbname         = $_POST['dbname'];
 if (isset($_POST['dbuser']))         $dbuser         = $_POST['dbuser'];
 if (isset($_POST['dbpass']))         $dbpassword     = $_POST['dbpass'];
+if (isset($_POST['dbport']))         $dbport         = $_POST['dbport'];
 if (isset($_POST['ftpaccount']))     $ftpaccount     = $_POST['ftpaccount'];
 if (isset($_POST['ftppassword']))    $ftppassword    = $_POST['ftppassword'];
 if (isset($_POST['appname']))        $appname        = $_POST['appname'];
@@ -88,16 +93,42 @@ if (isset($_POST['adminlastname']))  $adminlastname  = $_POST['adminlastname'];
 if (isset($_POST['domainport']))     $domainport     = $_POST['domainport'];
 if (isset($_POST['artisancmd']))     $artisancmd     = $_POST['artisancmd'];
 if (isset($_POST['artisanparam']))   $artisanparam   = $_POST['artisanparam'];
-if (isset($_POST['argvalue']))       $argvalue       = $_POST['argvalue'];
 if (isset($_POST['additionalpkg']))  $additionalpkg  = $_POST['additionalpkg'];
 if (isset($_POST['welcomeemailtype']))  $welcomeemailtype  = $_POST['welcomeemailtype'];
-if (isset($_POST['isrepair']))  $isrepair  = $_POST['isrepair'];
-if (isset($_POST['cptype']))  $cptype  = $_POST['cptype'];
-
+if (isset($_POST['isrepair']))          $isrepair  = $_POST['isrepair'];
+if (isset($_POST['cptype']))            $cptype  = $_POST['cptype'];
+if (isset($_POST['installtype']))       $installtype= $_POST['installtype'];
 
 $setupObj = new RVsitebuilder_Setup_API($responsetype,$rvsb_installing_token,$responsetype,$ignore_token,$rvlicensecode);
 
 
+//provision
+$provisionconfig = [];
+$userpathinfo = $setupObj->get_user_path_info();
+$userdomain = $setupObj->get_current_domain();
+$configfile = $userpathinfo['homepath'] . '/rvsitebuildercms/' . $userdomain. '/provisioning.ini';
+if(file_exists($configfile) && $installtype == 'provision') {
+    $provisionconfig = parse_ini_file($configfile,true);
+    if(isset($provisionconfig['provisioning']['db_host']) && $provisionconfig['provisioning']['db_host'] != '')  $dbhost = $provisionconfig['provisioning']['db_host'];
+    if(isset($provisionconfig['provisioning']['db_name']) && $provisionconfig['provisioning']['db_name'] != '')  $dbname = $provisionconfig['provisioning']['db_name'];
+    if(isset($provisionconfig['provisioning']['db_user']) && $provisionconfig['provisioning']['db_user'] != '')  $dbuser = $provisionconfig['provisioning']['db_user'];
+    if(isset($provisionconfig['provisioning']['db_pass']) && $provisionconfig['provisioning']['db_pass'] != '')  $dbpassword = $provisionconfig['provisioning']['db_pass'];
+    if(isset($provisionconfig['provisioning']['db_port']) && $provisionconfig['provisioning']['db_port'] != '')  $dbport = $provisionconfig['provisioning']['db_port'];
+    if(isset($provisionconfig['provisioning']['admin_email'])       && $provisionconfig['provisioning']['admin_email'] != '')      $adminemail = $provisionconfig['provisioning']['admin_email'];
+    if(isset($provisionconfig['provisioning']['admin_password'])    && $provisionconfig['provisioning']['admin_password'] != '')   $adminpassword = $provisionconfig['provisioning']['admin_password'];
+    if(isset($provisionconfig['provisioning']['admin_firstname'])   && $provisionconfig['provisioning']['admin_firstname'] != '')  $adminfirstname = $provisionconfig['provisioning']['admin_firstname'];
+    if(isset($provisionconfig['provisioning']['admin_lastname'])    && $provisionconfig['provisioning']['admin_lastname'] != '')   $adminlastname= $provisionconfig['provisioning']['admin_lastname'];
+    $homeuser = $userpathinfo['homepath'];
+    $domainname = $userdomain;
+    $publicpath = $userpathinfo['publicpath'];
+}
+
+
+
+
+////////////////
+//call to action
+////////////////
 if($action == '' && !file_exists(dirname(__FILE__).'/.Rvsb-Installing-Token') && $rvsb_installing_token == 0) {
     $setupObj->send_token();
 }
@@ -2097,7 +2128,13 @@ class RVsitebuilder_Setup_API {
     
     public function get_current_domain() {
         $this->print_debug_log('======'.__METHOD__.'======');
-        $domainname = $_SERVER['SERVER_NAME'];
+        $domainname = '';
+        if(isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] != '') {
+            $domainname = $_SERVER['HTTP_HOST'];
+        }
+        if(isset($_SERVER['SERVER_NAME']) && $_SERVER['SERVER_NAME'] != ''){
+            $domainname = $_SERVER['SERVER_NAME'];
+        }
         $domainname = str_replace("www.","",$domainname);
         $this->print_debug_log("Current domain ".$domainname);
         return $domainname;
