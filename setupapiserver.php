@@ -1423,6 +1423,13 @@ class RVsitebuilder_Setup_API {
             $files = new Filesystem();
             if($files->exists($logofile)){
                 $files->remove($logofile);
+                $this->print_debug_log('Remove '.$logofile);
+            }
+            $logomobile = $homeuser.'/rvsitebuildercms/'.$domainname.'/public/storage/images/logo-mobile.png';
+            $files = new Filesystem();
+            if($files->exists($logomobile)){
+                $files->remove($logomobile);
+                $this->print_debug_log('Remove '.$logomobile);
             }
         }
         $unit_time_start = microtime(true);
