@@ -1426,7 +1426,7 @@ class RVsitebuilder_Setup_API {
         
         
         //vendor publish
-        if($isrepair){
+        /*if($isrepair){
             //remove logo in public befor vendor:publish because if will overwrite site logo in public_html
             $logofile = $homeuser.'/rvsitebuildercms/'.$domainname.'/public/storage/images/logo.png';
             $files = new Filesystem();
@@ -1440,7 +1440,7 @@ class RVsitebuilder_Setup_API {
                 $files->remove($logomobile);
                 $this->print_debug_log('Remove '.$logomobile);
             }
-        }
+        }*/
         $unit_time_start = microtime(true);
         $kernel->call('vendor:publish', ['--tag'=> 'public','--force' => true]);
         $this->print_debug_log($kernel->output());
