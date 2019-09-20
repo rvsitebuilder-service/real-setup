@@ -660,8 +660,17 @@ class RVsitebuilder_Setup_API {
         if($files->exists($source.'/robots.txt')){
             $copy = $files->copy($source.'/robots.txt' , $destination.'/robots.txt' , true);
         }
-        if($files->exists($source.'/storage')){
-            $copy = $files->mirror($source.'/storage' , $destination.'/storage' , null ,['override' => true]);
+        if($files->exists($source.'/storage/freeImages.json')){
+            $copy = $files->copy($source.'/storage/freeImages.json', $destination.'/storage/freeImages.json' , true);
+        }
+        if($files->exists($source.'/storage/index.php')){
+            $copy = $files->copy($source.'/storage/index.php', $destination.'/storage/index.php' , true);
+        }
+        if($files->exists($source.'/storage/myheader')){
+            $copy = $files->mirror($source.'/storage/myheader' , $destination.'/storage/myheader' , null ,['override' => true]);
+        }
+        if($files->exists($source.'/storage/images')){
+            $copy = $files->mirror($source.'/storage/images' , $destination.'/storage/images' , null ,['override' => false]);
         }
         $this->print_debug_log("Copy $source To $destination");
         
