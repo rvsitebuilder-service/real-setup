@@ -385,7 +385,14 @@ class RVsitebuilder_Setup_API {
             $this->response['check_pre_require']['phpversion']['reason'] = 'System required PHP Version > = 7.1.3';
             $this->response['message'] = 'System required PHP Version > = 7.1.3';
             $this->response['status'] = false;
-            $this->print_debug_log("PHP version falase ".PHP_VERSION);
+            $this->print_debug_log("PHP version false ".PHP_VERSION);
+        }
+        //php ini
+        $this->response['check_pre_require']['phpini']['check'] = true;
+        if(function_exists('php_ini_loaded_file')){
+            $this->response['check_pre_require']['phpini']['check'] = php_ini_loaded_file();
+            $this->response['check_pre_require']['phpini']['reason'] = php_ini_loaded_file();
+            $this->print_debug_log("PHP ini ".php_ini_loaded_file());
         }
         //php extension
         $this->response['check_pre_require']['mysqlnd']['check'] = true;
@@ -1061,8 +1068,7 @@ class RVsitebuilder_Setup_API {
             'queuesharedhost',
             'scheduler',
             'wysiwyg',
-            //TODO เอา marketing ออก พร้อมกับ rvsb release 7.2
-            'marketing'
+            //'marketing'
         ];
         
         if($additionalpkg != '') {
