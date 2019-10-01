@@ -1039,6 +1039,9 @@ class RVsitebuilder_Setup_API {
         $env_data['CP_TYPE']  = $cptype;
         $env_data['MAIL_FROM_ADDRESS']  = 'admin'.'@'.$domainname;
         
+        //debug
+        $env_data['APP_DEBUG']  = 'true';
+        
         
         $this->print_debug_log("ENV data ".json_encode($env_data));
         
