@@ -603,9 +603,6 @@ class RVsitebuilder_Setup_API {
         
         $files =  new Filesystem();
         
-        //url replace for subfolder
-        $domainname = preg_replace('/\//', '_', $domainname);
-        
         //remove first if /home/<user>/rvsitebuildercms/$domainname/bootstrap/cache
         if(file_exists($homeuser.'/rvsitebuildercms/'.$domainname.'/bootstrap/cache')) {
             $files->remove($homeuser.'/rvsitebuildercms/'.$domainname.'/bootstrap/cache');
@@ -798,9 +795,6 @@ class RVsitebuilder_Setup_API {
         ];
         
         $files = new Filesystem();
-        
-        //url replace for subfolder
-        $domainname = preg_replace('/\//', '_', $domainname);
         
         //check rvsitebuilder.json
         if(! $files->exists($homeuser.'/rvsitebuildercms/'.$domainname.'/rvsitebuilder.json')){
@@ -1021,9 +1015,6 @@ class RVsitebuilder_Setup_API {
         $time_start = microtime(true);
         $this->print_debug_log('======'.__METHOD__.'======');
         
-        //url replace for subfolder
-        $domainnamepath = preg_replace('/\//', '_', $domainname);
-        
         //clear whitespace
         if (preg_match('/\s/',$appname)) $appname = '"'.$appname.'"';
         //add domain port
@@ -1047,12 +1038,13 @@ class RVsitebuilder_Setup_API {
         $env_data['WELCOME_EMAIL_TYPE']  = $welcomeemailtype;
         $env_data['CP_TYPE']  = $cptype;
         $env_data['MAIL_FROM_ADDRESS']  = 'admin'.'@'.$domainname;
+    
         
         
         $this->print_debug_log("ENV data ".json_encode($env_data));
         
         if($this->httpasuser) {
-            $res = $this->do_setupenv($homeuser.'/rvsitebuildercms/'.$domainnamepath, $env_data, true);
+            $res = $this->do_setupenv($homeuser.'/rvsitebuildercms/'.$domainname, $env_data, true);
         }else {
             $res = $this->do_setupenv(dirname(__FILE__).'/tmp', $env_data, true);
         }
@@ -1226,9 +1218,6 @@ class RVsitebuilder_Setup_API {
         
         $files = new Filesystem();
         
-        //url replace for subfolder
-        $domainname = preg_replace('/\//', '_', $domainname);
-        
         foreach ($commonpkg as $pkg) {
             
             $sha512verify['type'] = 'commonkpg';
@@ -1335,9 +1324,6 @@ class RVsitebuilder_Setup_API {
     public function artisan_call($homeuser,$domainname,$publicpath,$adminemail,$adminpassword,$adminfirstname,$adminlastname,$isrepair) {
         $time_start = microtime(true);
         $this->print_debug_log('======'.__METHOD__.'======');
-        
-        //url replace for subfolder
-        $domainname = preg_replace('/\//', '_', $domainname);
         
         //loader
         // /home/arnut/rvsitebuildercms/arnut.cpdev1.rvglobalsoft.net/vendor/autoload.php
@@ -1601,9 +1587,6 @@ class RVsitebuilder_Setup_API {
         
         $files = new Filesystem();
         
-        //url replace for subfolder
-        $domainname = preg_replace('/\//', '_', $domainname);
-        
         $this->print_debug_log("TOUCH INSTALL_COMPLETED");
         
         //touch install complete
@@ -1794,9 +1777,6 @@ class RVsitebuilder_Setup_API {
         ];
         
         $files =  new Filesystem();
-        
-        //url replace for subfolder
-        $domainname = preg_replace('/\//', '_', $domainname);
         
         //old htaccess
         $oldhtaccess = '';
@@ -2350,7 +2330,6 @@ class RVsitebuilder_Setup_API {
         $this->response['status'] = true;
         $this->response['homepath'] = $userpathinfo['homepath'];
         $this->response['publicpath'] = $userpathinfo['publicpath'];
-        $this->response['currentpath'] = $userpathinfo['currentpath'];
         $this->response['exectime'] = (microtime(true) - $time_start);
         $this->print_debug_log('User path info '.json_encode($userpathinfo));
         $this->print_install_log(__METHOD__." TRUE ".json_encode($userpathinfo).' timeusage '.$this->response['exectime']);
@@ -2440,7 +2419,6 @@ class RVsitebuilder_Setup_API {
 
         $userpathinfo['homepath'] = $user_path;
         $userpathinfo['publicpath'] = $document_root;
-        $userpathinfo['currentpath'] = dirname(__FILE__ , 2);
         
         return $userpathinfo;        
     }

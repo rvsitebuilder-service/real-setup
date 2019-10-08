@@ -329,7 +329,6 @@
                                         id="url" placeholder="" required disabled>
                                 </div>
                                 <div class="help-block with-errors"></div>
-                                <input type="hidden" id="domainnamesetup"/>
                             </div>
                         </div>
                         <div class="form-group">
@@ -723,17 +722,8 @@
             
             
             //url value 
-            //$("#url").val(window.location.origin);
-            //default app_url
-            //$("#websitename").val(window.location.hostname);
-            var location = window.location.href;
-            var url = location.replace("/rvsitebuilder/install.html#form-step-0", "");
-            //url value 
-            $("#url").val(url);
-            //default app_url
-            var hostname = location.replace("/rvsitebuilder/install.html#form-step-0", "").replace(/https:\/\/|http:\/\//,"");
-            $("#websitename").val(hostname);
-            $("#domainnamesetup").val(hostname);
+            $("#url").val(window.location.origin);
+            
             
             
             
@@ -744,8 +734,7 @@
                 console.log(data);
                 if (data.status == true){
                     $("#homepath").val(data.homepath);
-                    //$("#publicpath").val(data.publicpath);
-                    $("#publicpath").val(data.currentpath);
+                    $("#publicpath").val(data.publicpath);
                 } else {
                     return true;
                 }
@@ -791,6 +780,9 @@
                 }
             }); 
             
+            
+            //default app_url
+            $("#websitename").val(window.location.hostname);
             
             
             //checkbox before install
@@ -842,7 +834,7 @@
                                 $('#exectime').text(parseFloat($('#exectime').text()) + parseFloat((typeof data.exectime == 'undefined') ? 0 : data.exectime));
                                 
                                 
-                                param = {'action':'download_framework' ,'homeuser':$('#homepath').val(),'domainname': $('#domainnamesetup').val(), 'publicpath': $('#publicpath').val()};
+                                param = {'action':'download_framework' ,'homeuser':$('#homepath').val(),'domainname': window.location.hostname, 'publicpath': $('#publicpath').val()};
                                 doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
                                     console.log(data);
                                     if (data === null  || typeof data.status === "undefined" || data.status == false){
@@ -856,7 +848,7 @@
                                         $('#exectime').text(parseFloat($('#exectime').text()) + parseFloat((typeof data.exectime == 'undefined') ? 0 : data.exectime));
                                         
                                         
-                                        param = {'action':'download_vendor','homeuser':$('#homepath').val(),'domainname': $('#domainnamesetup').val()};
+                                        param = {'action':'download_vendor','homeuser':$('#homepath').val(),'domainname': window.location.hostname};
                                         doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
                                             console.log(data);
                                             if (data === null  || typeof data.status === "undefined" || data.status == false){
@@ -872,7 +864,7 @@
                                                 
                                                 param = {
                                                 		'action':'setup_env',
-                                                		'domainname': $('#domainnamesetup').val(),
+                                                		'domainname': window.location.hostname,
                                                 		'domainport': (window.location.port == 0 || window.location.port == '') ? '' : window.location.port,
                                                 		'publicpath': $('#publicpath').val(),
                                                 		'dbhost': $('#dbhost').val(),
@@ -899,7 +891,7 @@
                                                         $('#exectime').text(parseFloat($('#exectime').text()) + parseFloat((typeof data.exectime == 'undefined') ? 0 : data.exectime));
                                                         
                                                         
-                                                        param = {'action':'download_common_pkg','homeuser':$('#homepath').val(),'domainname': $('#domainnamesetup').val()};
+                                                        param = {'action':'download_common_pkg','homeuser':$('#homepath').val(),'domainname': window.location.hostname};
                                                         doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
                                                             console.log(data);
                                                             if (data === null  || typeof data.status === "undefined" || data.status == false){
@@ -916,7 +908,7 @@
                                                                 param = {
                                                                 		'action':'install_all_pkg',
                                                                 		'homeuser':$('#homepath').val(),
-                                                                		'domainname':$('#domainnamesetup').val(),
+                                                                		'domainname':window.location.hostname,
                                                                 		'publicpath': $('#publicpath').val(),
                                                                 		'ftpserver': $('#ftpserver').val(),
                                                                 		'ftpaccount': $('#ftpusername').val(),
@@ -940,7 +932,7 @@
                                                                         param = {
                                                                         		'action':'artisan_call',
                                                                         		'homeuser':$('#homepath').val(),
-                                                                        		'domainname':$('#domainnamesetup').val(),
+                                                                        		'domainname':window.location.hostname,
                                                                         		'publicpath': $('#publicpath').val(),
                                                                         		'adminemail': $('#email').val(),
                                                                         		'adminpassword': $('#password').val(), 
@@ -963,7 +955,7 @@
                                                                                 param = {
                                                                                 		'action':'finished_setup',
                                                                                 		'homeuser':$('#homepath').val(),
-                                                                                		'domainname':$('#domainnamesetup').val(),
+                                                                                		'domainname':window.location.hostname,
                                                                                 		'publicpath': $('#publicpath').val(),
                                                                                 		'ftpserver': $('#ftpserver').val(),
                                                                                 		'ftpaccount': $('#ftpusername').val(),
@@ -992,8 +984,7 @@
                                                                                         
                                                                                     });
                                                                                     
-                                                                                    window.location.href = location.replace("/rvsitebuilder/install.html#form-step-0", "")  + '/admin/login';
-                                                                                    
+                                                                                    window.location.href = window.location.origin + '/admin/login';
                                                                                     
                                                                                 });
                                                                                 
@@ -1032,9 +1023,8 @@
 	                type : type,
 	                dataType : "json",
 	                headers : {'Ignore-Token':1},
-	                error : function(error) {
-	                	console.log(error);
-	                    callback(error, null);
+	                error : function() {
+	                    callback("error", null);
 	                },
 	                success : function(data) {
 	                    callback(null, data);
