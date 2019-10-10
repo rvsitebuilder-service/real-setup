@@ -739,7 +739,7 @@
             
 			//system requrired recheck
 			$("#systemreg_recheck").on("click", function() {
-				location.reload();
+				window.location.reload();
             });
            
             
@@ -777,19 +777,18 @@
             param = {'action':'pre_check_php'};
             doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
                 console.log(data);
-                if (data.status == true){
-                	$.each( data.check_pre_require, function( key, value ) {
-                		  if(value.check == true) {
-                			  $("#"+key).val(value.check.toString().toUpperCase());
-                			  $("#"+key).removeClass("text-danger").addClass("text-success");
-                		  }
-                		  else {
-                			  return true;
-                		  }
-                    });
-                } else {
-                    return true;
+                if(typeof data === "object"){
+	               	$.each( data.check_pre_require, function( key, value ) {
+	               		  if(value.check == true) {
+	               			  $("#"+key).val(value.check.toString().toUpperCase());
+	               			  $("#"+key).removeClass("text-danger").addClass("text-success");
+	               		  }
+	               		  else {
+	               			  $("#chk_pre_require_error").removeClass("d-none").html($("#chk_pre_require_error").text() + '<p>'+ value.reason + '</p>');
+	               		  }
+	                });
                 }
+                return true;
             }); 
             
             

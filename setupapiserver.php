@@ -389,8 +389,8 @@ class RVsitebuilder_Setup_API {
         }
         //php ini
         $this->response['check_pre_require']['phpini']['check'] = true;
+        $this->response['check_pre_require']['phpini']['reason'] = '';
         if(function_exists('php_ini_loaded_file')){
-            $this->response['check_pre_require']['phpini']['check'] = php_ini_loaded_file();
             $this->response['check_pre_require']['phpini']['reason'] = php_ini_loaded_file();
             $this->print_debug_log("PHP ini ".php_ini_loaded_file());
         }
@@ -620,11 +620,11 @@ class RVsitebuilder_Setup_API {
                 $response['status'] = true;
             }
         } catch (\Exception $e) {
-            $this->print_debug_log('Validate developer token error '.$e->getMessage());
+            $this->print_debug_log('Validate Service Response Error '.$e->getMessage());
             $response['reason']  = $e->getMessage();
         }
         
-        $this->print_install_log(__METHOD__.' status: '.$response['status'].' url: ' . $url);
+        $this->print_install_log(__METHOD__.' status: '.$response['status'].' url: ' . $serviceurl);
         return $response;
     }
     
