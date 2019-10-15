@@ -763,7 +763,6 @@
             //home path value
             param = {'action':'get_user_path'};
             doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
-                console.log(data);
                 if (data.status == true){
                     $("#homepath").val(data.homepath);
                     //$("#publicpath").val(data.publicpath);
@@ -776,7 +775,6 @@
             //check pre require value
             param = {'action':'pre_check_php'};
             doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
-                console.log(data);
                 if(typeof data === "object"){
 	               	$.each( data.check_pre_require, function( key, value ) {
 	               		  if(value.check == true) {
@@ -791,11 +789,9 @@
                 return true;
             }); 
             
-            
             //check http as user
             param = {'action':'check_http_as_user'};
             doAnAjax('setupapiserver.php',param,'GET', function(error, data) {
-                console.log(data);
                 if (data.status == true){
 	                if(data.httpasuser == false) {
 	                    $("#ftpinfo").removeClass("d-none").addClass("ftprequired");
@@ -1053,11 +1049,13 @@
 	                type : type,
 	                dataType : "json",
 	                headers : {'Ignore-Token':1},
+	                async : false,
 	                error : function(error) {
 	                	console.log(error);
 	                    callback(error, null);
 	                },
 	                success : function(data) {
+	                	console.log(data);
 	                    callback(null, data);
 	                },
 	                timeout: 300000
