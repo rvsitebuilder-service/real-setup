@@ -1079,8 +1079,9 @@ class RVsitebuilder_Setup_API {
         
         //clear whitespace
         if (preg_match('/\s/',$appname)) $appname = '"'.$appname.'"';
+        
         //add domain port
-        $appurl = ($domainport != '') ?  'https://'.$domainname.':'.$domainport : 'https://'.$domainname ;
+        $appurl = (!preg_match('/:\d+/',$domainname) && $domainport != '') ?  'https://'.$domainname.':'.$domainport : 'https://'.$domainname ;
         
         $env_data = [];
         $env_data['APP_URL'] = $appurl;
