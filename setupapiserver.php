@@ -1,5 +1,17 @@
 <?php
 
+register_shutdown_function(function() {
+    $error = error_get_last();
+    if(null !== $error) {
+        $response = [];
+        $response['status'] = false;
+        $response['exectime'] = '';
+        $response['message'] = 'Fatal error on setupapiserver.php';
+        header('Content-type: application/json');
+        echo json_encode( $data );
+        exit;
+    }
+});
 
 require 'vendor/autoload.php';
 use GuzzleHttp\Client;
