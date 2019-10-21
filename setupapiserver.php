@@ -6,7 +6,7 @@ register_shutdown_function(function() {
         $response = [];
         $response['status'] = false;
         $response['exectime'] = '';
-        $response['message'] = 'Fatal error on setupapiserver.php';
+        $response['message'] = 'This error has to be fixed by RVsitebuilder team. Please submit a ticket with Hosting Access and Domain name provided to us directly <a href="https://rvglobalsoft.com/tickets/new&deptId=5" target="_blank">here.</a>';
         header('Content-type: application/json');
         echo json_encode( $data );
         exit;
