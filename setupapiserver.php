@@ -1,20 +1,21 @@
 <?php
 
 register_shutdown_function(function() {
-    //ref https://www.php.net/manual/en/errorfunc.constants.php
-    //error type 2 is warning
-    $error = error_get_last();
-    if(null !== $error && $error['type'] != 2) {
-        $response = [];
-        $response['status'] = false;
-        $response['exectime'] = '';
-        $response['message'] = ' This error has to be fixed by RVsitebuilder team. Please submit a ticket with Hosting Access and Domain name provided to us directly <a href="https://rvglobalsoft.com/tickets/new&deptId=5" target="_blank">Here.</a> ';
-        if (isset($error['message'])) $response['message'] = $response['message'] . ' ('.$error['message'].')';
-        if (!headers_sent()) {
-            header('Content-type: application/json');
+    //if header is sent , because worker function is responsed install task status
+    if(!headers_sent()){
+        header('Content-type: application/json');
+        //ref https://www.php.net/manual/en/errorfunc.constants.php
+        //error type 2 is warning
+        $error = error_get_last();
+        if(null !== $error && $error['type'] != 2) {
+            $response = [];
+            $response['status'] = false;
+            $response['exectime'] = '';
+            $response['message'] = ' This error has to be fixed by RVsitebuilder team. Please submit a ticket with Hosting Access and Domain name provided to us directly <a href="https://rvglobalsoft.com/tickets/new&deptId=5" target="_blank">Here.</a> ';
+            if (isset($error['message'])) $response['message'] = $response['message'] . ' ('.$error['message'].')';
+            echo json_encode( $response);
+            exit;
         }
-        echo json_encode( $response);
-        exit;
     }
 });
 
