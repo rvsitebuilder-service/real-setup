@@ -705,7 +705,7 @@ class RVsitebuilder_Setup_API {
             $downloadurl = $this->mirrorurl.'/download/rvsitebuilder/framework/version/'.$this->installerconfig['framework']['getversion'];
             $sha512verify['version_type'] = 'version';
             $sha512verify['version'] = $this->installerconfig['framework']['getversion'];
-            $sha512verify['getversionurl'] = '/getversion/rvsitebuilder/framework';
+            $sha512verify['getversionurl'] = '/getversion/rvsitebuilder/framework'.'/version/'.$this->installerconfig['framework']['getversion'];
         }
         else if(isset($this->installerconfig['framework']['getversion']) && $this->installerconfig['framework']['getversion'] == 'edge')
         {
@@ -807,7 +807,7 @@ class RVsitebuilder_Setup_API {
             $downloadurl = $this->mirrorurl.'/download/rvsitebuilder/framework/version/'.$this->installerconfig['framework']['getversion'];
             $sha512verify['version_type'] = 'version';
             $sha512verify['version'] = $this->installerconfig['framework']['getversion'];
-            $sha512verify['getversionurl'] = '/getversion/rvsitebuilder/framework';
+            $sha512verify['getversionurl'] = '/getversion/rvsitebuilder/framework'.'/version/'.$this->installerconfig['framework']['getversion'];
         }
         else if(isset($this->installerconfig['framework']['getversion']) && $this->installerconfig['framework']['getversion'] == 'edge')
         {
@@ -2207,7 +2207,14 @@ class RVsitebuilder_Setup_API {
                 $verify_arr = json_decode($arr_request->getBody() , true);
                 $verify_arr = array_change_key_case($verify_arr,CASE_LOWER);
                 if(isset($verify_arr[$sha512verify['name']])){
-                    $versionsha512 = $verify_arr[$sha512verify['name']]['versions'][$sha512verify['version']]['sha512'];    
+                    //vendor
+                    if(isset($verify_arr[$sha512verify['name']]['versions'][$sha512verify['version']]['sha512'])) {
+                        $versionsha512 = $verify_arr[$sha512verify['name']]['versions'][$sha512verify['version']]['sha512'];
+                    }
+                    //rvsitebuilder/package
+                    else {
+                        $versionsha512 = $verify_arr[$sha512verify['name']]['sha512'];
+                    }
                 }else{
                     $versionsha512 = $verify_arr[urldecode($sha512verify['name'])]['versions'][$sha512verify['version']]['sha512'];
                 }
@@ -2224,9 +2231,9 @@ class RVsitebuilder_Setup_API {
                 }
                 $versionsha512 = $verify_arr[$sha512verify['name']]['sha512'];
             }
-            if($file_sha512!=$versionsha512){
+            if(trim($file_sha512) != trim($versionsha512)){
                 $response['success'] = false;
-                $response['message'] = 'Download error , File validation incorret.';
+                $response['message'] = 'Download error , File validation incorrect.';
             }
         }
         
