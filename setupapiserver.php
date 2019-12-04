@@ -2197,7 +2197,8 @@ class RVsitebuilder_Setup_API {
         }
         
         /////////////////////////// **start** function verify sha512 ///////////////////////////
-        
+        //fixed ชั่วคราว กรณี sha512 verify error arnut/20191205
+        $sha512verify = [];
         if(!empty($sha512verify)){
             
             $file_sha512 = hash_file('sha512' , $sink);
