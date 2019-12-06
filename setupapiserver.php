@@ -2232,7 +2232,7 @@ class RVsitebuilder_Setup_API {
             }
             if(trim($file_sha512) != trim($versionsha512)){
                 $response['success'] = false;
-                $response['message'] = 'Download error , File validation incorrect.';
+                $response['message'] = 'Cannot download framework. File validation is failed.';
             }
         }
         
