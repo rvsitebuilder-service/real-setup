@@ -1460,6 +1460,8 @@ class RVsitebuilder_Setup_API {
                 if(is_file($auto_load_file)){
                     require $auto_load_file;
                     $this->print_debug_log("require  ".$auto_load_file);
+                } else {
+                    $this->print_debug_log("ERROR not have auto_load_file --> ".$auto_load_file);
                 }
             }
         }
