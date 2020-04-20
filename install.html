@@ -278,7 +278,13 @@
                         </div>
 
                         <span id="chk_pre_require_error"
-                            class="d-none list-group-item list-group-item-action list-group-item-warning margin-b"></span>
+                            class="d-none list-group-item list-group-item-action list-group-item-warning margin-b">
+                            <p class="font-weight-bold">We found this:</p>
+                            <ul id="chk_pre_require_error_list">
+
+                            </ul>
+                            <p class="font-weight-bold">Please correct, then click "Recheck" again.</p>
+                        </span>
                         <button type="button" id="systemreg_recheck" class="btn btn-info">Recheck</button>
 
                     </div>
@@ -662,6 +668,7 @@
                 //alert("You are on step "+stepNumber+" now");
                 if (stepPosition === 'first') {
                     $("#prev-btn").addClass('disabled');
+                    $(".btn-cancel").addClass('d-none');
                 } else if (stepPosition === 'final') {
                     $("#next-btn").addClass('disabled');
                 } else {
@@ -714,6 +721,8 @@
             //$("#theme_selector").change();
 
 
+
+
             //bootstrap input validate default 
             var ajaxInvokeStep1 = false;
             var ajaxInvokeStep2 = false;
@@ -735,8 +744,7 @@
                     var noerror = true;
                     $("#form-step-0 .chk_pre_require").each(function () {
                         if ($(this).val() === "FALSE") {
-                            $("#chk_pre_require_error").removeClass("d-none").text(
-                                "PHP required error");
+                            $("#chk_pre_require_error").removeClass("d-none");
                             console.log('pre check error');
                             noerror = false;
                             return noerror;
@@ -866,9 +874,10 @@
                             $("#" + key).val(value.check.toString().toUpperCase());
                             $("#" + key).removeClass("text-danger").addClass("text-success");
                         } else {
-                            $("#chk_pre_require_error").removeClass("d-none").html($(
-                                    "#chk_pre_require_error").text() + '<p>' + value
-                                .reason + '</p>');
+                            $("#chk_pre_require_error_list").append('<li>' + value.reason +
+                                '</li>');
+                            $("#chk_pre_require_error").removeClass("d-none");
+                            $(".sw-btn-next").addClass("disabled");
                         }
                     });
                 }
@@ -899,14 +908,16 @@
 
             //checkbox before install
             $('#confirmoverwrite').change(function () {
-                if ($(this).prop('checked') == true && $('#confirmagreement').prop('checked') == true) {
+                if ($(this).prop('checked') == true && $('#confirmagreement').prop('checked') ==
+                    true) {
                     $('#buttoninstall').prop('disabled', false);
                 } else {
                     $('#buttoninstall').prop('disabled', true);
                 }
             });
             $('#confirmagreement').change(function () {
-                if ($(this).prop('checked') == true && $('#confirmoverwrite').prop('checked') == true) {
+                if ($(this).prop('checked') == true && $('#confirmoverwrite').prop('checked') ==
+                    true) {
                     $('#buttoninstall').prop('disabled', false);
                 } else {
                     $('#buttoninstall').prop('disabled', true);
@@ -921,7 +932,8 @@
                     'action': 'check_license'
                 };
                 doAnAjax('setupapiserver.php', param, 'GET', function (error, data) {
-                    if (data === null || typeof data.status === "undefined" || data.status ==
+                    if (data === null || typeof data.status === "undefined" || data
+                        .status ==
                         false) {
                         $('span.check_license').text((typeof data.message == 'undefined') ?
                             'ERROR' : data.message);
@@ -932,7 +944,8 @@
                         $('i.check_license').removeClass("fa fa-sync fa-spin").addClass(
                             "fa fa-check-circle");
                         $('a.check_license').attr('title', (typeof data.exectime ==
-                            'undefined') ? '0' + ' s' : data.exectime.toString() + ' s');
+                                'undefined') ? '0' + ' s' : data.exectime.toString() +
+                            ' s');
                         $('#exectime').text(parseFloat($('#exectime').text()) + parseFloat((
                                 typeof data.exectime == 'undefined') ? 0 : data
                             .exectime));
@@ -940,21 +953,26 @@
                         param = {
                             'action': 'disk_required'
                         };
-                        doAnAjax('setupapiserver.php', param, 'GET', function (error, data) {
-                            if (data === null || typeof data.status === "undefined" ||
+                        doAnAjax('setupapiserver.php', param, 'GET', function (error,
+                            data) {
+                            if (data === null || typeof data.status ===
+                                "undefined" ||
                                 data.status == false) {
                                 $('span.disk_required').text((typeof data.message ==
                                     'undefined') ? 'ERROR' : data.message);
-                                $('i.disk_required').removeClass("fa fa-sync fa-spin")
+                                $('i.disk_required').removeClass(
+                                        "fa fa-sync fa-spin")
                                     .addClass("fa fa-exclamation-circle")
                             } else {
                                 $('span.disk_required').text('');
-                                $('i.disk_required').removeClass("fa fa-sync fa-spin")
+                                $('i.disk_required').removeClass(
+                                        "fa fa-sync fa-spin")
                                     .addClass("fa fa-check-circle");
                                 $('a.disk_required').attr('title', (typeof data
                                         .exectime == 'undefined') ? '0' + ' s' :
                                     data.exectime.toString() + ' s');
-                                $('#exectime').text(parseFloat($('#exectime').text()) +
+                                $('#exectime').text(parseFloat($('#exectime')
+                                        .text()) +
                                     parseFloat((typeof data.exectime ==
                                         'undefined') ? 0 : data.exectime));
 
@@ -965,720 +983,742 @@
                                     'domainname': $('#domainnamesetup').val(),
                                     'publicpath': $('#publicpath').val()
                                 };
-                                doAnAjax('setupapiserver.php', param, 'GET', function (
-                                    error, data) {
-                                    if (data === null || typeof data.status ===
-                                        "undefined" || data.status == false) {
-                                        $('span.download_framework').text((
-                                                typeof data.message ==
-                                                'undefined') ? 'ERROR' :
-                                            data.message);
-                                        $('i.download_framework').removeClass(
-                                            "fa fa-sync fa-spin").addClass(
-                                            "fa fa-exclamation-circle")
-                                    } else {
-                                        $('span.download_framework').text('');
-                                        $('i.download_framework').removeClass(
-                                            "fa fa-sync fa-spin").addClass(
-                                            "fa fa-check-circle");
-                                        $('a.download_framework').attr('title',
-                                            (typeof data.exectime ==
-                                                'undefined') ? '0' + ' s' :
-                                            data.exectime.toString() + ' s');
-                                        $('#exectime').text(parseFloat($(
-                                                '#exectime').text()) +
-                                            parseFloat((typeof data
-                                                .exectime == 'undefined'
-                                            ) ? 0 : data.exectime));
+                                doAnAjax('setupapiserver.php', param, 'GET',
+                                    function (
+                                        error, data) {
+                                        if (data === null || typeof data
+                                            .status ===
+                                            "undefined" || data.status == false
+                                        ) {
+                                            $('span.download_framework').text((
+                                                    typeof data.message ==
+                                                    'undefined') ? 'ERROR' :
+                                                data.message);
+                                            $('i.download_framework')
+                                                .removeClass(
+                                                    "fa fa-sync fa-spin")
+                                                .addClass(
+                                                    "fa fa-exclamation-circle")
+                                        } else {
+                                            $('span.download_framework').text(
+                                                '');
+                                            $('i.download_framework')
+                                                .removeClass(
+                                                    "fa fa-sync fa-spin")
+                                                .addClass(
+                                                    "fa fa-check-circle");
+                                            $('a.download_framework').attr(
+                                                'title',
+                                                (typeof data.exectime ==
+                                                    'undefined') ? '0' +
+                                                ' s' :
+                                                data.exectime.toString() +
+                                                ' s');
+                                            $('#exectime').text(parseFloat($(
+                                                    '#exectime').text()) +
+                                                parseFloat((typeof data
+                                                    .exectime ==
+                                                    'undefined'
+                                                ) ? 0 : data.exectime));
 
 
-                                        param = {
-                                            'action': 'download_vendor',
-                                            'homeuser': $('#homepath')
-                                                .val(),
-                                            'domainname': $(
-                                                    '#domainnamesetup')
-                                                .val()
-                                        };
-                                        doAnAjax('setupapiserver.php', param,
-                                            'GET',
-                                            function (error, data) {
-                                                if (data === null ||
-                                                    typeof data.status ===
-                                                    "undefined" || data
-                                                    .status == false) {
-                                                    $('span.download_vendor')
-                                                        .text((typeof data
-                                                                .message ==
-                                                                'undefined'
-                                                            ) ?
-                                                            'ERROR' : data
-                                                            .message);
-                                                    $('i.download_vendor')
-                                                        .removeClass(
-                                                            "fa fa-sync fa-spin"
-                                                        ).addClass(
-                                                            "fa fa-exclamation-circle"
-                                                        )
-                                                } else {
-                                                    $('span.download_vendor')
-                                                        .text('');
-                                                    $('i.download_vendor')
-                                                        .removeClass(
-                                                            "fa fa-sync fa-spin"
-                                                        ).addClass(
-                                                            "fa fa-check-circle"
-                                                        );
-                                                    $('a.download_vendor')
-                                                        .attr('title', (
-                                                                typeof data
-                                                                .exectime ==
-                                                                'undefined'
-                                                            ) ? '0' +
-                                                            ' s' : data
-                                                            .exectime
-                                                            .toString() +
-                                                            ' s');
-                                                    $('#exectime').text(
-                                                        parseFloat($(
-                                                                '#exectime'
-                                                            )
-                                                            .text()) +
-                                                        parseFloat((
-                                                                typeof data
-                                                                .exectime ==
-                                                                'undefined'
-                                                            ) ? 0 :
-                                                            data
-                                                            .exectime));
-
-
-                                                    param = {
-                                                        'action': 'setup_env',
-                                                        'domainname': $(
-                                                            '#domainnamesetup'
-                                                        ).val(),
-                                                        'domainport': (
-                                                                window
-                                                                .location
-                                                                .port ==
-                                                                0 ||
-                                                                window
-                                                                .location
-                                                                .port ==
-                                                                '') ?
-                                                            '' : window
-                                                            .location
-                                                            .port,
-                                                        'publicpath': $(
-                                                            '#publicpath'
-                                                        ).val(),
-                                                        'dbhost': $(
-                                                            '#dbhost'
-                                                        ).val(),
-                                                        'dbname': $(
-                                                            '#dbname'
-                                                        ).val(),
-                                                        'dbuser': $(
-                                                            '#dbuser'
-                                                        ).val(),
-                                                        'dbpass': $(
-                                                            '#dbpassword'
-                                                        ).val(),
-                                                        'ftpserver': $(
-                                                            '#ftpserver'
-                                                        ).val(),
-                                                        'ftpaccount': $(
-                                                            '#ftpusername'
-                                                        ).val(),
-                                                        'ftppassword': $(
-                                                            '#ftppassword'
-                                                        ).val(),
-                                                        'appname': $(
-                                                            '#websitename'
-                                                        ).val(),
-                                                        'ftpport': $(
-                                                            '#ftpport'
-                                                        ).val(),
-                                                        'homeuser': $(
-                                                            '#homepath'
-                                                        ).val(),
-                                                    };
-                                                    doAnAjax(
-                                                        'setupapiserver.php',
-                                                        param, 'POST',
-                                                        function (error,
-                                                            data) {
-                                                            if (data ===
-                                                                null ||
-                                                                typeof data
-                                                                .status ===
-                                                                "undefined" ||
+                                            param = {
+                                                'action': 'download_vendor',
+                                                'homeuser': $('#homepath')
+                                                    .val(),
+                                                'domainname': $(
+                                                        '#domainnamesetup')
+                                                    .val()
+                                            };
+                                            doAnAjax('setupapiserver.php',
+                                                param,
+                                                'GET',
+                                                function (error, data) {
+                                                    if (data === null ||
+                                                        typeof data
+                                                        .status ===
+                                                        "undefined" || data
+                                                        .status == false) {
+                                                        $('span.download_vendor')
+                                                            .text((typeof data
+                                                                    .message ==
+                                                                    'undefined'
+                                                                ) ?
+                                                                'ERROR' :
                                                                 data
-                                                                .status ==
-                                                                false) {
-                                                                $('span.setup_env')
-                                                                    .text(
-                                                                        (typeof data
-                                                                            .message ==
-                                                                            'undefined'
-                                                                        ) ?
-                                                                        'ERROR' :
-                                                                        data
-                                                                        .message
-                                                                    );
-                                                                $('i.setup_env')
-                                                                    .removeClass(
-                                                                        "fa fa-sync fa-spin"
-                                                                    )
-                                                                    .addClass(
-                                                                        "fa fa-exclamation-circle"
-                                                                    )
-                                                            } else {
-                                                                $('span.setup_env')
-                                                                    .text(
-                                                                        ''
-                                                                    );
-                                                                $('i.setup_env')
-                                                                    .removeClass(
-                                                                        "fa fa-sync fa-spin"
-                                                                    )
-                                                                    .addClass(
-                                                                        "fa fa-check-circle"
-                                                                    );
-                                                                $('a.setup_env')
-                                                                    .attr(
-                                                                        'title',
-                                                                        (typeof data
-                                                                            .exectime ==
-                                                                            'undefined'
-                                                                        ) ?
-                                                                        '0' +
-                                                                        ' s' :
-                                                                        data
-                                                                        .exectime
-                                                                        .toString() +
-                                                                        ' s'
-                                                                    );
-                                                                $('#exectime')
-                                                                    .text(
-                                                                        parseFloat(
-                                                                            $(
-                                                                                '#exectime'
-                                                                            )
-                                                                            .text()
-                                                                        ) +
-                                                                        parseFloat(
+                                                                .message);
+                                                        $('i.download_vendor')
+                                                            .removeClass(
+                                                                "fa fa-sync fa-spin"
+                                                            ).addClass(
+                                                                "fa fa-exclamation-circle"
+                                                            )
+                                                    } else {
+                                                        $('span.download_vendor')
+                                                            .text('');
+                                                        $('i.download_vendor')
+                                                            .removeClass(
+                                                                "fa fa-sync fa-spin"
+                                                            ).addClass(
+                                                                "fa fa-check-circle"
+                                                            );
+                                                        $('a.download_vendor')
+                                                            .attr('title', (
+                                                                    typeof data
+                                                                    .exectime ==
+                                                                    'undefined'
+                                                                ) ? '0' +
+                                                                ' s' : data
+                                                                .exectime
+                                                                .toString() +
+                                                                ' s');
+                                                        $('#exectime').text(
+                                                            parseFloat(
+                                                                $(
+                                                                    '#exectime'
+                                                                )
+                                                                .text()
+                                                            ) +
+                                                            parseFloat((
+                                                                    typeof data
+                                                                    .exectime ==
+                                                                    'undefined'
+                                                                ) ? 0 :
+                                                                data
+                                                                .exectime
+                                                            ));
+
+
+                                                        param = {
+                                                            'action': 'setup_env',
+                                                            'domainname': $(
+                                                                '#domainnamesetup'
+                                                            ).val(),
+                                                            'domainport': (
+                                                                    window
+                                                                    .location
+                                                                    .port ==
+                                                                    0 ||
+                                                                    window
+                                                                    .location
+                                                                    .port ==
+                                                                    ''
+                                                                ) ?
+                                                                '' : window
+                                                                .location
+                                                                .port,
+                                                            'publicpath': $(
+                                                                '#publicpath'
+                                                            ).val(),
+                                                            'dbhost': $(
+                                                                '#dbhost'
+                                                            ).val(),
+                                                            'dbname': $(
+                                                                '#dbname'
+                                                            ).val(),
+                                                            'dbuser': $(
+                                                                '#dbuser'
+                                                            ).val(),
+                                                            'dbpass': $(
+                                                                '#dbpassword'
+                                                            ).val(),
+                                                            'ftpserver': $(
+                                                                '#ftpserver'
+                                                            ).val(),
+                                                            'ftpaccount': $(
+                                                                '#ftpusername'
+                                                            ).val(),
+                                                            'ftppassword': $(
+                                                                '#ftppassword'
+                                                            ).val(),
+                                                            'appname': $(
+                                                                '#websitename'
+                                                            ).val(),
+                                                            'ftpport': $(
+                                                                '#ftpport'
+                                                            ).val(),
+                                                            'homeuser': $(
+                                                                '#homepath'
+                                                            ).val(),
+                                                        };
+                                                        doAnAjax(
+                                                            'setupapiserver.php',
+                                                            param,
+                                                            'POST',
+                                                            function (
+                                                                error,
+                                                                data) {
+                                                                if (data ===
+                                                                    null ||
+                                                                    typeof data
+                                                                    .status ===
+                                                                    "undefined" ||
+                                                                    data
+                                                                    .status ==
+                                                                    false
+                                                                ) {
+                                                                    $('span.setup_env')
+                                                                        .text(
+                                                                            (typeof data
+                                                                                .message ==
+                                                                                'undefined'
+                                                                            ) ?
+                                                                            'ERROR' :
+                                                                            data
+                                                                            .message
+                                                                        );
+                                                                    $('i.setup_env')
+                                                                        .removeClass(
+                                                                            "fa fa-sync fa-spin"
+                                                                        )
+                                                                        .addClass(
+                                                                            "fa fa-exclamation-circle"
+                                                                        )
+                                                                } else {
+                                                                    $('span.setup_env')
+                                                                        .text(
+                                                                            ''
+                                                                        );
+                                                                    $('i.setup_env')
+                                                                        .removeClass(
+                                                                            "fa fa-sync fa-spin"
+                                                                        )
+                                                                        .addClass(
+                                                                            "fa fa-check-circle"
+                                                                        );
+                                                                    $('a.setup_env')
+                                                                        .attr(
+                                                                            'title',
                                                                             (typeof data
                                                                                 .exectime ==
                                                                                 'undefined'
                                                                             ) ?
-                                                                            0 :
+                                                                            '0' +
+                                                                            ' s' :
                                                                             data
                                                                             .exectime
-                                                                        )
-                                                                    );
-
-
-                                                                param
-                                                                    = {
-                                                                        'action': 'download_common_pkg',
-                                                                        'homeuser': $(
-                                                                                '#homepath'
-                                                                            )
-                                                                            .val(),
-                                                                        'domainname': $(
-                                                                                '#domainnamesetup'
-                                                                            )
-                                                                            .val()
-                                                                    };
-                                                                doAnAjax
-                                                                    ('setupapiserver.php',
-                                                                        param,
-                                                                        'GET',
-                                                                        function (
-                                                                            error,
-                                                                            data
-                                                                        ) {
-                                                                            if (data ===
-                                                                                null ||
-                                                                                typeof data
-                                                                                .status ===
-                                                                                "undefined" ||
+                                                                            .toString() +
+                                                                            ' s'
+                                                                        );
+                                                                    $('#exectime')
+                                                                        .text(
+                                                                            parseFloat(
+                                                                                $(
+                                                                                    '#exectime'
+                                                                                )
+                                                                                .text()
+                                                                            ) +
+                                                                            parseFloat(
+                                                                                (typeof data
+                                                                                    .exectime ==
+                                                                                    'undefined'
+                                                                                ) ?
+                                                                                0 :
                                                                                 data
-                                                                                .status ==
-                                                                                false
+                                                                                .exectime
+                                                                            )
+                                                                        );
+
+
+                                                                    param
+                                                                        = {
+                                                                            'action': 'download_common_pkg',
+                                                                            'homeuser': $(
+                                                                                    '#homepath'
+                                                                                )
+                                                                                .val(),
+                                                                            'domainname': $(
+                                                                                    '#domainnamesetup'
+                                                                                )
+                                                                                .val()
+                                                                        };
+                                                                    doAnAjax
+                                                                        ('setupapiserver.php',
+                                                                            param,
+                                                                            'GET',
+                                                                            function (
+                                                                                error,
+                                                                                data
                                                                             ) {
-                                                                                $('span.download_common_pkg')
-                                                                                    .text(
-                                                                                        (typeof data
-                                                                                            .message ==
-                                                                                            'undefined'
-                                                                                        ) ?
-                                                                                        'ERROR' :
-                                                                                        data
-                                                                                        .message
-                                                                                    );
-                                                                                $('i.download_common_pkg')
-                                                                                    .removeClass(
-                                                                                        "fa fa-sync fa-spin"
-                                                                                    )
-                                                                                    .addClass(
-                                                                                        "fa fa-exclamation-circle"
-                                                                                    )
-                                                                            } else {
-                                                                                $('span.download_common_pkg')
-                                                                                    .text(
-                                                                                        ''
-                                                                                    );
-                                                                                $('i.download_common_pkg')
-                                                                                    .removeClass(
-                                                                                        "fa fa-sync fa-spin"
-                                                                                    )
-                                                                                    .addClass(
-                                                                                        "fa fa-check-circle"
-                                                                                    );
-                                                                                $('a.download_common_pkg')
-                                                                                    .attr(
-                                                                                        'title',
-                                                                                        (typeof data
-                                                                                            .exectime ==
-                                                                                            'undefined'
-                                                                                        ) ?
-                                                                                        '0' +
-                                                                                        ' s' :
-                                                                                        data
-                                                                                        .exectime
-                                                                                        .toString() +
-                                                                                        ' s'
-                                                                                    );
-                                                                                $('#exectime')
-                                                                                    .text(
-                                                                                        parseFloat(
-                                                                                            $(
-                                                                                                '#exectime'
-                                                                                            )
-                                                                                            .text()
-                                                                                        ) +
-                                                                                        parseFloat(
+                                                                                if (data ===
+                                                                                    null ||
+                                                                                    typeof data
+                                                                                    .status ===
+                                                                                    "undefined" ||
+                                                                                    data
+                                                                                    .status ==
+                                                                                    false
+                                                                                ) {
+                                                                                    $('span.download_common_pkg')
+                                                                                        .text(
+                                                                                            (typeof data
+                                                                                                .message ==
+                                                                                                'undefined'
+                                                                                            ) ?
+                                                                                            'ERROR' :
+                                                                                            data
+                                                                                            .message
+                                                                                        );
+                                                                                    $('i.download_common_pkg')
+                                                                                        .removeClass(
+                                                                                            "fa fa-sync fa-spin"
+                                                                                        )
+                                                                                        .addClass(
+                                                                                            "fa fa-exclamation-circle"
+                                                                                        )
+                                                                                } else {
+                                                                                    $('span.download_common_pkg')
+                                                                                        .text(
+                                                                                            ''
+                                                                                        );
+                                                                                    $('i.download_common_pkg')
+                                                                                        .removeClass(
+                                                                                            "fa fa-sync fa-spin"
+                                                                                        )
+                                                                                        .addClass(
+                                                                                            "fa fa-check-circle"
+                                                                                        );
+                                                                                    $('a.download_common_pkg')
+                                                                                        .attr(
+                                                                                            'title',
                                                                                             (typeof data
                                                                                                 .exectime ==
                                                                                                 'undefined'
                                                                                             ) ?
-                                                                                            0 :
+                                                                                            '0' +
+                                                                                            ' s' :
                                                                                             data
                                                                                             .exectime
-                                                                                        )
-                                                                                    );
-
-
-                                                                                param
-                                                                                    = {
-                                                                                        'action': 'install_all_pkg',
-                                                                                        'homeuser': $(
-                                                                                                '#homepath'
-                                                                                            )
-                                                                                            .val(),
-                                                                                        'domainname': $(
-                                                                                                '#domainnamesetup'
-                                                                                            )
-                                                                                            .val(),
-                                                                                        'publicpath': $(
-                                                                                                '#publicpath'
-                                                                                            )
-                                                                                            .val(),
-                                                                                        'ftpserver': $(
-                                                                                                '#ftpserver'
-                                                                                            )
-                                                                                            .val(),
-                                                                                        'ftpaccount': $(
-                                                                                                '#ftpusername'
-                                                                                            )
-                                                                                            .val(),
-                                                                                        'ftppassword': $(
-                                                                                                '#ftppassword'
-                                                                                            )
-                                                                                            .val(),
-                                                                                        'ftpport': $(
-                                                                                                '#ftpport'
-                                                                                            )
-                                                                                            .val(),
-                                                                                    };
-
-                                                                                doAnAjax
-                                                                                    ('setupapiserver.php',
-                                                                                        param,
-                                                                                        'POST',
-                                                                                        function (
-                                                                                            error,
-                                                                                            data
-                                                                                        ) {
-                                                                                            if (data ===
-                                                                                                null ||
-                                                                                                typeof data
-                                                                                                .status ===
-                                                                                                "undefined" ||
+                                                                                            .toString() +
+                                                                                            ' s'
+                                                                                        );
+                                                                                    $('#exectime')
+                                                                                        .text(
+                                                                                            parseFloat(
+                                                                                                $(
+                                                                                                    '#exectime'
+                                                                                                )
+                                                                                                .text()
+                                                                                            ) +
+                                                                                            parseFloat(
+                                                                                                (typeof data
+                                                                                                    .exectime ==
+                                                                                                    'undefined'
+                                                                                                ) ?
+                                                                                                0 :
                                                                                                 data
-                                                                                                .status ==
-                                                                                                false
+                                                                                                .exectime
+                                                                                            )
+                                                                                        );
+
+
+                                                                                    param
+                                                                                        = {
+                                                                                            'action': 'install_all_pkg',
+                                                                                            'homeuser': $(
+                                                                                                    '#homepath'
+                                                                                                )
+                                                                                                .val(),
+                                                                                            'domainname': $(
+                                                                                                    '#domainnamesetup'
+                                                                                                )
+                                                                                                .val(),
+                                                                                            'publicpath': $(
+                                                                                                    '#publicpath'
+                                                                                                )
+                                                                                                .val(),
+                                                                                            'ftpserver': $(
+                                                                                                    '#ftpserver'
+                                                                                                )
+                                                                                                .val(),
+                                                                                            'ftpaccount': $(
+                                                                                                    '#ftpusername'
+                                                                                                )
+                                                                                                .val(),
+                                                                                            'ftppassword': $(
+                                                                                                    '#ftppassword'
+                                                                                                )
+                                                                                                .val(),
+                                                                                            'ftpport': $(
+                                                                                                    '#ftpport'
+                                                                                                )
+                                                                                                .val(),
+                                                                                        };
+
+                                                                                    doAnAjax
+                                                                                        ('setupapiserver.php',
+                                                                                            param,
+                                                                                            'POST',
+                                                                                            function (
+                                                                                                error,
+                                                                                                data
                                                                                             ) {
-                                                                                                $('span.install_all_pkg')
-                                                                                                    .text(
-                                                                                                        (typeof data
-                                                                                                            .message ==
-                                                                                                            'undefined'
-                                                                                                        ) ?
-                                                                                                        'ERROR' :
-                                                                                                        data
-                                                                                                        .message
-                                                                                                    );
-                                                                                                $('i.install_all_pkg')
-                                                                                                    .removeClass(
-                                                                                                        "fa fa-sync fa-spin"
-                                                                                                    )
-                                                                                                    .addClass(
-                                                                                                        "fa fa-exclamation-circle"
-                                                                                                    )
-                                                                                            } else {
-                                                                                                $('span.install_all_pkg')
-                                                                                                    .text(
-                                                                                                        ''
-                                                                                                    );
-                                                                                                $('i.install_all_pkg')
-                                                                                                    .removeClass(
-                                                                                                        "fa fa-sync fa-spin"
-                                                                                                    )
-                                                                                                    .addClass(
-                                                                                                        "fa fa-check-circle"
-                                                                                                    );
-                                                                                                $('a.install_all_pkg')
-                                                                                                    .attr(
-                                                                                                        'title',
-                                                                                                        (typeof data
-                                                                                                            .exectime ==
-                                                                                                            'undefined'
-                                                                                                        ) ?
-                                                                                                        '0' +
-                                                                                                        ' s' :
-                                                                                                        data
-                                                                                                        .exectime
-                                                                                                        .toString() +
-                                                                                                        ' s'
-                                                                                                    );
-                                                                                                $('#exectime')
-                                                                                                    .text(
-                                                                                                        parseFloat(
-                                                                                                            $(
-                                                                                                                '#exectime'
-                                                                                                            )
-                                                                                                            .text()
-                                                                                                        ) +
-                                                                                                        parseFloat(
+                                                                                                if (data ===
+                                                                                                    null ||
+                                                                                                    typeof data
+                                                                                                    .status ===
+                                                                                                    "undefined" ||
+                                                                                                    data
+                                                                                                    .status ==
+                                                                                                    false
+                                                                                                ) {
+                                                                                                    $('span.install_all_pkg')
+                                                                                                        .text(
+                                                                                                            (typeof data
+                                                                                                                .message ==
+                                                                                                                'undefined'
+                                                                                                            ) ?
+                                                                                                            'ERROR' :
+                                                                                                            data
+                                                                                                            .message
+                                                                                                        );
+                                                                                                    $('i.install_all_pkg')
+                                                                                                        .removeClass(
+                                                                                                            "fa fa-sync fa-spin"
+                                                                                                        )
+                                                                                                        .addClass(
+                                                                                                            "fa fa-exclamation-circle"
+                                                                                                        )
+                                                                                                } else {
+                                                                                                    $('span.install_all_pkg')
+                                                                                                        .text(
+                                                                                                            ''
+                                                                                                        );
+                                                                                                    $('i.install_all_pkg')
+                                                                                                        .removeClass(
+                                                                                                            "fa fa-sync fa-spin"
+                                                                                                        )
+                                                                                                        .addClass(
+                                                                                                            "fa fa-check-circle"
+                                                                                                        );
+                                                                                                    $('a.install_all_pkg')
+                                                                                                        .attr(
+                                                                                                            'title',
                                                                                                             (typeof data
                                                                                                                 .exectime ==
                                                                                                                 'undefined'
                                                                                                             ) ?
-                                                                                                            0 :
+                                                                                                            '0' +
+                                                                                                            ' s' :
                                                                                                             data
                                                                                                             .exectime
-                                                                                                        )
-                                                                                                    );
-
-
-                                                                                                param
-                                                                                                    = {
-                                                                                                        'action': 'artisan_call',
-                                                                                                        'homeuser': $(
-                                                                                                                '#homepath'
-                                                                                                            )
-                                                                                                            .val(),
-                                                                                                        'domainname': $(
-                                                                                                                '#domainnamesetup'
-                                                                                                            )
-                                                                                                            .val(),
-                                                                                                        'publicpath': $(
-                                                                                                                '#publicpath'
-                                                                                                            )
-                                                                                                            .val(),
-                                                                                                        'adminemail': $(
-                                                                                                                '#email'
-                                                                                                            )
-                                                                                                            .val(),
-                                                                                                        'adminpassword': $(
-                                                                                                                '#password'
-                                                                                                            )
-                                                                                                            .val(),
-                                                                                                        'adminfirstname': $(
-                                                                                                                '#firstname'
-                                                                                                            )
-                                                                                                            .val(),
-                                                                                                        'adminlastname': $(
-                                                                                                                '#lastname'
-                                                                                                            )
-                                                                                                            .val(),
-                                                                                                    };
-                                                                                                doAnAjax
-                                                                                                    ('setupapiserver.php',
-                                                                                                        param,
-                                                                                                        'POST',
-                                                                                                        function (
-                                                                                                            error,
-                                                                                                            data
-                                                                                                        ) {
-                                                                                                            if (data ===
-                                                                                                                null ||
-                                                                                                                typeof data
-                                                                                                                .status ===
-                                                                                                                "undefined" ||
+                                                                                                            .toString() +
+                                                                                                            ' s'
+                                                                                                        );
+                                                                                                    $('#exectime')
+                                                                                                        .text(
+                                                                                                            parseFloat(
+                                                                                                                $(
+                                                                                                                    '#exectime'
+                                                                                                                )
+                                                                                                                .text()
+                                                                                                            ) +
+                                                                                                            parseFloat(
+                                                                                                                (typeof data
+                                                                                                                    .exectime ==
+                                                                                                                    'undefined'
+                                                                                                                ) ?
+                                                                                                                0 :
                                                                                                                 data
-                                                                                                                .status ==
-                                                                                                                false
+                                                                                                                .exectime
+                                                                                                            )
+                                                                                                        );
+
+
+                                                                                                    param
+                                                                                                        = {
+                                                                                                            'action': 'artisan_call',
+                                                                                                            'homeuser': $(
+                                                                                                                    '#homepath'
+                                                                                                                )
+                                                                                                                .val(),
+                                                                                                            'domainname': $(
+                                                                                                                    '#domainnamesetup'
+                                                                                                                )
+                                                                                                                .val(),
+                                                                                                            'publicpath': $(
+                                                                                                                    '#publicpath'
+                                                                                                                )
+                                                                                                                .val(),
+                                                                                                            'adminemail': $(
+                                                                                                                    '#email'
+                                                                                                                )
+                                                                                                                .val(),
+                                                                                                            'adminpassword': $(
+                                                                                                                    '#password'
+                                                                                                                )
+                                                                                                                .val(),
+                                                                                                            'adminfirstname': $(
+                                                                                                                    '#firstname'
+                                                                                                                )
+                                                                                                                .val(),
+                                                                                                            'adminlastname': $(
+                                                                                                                    '#lastname'
+                                                                                                                )
+                                                                                                                .val(),
+                                                                                                        };
+                                                                                                    doAnAjax
+                                                                                                        ('setupapiserver.php',
+                                                                                                            param,
+                                                                                                            'POST',
+                                                                                                            function (
+                                                                                                                error,
+                                                                                                                data
                                                                                                             ) {
-                                                                                                                $('span.artisan_call')
-                                                                                                                    .text(
-                                                                                                                        (typeof data
-                                                                                                                            .message ==
-                                                                                                                            'undefined'
-                                                                                                                        ) ?
-                                                                                                                        'ERROR' :
-                                                                                                                        data
-                                                                                                                        .message
-                                                                                                                    );
-                                                                                                                $('i.artisan_call')
-                                                                                                                    .removeClass(
-                                                                                                                        "fa fa-sync fa-spin"
-                                                                                                                    )
-                                                                                                                    .addClass(
-                                                                                                                        "fa fa-exclamation-circle"
-                                                                                                                    )
-                                                                                                            } else {
-                                                                                                                $('span.artisan_call')
-                                                                                                                    .text(
-                                                                                                                        ''
-                                                                                                                    );
-                                                                                                                $('i.artisan_call')
-                                                                                                                    .removeClass(
-                                                                                                                        "fa fa-sync fa-spin"
-                                                                                                                    )
-                                                                                                                    .addClass(
-                                                                                                                        "fa fa-check-circle"
-                                                                                                                    );
-                                                                                                                $('a.artisan_call')
-                                                                                                                    .attr(
-                                                                                                                        'title',
-                                                                                                                        (typeof data
-                                                                                                                            .exectime ==
-                                                                                                                            'undefined'
-                                                                                                                        ) ?
-                                                                                                                        '0' +
-                                                                                                                        ' s' :
-                                                                                                                        data
-                                                                                                                        .exectime
-                                                                                                                        .toString() +
-                                                                                                                        ' s'
-                                                                                                                    );
-                                                                                                                $('#exectime')
-                                                                                                                    .text(
-                                                                                                                        parseFloat(
-                                                                                                                            $(
-                                                                                                                                '#exectime'
-                                                                                                                            )
-                                                                                                                            .text()
-                                                                                                                        ) +
-                                                                                                                        parseFloat(
+                                                                                                                if (data ===
+                                                                                                                    null ||
+                                                                                                                    typeof data
+                                                                                                                    .status ===
+                                                                                                                    "undefined" ||
+                                                                                                                    data
+                                                                                                                    .status ==
+                                                                                                                    false
+                                                                                                                ) {
+                                                                                                                    $('span.artisan_call')
+                                                                                                                        .text(
+                                                                                                                            (typeof data
+                                                                                                                                .message ==
+                                                                                                                                'undefined'
+                                                                                                                            ) ?
+                                                                                                                            'ERROR' :
+                                                                                                                            data
+                                                                                                                            .message
+                                                                                                                        );
+                                                                                                                    $('i.artisan_call')
+                                                                                                                        .removeClass(
+                                                                                                                            "fa fa-sync fa-spin"
+                                                                                                                        )
+                                                                                                                        .addClass(
+                                                                                                                            "fa fa-exclamation-circle"
+                                                                                                                        )
+                                                                                                                } else {
+                                                                                                                    $('span.artisan_call')
+                                                                                                                        .text(
+                                                                                                                            ''
+                                                                                                                        );
+                                                                                                                    $('i.artisan_call')
+                                                                                                                        .removeClass(
+                                                                                                                            "fa fa-sync fa-spin"
+                                                                                                                        )
+                                                                                                                        .addClass(
+                                                                                                                            "fa fa-check-circle"
+                                                                                                                        );
+                                                                                                                    $('a.artisan_call')
+                                                                                                                        .attr(
+                                                                                                                            'title',
                                                                                                                             (typeof data
                                                                                                                                 .exectime ==
                                                                                                                                 'undefined'
                                                                                                                             ) ?
-                                                                                                                            0 :
+                                                                                                                            '0' +
+                                                                                                                            ' s' :
                                                                                                                             data
                                                                                                                             .exectime
-                                                                                                                        )
-                                                                                                                    );
-
-
-                                                                                                                param
-                                                                                                                    = {
-                                                                                                                        'action': 'finished_setup',
-                                                                                                                        'homeuser': $(
-                                                                                                                                '#homepath'
-                                                                                                                            )
-                                                                                                                            .val(),
-                                                                                                                        'domainname': $(
-                                                                                                                                '#domainnamesetup'
-                                                                                                                            )
-                                                                                                                            .val(),
-                                                                                                                        'publicpath': $(
-                                                                                                                                '#publicpath'
-                                                                                                                            )
-                                                                                                                            .val(),
-                                                                                                                        'ftpserver': $(
-                                                                                                                                '#ftpserver'
-                                                                                                                            )
-                                                                                                                            .val(),
-                                                                                                                        'ftpaccount': $(
-                                                                                                                                '#ftpusername'
-                                                                                                                            )
-                                                                                                                            .val(),
-                                                                                                                        'ftppassword': $(
-                                                                                                                                '#ftppassword'
-                                                                                                                            )
-                                                                                                                            .val(),
-                                                                                                                        'ftpport': $(
-                                                                                                                                '#ftpport'
-                                                                                                                            )
-                                                                                                                            .val(),
-                                                                                                                    };
-                                                                                                                doAnAjax
-                                                                                                                    ('setupapiserver.php',
-                                                                                                                        param,
-                                                                                                                        'POST',
-                                                                                                                        function (
-                                                                                                                            error,
-                                                                                                                            data
-                                                                                                                        ) {
-                                                                                                                            if (data ===
-                                                                                                                                null ||
-                                                                                                                                typeof data
-                                                                                                                                .status ===
-                                                                                                                                "undefined" ||
+                                                                                                                            .toString() +
+                                                                                                                            ' s'
+                                                                                                                        );
+                                                                                                                    $('#exectime')
+                                                                                                                        .text(
+                                                                                                                            parseFloat(
+                                                                                                                                $(
+                                                                                                                                    '#exectime'
+                                                                                                                                )
+                                                                                                                                .text()
+                                                                                                                            ) +
+                                                                                                                            parseFloat(
+                                                                                                                                (typeof data
+                                                                                                                                    .exectime ==
+                                                                                                                                    'undefined'
+                                                                                                                                ) ?
+                                                                                                                                0 :
                                                                                                                                 data
-                                                                                                                                .status ==
-                                                                                                                                false
+                                                                                                                                .exectime
+                                                                                                                            )
+                                                                                                                        );
+
+
+                                                                                                                    param
+                                                                                                                        = {
+                                                                                                                            'action': 'finished_setup',
+                                                                                                                            'homeuser': $(
+                                                                                                                                    '#homepath'
+                                                                                                                                )
+                                                                                                                                .val(),
+                                                                                                                            'domainname': $(
+                                                                                                                                    '#domainnamesetup'
+                                                                                                                                )
+                                                                                                                                .val(),
+                                                                                                                            'publicpath': $(
+                                                                                                                                    '#publicpath'
+                                                                                                                                )
+                                                                                                                                .val(),
+                                                                                                                            'ftpserver': $(
+                                                                                                                                    '#ftpserver'
+                                                                                                                                )
+                                                                                                                                .val(),
+                                                                                                                            'ftpaccount': $(
+                                                                                                                                    '#ftpusername'
+                                                                                                                                )
+                                                                                                                                .val(),
+                                                                                                                            'ftppassword': $(
+                                                                                                                                    '#ftppassword'
+                                                                                                                                )
+                                                                                                                                .val(),
+                                                                                                                            'ftpport': $(
+                                                                                                                                    '#ftpport'
+                                                                                                                                )
+                                                                                                                                .val(),
+                                                                                                                        };
+                                                                                                                    doAnAjax
+                                                                                                                        ('setupapiserver.php',
+                                                                                                                            param,
+                                                                                                                            'POST',
+                                                                                                                            function (
+                                                                                                                                error,
+                                                                                                                                data
                                                                                                                             ) {
-                                                                                                                                $('span.finished_setup')
-                                                                                                                                    .text(
-                                                                                                                                        (typeof data
-                                                                                                                                            .message ==
-                                                                                                                                            'undefined'
-                                                                                                                                        ) ?
-                                                                                                                                        'ERROR' :
-                                                                                                                                        data
-                                                                                                                                        .message
-                                                                                                                                    );
-                                                                                                                                $('i.finished_setup')
-                                                                                                                                    .removeClass(
-                                                                                                                                        "fa fa-sync fa-spin"
-                                                                                                                                    )
-                                                                                                                                    .addClass(
-                                                                                                                                        "fa fa-exclamation-circle"
-                                                                                                                                    )
-                                                                                                                            } else {
-                                                                                                                                $('span.finished_setup')
-                                                                                                                                    .text(
-                                                                                                                                        ''
-                                                                                                                                    );
-                                                                                                                                $('i.finished_setup')
-                                                                                                                                    .removeClass(
-                                                                                                                                        "fa fa-sync fa-spin"
-                                                                                                                                    )
-                                                                                                                                    .addClass(
-                                                                                                                                        "fa fa-check-circle"
-                                                                                                                                    );
-                                                                                                                                $('a.finished_setup')
-                                                                                                                                    .attr(
-                                                                                                                                        'title',
-                                                                                                                                        (typeof data
-                                                                                                                                            .exectime ==
-                                                                                                                                            'undefined'
-                                                                                                                                        ) ?
-                                                                                                                                        '0' +
-                                                                                                                                        ' s' :
-                                                                                                                                        data
-                                                                                                                                        .exectime
-                                                                                                                                        .toString() +
-                                                                                                                                        ' s'
-                                                                                                                                    );
-                                                                                                                                $('#exectime')
-                                                                                                                                    .text(
-                                                                                                                                        parseFloat(
-                                                                                                                                            $(
-                                                                                                                                                '#exectime'
-                                                                                                                                            )
-                                                                                                                                            .text()
-                                                                                                                                        ) +
-                                                                                                                                        parseFloat(
+                                                                                                                                if (data ===
+                                                                                                                                    null ||
+                                                                                                                                    typeof data
+                                                                                                                                    .status ===
+                                                                                                                                    "undefined" ||
+                                                                                                                                    data
+                                                                                                                                    .status ==
+                                                                                                                                    false
+                                                                                                                                ) {
+                                                                                                                                    $('span.finished_setup')
+                                                                                                                                        .text(
+                                                                                                                                            (typeof data
+                                                                                                                                                .message ==
+                                                                                                                                                'undefined'
+                                                                                                                                            ) ?
+                                                                                                                                            'ERROR' :
+                                                                                                                                            data
+                                                                                                                                            .message
+                                                                                                                                        );
+                                                                                                                                    $('i.finished_setup')
+                                                                                                                                        .removeClass(
+                                                                                                                                            "fa fa-sync fa-spin"
+                                                                                                                                        )
+                                                                                                                                        .addClass(
+                                                                                                                                            "fa fa-exclamation-circle"
+                                                                                                                                        )
+                                                                                                                                } else {
+                                                                                                                                    $('span.finished_setup')
+                                                                                                                                        .text(
+                                                                                                                                            ''
+                                                                                                                                        );
+                                                                                                                                    $('i.finished_setup')
+                                                                                                                                        .removeClass(
+                                                                                                                                            "fa fa-sync fa-spin"
+                                                                                                                                        )
+                                                                                                                                        .addClass(
+                                                                                                                                            "fa fa-check-circle"
+                                                                                                                                        );
+                                                                                                                                    $('a.finished_setup')
+                                                                                                                                        .attr(
+                                                                                                                                            'title',
                                                                                                                                             (typeof data
                                                                                                                                                 .exectime ==
                                                                                                                                                 'undefined'
                                                                                                                                             ) ?
-                                                                                                                                            0 :
+                                                                                                                                            '0' +
+                                                                                                                                            ' s' :
                                                                                                                                             data
                                                                                                                                             .exectime
-                                                                                                                                        )
+                                                                                                                                            .toString() +
+                                                                                                                                            ' s'
+                                                                                                                                        );
+                                                                                                                                    $('#exectime')
+                                                                                                                                        .text(
+                                                                                                                                            parseFloat(
+                                                                                                                                                $(
+                                                                                                                                                    '#exectime'
+                                                                                                                                                )
+                                                                                                                                                .text()
+                                                                                                                                            ) +
+                                                                                                                                            parseFloat(
+                                                                                                                                                (typeof data
+                                                                                                                                                    .exectime ==
+                                                                                                                                                    'undefined'
+                                                                                                                                                ) ?
+                                                                                                                                                0 :
+                                                                                                                                                data
+                                                                                                                                                .exectime
+                                                                                                                                            )
+                                                                                                                                        );
+
+
+                                                                                                                                }
+
+                                                                                                                                param
+                                                                                                                                    = {
+                                                                                                                                        'action': 'remove_installer_api'
+                                                                                                                                    };
+                                                                                                                                doAnAjax
+                                                                                                                                    ('setupapiserver.php',
+                                                                                                                                        param,
+                                                                                                                                        'GET',
+                                                                                                                                        function (
+                                                                                                                                            error,
+                                                                                                                                            data
+                                                                                                                                        ) {
+                                                                                                                                            $('#exectime')
+                                                                                                                                                .text(
+                                                                                                                                                    parseFloat(
+                                                                                                                                                        $(
+                                                                                                                                                            '#exectime'
+                                                                                                                                                        )
+                                                                                                                                                        .text()
+                                                                                                                                                    ) +
+                                                                                                                                                    parseFloat(
+                                                                                                                                                        (typeof data
+                                                                                                                                                            .exectime ==
+                                                                                                                                                            'undefined'
+                                                                                                                                                        ) ?
+                                                                                                                                                        0 :
+                                                                                                                                                        data
+                                                                                                                                                        .exectime
+                                                                                                                                                    )
+                                                                                                                                                );
+
+                                                                                                                                        }
                                                                                                                                     );
+
+                                                                                                                                window
+                                                                                                                                    .location
+                                                                                                                                    .href =
+                                                                                                                                    location
+                                                                                                                                    .replace(
+                                                                                                                                        "/rvsitebuilder/install.html#form-step-0",
+                                                                                                                                        ""
+                                                                                                                                    ) +
+                                                                                                                                    '/admin/login';
 
 
                                                                                                                             }
-
-                                                                                                                            param
-                                                                                                                                = {
-                                                                                                                                    'action': 'remove_installer_api'
-                                                                                                                                };
-                                                                                                                            doAnAjax
-                                                                                                                                ('setupapiserver.php',
-                                                                                                                                    param,
-                                                                                                                                    'GET',
-                                                                                                                                    function (
-                                                                                                                                        error,
-                                                                                                                                        data
-                                                                                                                                    ) {
-                                                                                                                                        $('#exectime')
-                                                                                                                                            .text(
-                                                                                                                                                parseFloat(
-                                                                                                                                                    $(
-                                                                                                                                                        '#exectime'
-                                                                                                                                                    )
-                                                                                                                                                    .text()
-                                                                                                                                                ) +
-                                                                                                                                                parseFloat(
-                                                                                                                                                    (typeof data
-                                                                                                                                                        .exectime ==
-                                                                                                                                                        'undefined'
-                                                                                                                                                    ) ?
-                                                                                                                                                    0 :
-                                                                                                                                                    data
-                                                                                                                                                    .exectime
-                                                                                                                                                )
-                                                                                                                                            );
-
-                                                                                                                                    }
-                                                                                                                                );
-
-                                                                                                                            window
-                                                                                                                                .location
-                                                                                                                                .href =
-                                                                                                                                location
-                                                                                                                                .replace(
-                                                                                                                                    "/rvsitebuilder/install.html#form-step-0",
-                                                                                                                                    ""
-                                                                                                                                ) +
-                                                                                                                                '/admin/login';
-
-
-                                                                                                                        }
-                                                                                                                    );
+                                                                                                                        );
 
 
 
+                                                                                                                }
                                                                                                             }
-                                                                                                        }
-                                                                                                    );
+                                                                                                        );
 
+                                                                                                }
                                                                                             }
-                                                                                        }
-                                                                                    );
+                                                                                        );
 
+                                                                                }
                                                                             }
-                                                                        }
-                                                                    );
+                                                                        );
 
-                                                            }
-                                                        });
-                                                }
-                                            });
-                                    }
-                                });
+                                                                }
+                                                            });
+                                                    }
+                                                });
+                                        }
+                                    });
                             }
                         });
                     }
