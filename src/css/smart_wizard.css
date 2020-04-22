@@ -304,3 +304,8 @@
     width: max-content !important;
     margin: 30px auto 0 auto !important;
 }
+
+.rv-wizard input::placeholder,
+.rv-wizard textarea::placeholder {
+    color: #ccc;
+}
