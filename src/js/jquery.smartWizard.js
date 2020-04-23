@@ -235,7 +235,7 @@
           break;
         case "bottom":
           toolbarBottom = $("<div></div>").addClass(
-            "btn-toolbar sw-toolbar sw-toolbar-bottom btn-center justify-content-" +
+            "btn-toolbar sw-toolbar sw-toolbar-bottom justify-content-" +
               this.options.toolbarSettings.toolbarButtonPosition
           );
           toolbarBottom.append(btnGroup);
@@ -260,7 +260,7 @@
           this.container.before(toolbarTop);
 
           toolbarBottom = $("<div></div>").addClass(
-            "btn-toolbar sw-toolbar sw-toolbar-bottom btn-center justify-content-" +
+            "btn-toolbar sw-toolbar sw-toolbar-bottom justify-content-" +
               this.options.toolbarSettings.toolbarButtonPosition
           );
           toolbarBottom.append(btnGroup.clone(true));
@@ -278,7 +278,7 @@
           break;
         default:
           toolbarBottom = $("<div></div>").addClass(
-            "btn-toolbar sw-toolbar sw-toolbar-bottom btn-center justify-content-" +
+            "btn-toolbar sw-toolbar sw-toolbar-bottom justify-content-" +
               this.options.toolbarSettings.toolbarButtonPosition
           );
           toolbarBottom.append(btnGroup);
