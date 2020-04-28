@@ -1550,6 +1550,9 @@ class RVsitebuilder_Setup_API
         
         //url replace for subfolder
         $domainname = preg_replace('/\//', '_', $domainname);
+
+        //fix for error Use of undefined constant STDIN - assumed 'STDIN'
+        define('STDIN', fopen("php://stdin", "r"));
         
         //loader
         // /home/arnut/rvsitebuildercms/arnut.cpdev1.rvglobalsoft.net/vendor/autoload.php
