@@ -60,6 +60,9 @@ $welcomeemailtype = 'default';
 $isrepair         = 0;
 $cptype         = 'none';
 $installtype    = '';
+$devemail       = '';
+$devkey         = '';
+$devlicensejwtkey = '';
 
 //get
 if (isset($_GET['action'])) {
@@ -140,6 +143,18 @@ if (isset($_GET['cptype'])) {
 if (isset($_GET['installtype'])) {
     $installtype= $_GET['installtype'];
 }
+if (isset($_GET['devemail'])) {
+    $devemail= $_GET['devemail'];
+}
+if (isset($_GET['devkey'])) {
+    $devkey= $_GET['devkey'];
+}
+if (isset($_GET['devlicensejwtkey'])) {
+    $devlicensejwtkey= $_GET['devlicensejwtkey'];
+}
+
+
+
 
 //post
 if (isset($_POST['action'])) {
@@ -220,6 +235,15 @@ if (isset($_POST['cptype'])) {
 if (isset($_POST['installtype'])) {
     $installtype= $_POST['installtype'];
 }
+if (isset($_POST['devemail'])) {
+    $devemail= $_POST['devemail'];
+}
+if (isset($_POST['devkey'])) {
+    $devkey= $_POST['devkey'];
+}
+if (isset($_POST['devlicensejwtkey'])) {
+    $devlicensejwtkey= $_GET['devlicensejwtkey'];
+}
 
 $setupObj = new RVsitebuilder_Setup_API($responsetype, $rvsb_installing_token, $responsetype, $ignore_token, $rvlicensecode);
 
@@ -286,7 +310,7 @@ if ($action == 'download_vendor') {
 }
 
 if ($action == 'setup_env') {
-    $setupObj->setup_env($domainname, $publicpath, $dbhost, $dbname, $dbuser, $dbpassword, $ftpaccount, $ftppassword, $appname, $ftpserver, $ftpport, $domainport, $welcomeemailtype, $homeuser, $cptype);
+    $setupObj->setup_env($domainname, $publicpath, $dbhost, $dbname, $dbuser, $dbpassword, $ftpaccount, $ftppassword, $appname, $ftpserver, $ftpport, $domainport, $welcomeemailtype, $homeuser, $cptype, $devlicensejwtkey);
 }
 
 if ($action == 'download_common_pkg') {
@@ -329,9 +353,9 @@ if ($action == 'disk_required') {
 if ($action == 'test_database_ftp_connect') {
     $setupObj->test_database_ftp_connect($dbhost, $dbname, $dbuser, $dbpassword, $ftpserver, $ftpaccount, $ftppassword, $ftpport);
 }
-// if($action == 'validate_developer_token') {
-//     $setupObj->validate_developer_token($devtokenkey);
-// }
+if ($action == 'developer_license_addnewsite') {
+    $setupObj->developer_license_addnewsite($devemail, $devkey);
+}
 if ($action == 'check_dev_mode') {
     $setupObj->check_dev_mode();
 }
@@ -1220,7 +1244,7 @@ class RVsitebuilder_Setup_API
         return $res;
     }
     
-    public function setup_env($domainname, $publicpath, $dbhost, $dbname, $dbuser, $dbpassword, $ftpaccount, $ftppassword, $appname, $ftpserver, $ftpport, $domainport, $welcomeemailtype, $homeuser, $cptype)
+    public function setup_env($domainname, $publicpath, $dbhost, $dbname, $dbuser, $dbpassword, $ftpaccount, $ftppassword, $appname, $ftpserver, $ftpport, $domainport, $welcomeemailtype, $homeuser, $cptype, $devlicensejwtkey)
     {
         $time_start = microtime(true);
         $this->print_debug_log('======'.__METHOD__.'======');
@@ -1250,7 +1274,7 @@ class RVsitebuilder_Setup_API
         $env_data['FTP_PORT'] = $ftpport;
         $env_data['DOCUMENT_ROOT'] = $publicpath;
         $env_data['RV_MIRROR']  = $this->mirrorurl;
-        $env_data['DEVELOPER_TOKEN_KEY']  = '';
+        $env_data['DEVELOPER_LICENSE_JWT_KEY']  = $devlicensejwtkey;
         $env_data['WELCOME_EMAIL_TYPE']  = $welcomeemailtype;
         $env_data['CP_TYPE']  = $cptype;
         $env_data['MAIL_FROM_ADDRESS']  = 'admin'.'@'.$domainname;
@@ -1934,38 +1958,43 @@ class RVsitebuilder_Setup_API
         return $this->print_response($this->response);
     }
     
-//     public function validate_developer_token($devtokenkey) {
-//         $time_start = microtime(true);
-//         $this->print_debug_log('======'.__METHOD__.'======');
+    public function developer_license_addnewsite($devemail, $devkey)
+    {
+        $time_start = microtime(true);
+        $this->print_debug_log('======'.__METHOD__.'======');
         
-//         $this->response['dev_token'] = false;
-        
-//         try {
-//             $client = new Client([
-//                 'curl'            => [CURLOPT_SSL_VERIFYPEER => false, CURLOPT_SSL_VERIFYHOST => false],
-//                 'allow_redirects' => false,
-//                 'cookies'         => true,
-//                 'verify'          => false
-//             ]);
-//             $this->print_debug_log("Validate developer token Type=POST URL=http://license3.rvglobalsoft.com/validatetoken Devtoken=$devtokenkey");
-//             $form_params = ['devtokenkey'=>$devtokenkey];
-//             $res = $client->request('POST', 'http://license3.rvglobalsoft.com/validatetoken' ,['form_params' => $form_params]);
-//             $this->print_debug_log('Server Response Status '.$res->getStatusCode());
-//             $this->print_debug_log('Server Response Header '.json_encode((array) $res->getHeaders()));
-//             $rescontent = json_decode($res->getBody(), true);
-//             if (isset($rescontent['status']) && true == $rescontent['status']) {
-//                 $this->response['dev_token'] = true;
-//             } else {
-//                 $this->response['message'] = $rescontent['message'];
-//             }
-//         } catch (\Exception $e) {
-//             $this->print_debug_log('Validate developer token error '.$e->getMessage());
-//             $this->response['message']  = $e->getMessage();
-//         }
-//         $this->response['status'] = true;
-//         $this->response['exectime'] = (microtime(true) - $time_start);
-//         return $this->print_response($this->response);
-//     }
+        try {
+            $client = new Client([
+                'curl'            => [CURLOPT_SSL_VERIFYPEER => false, CURLOPT_SSL_VERIFYHOST => false],
+                'allow_redirects' => false,
+                'cookies'         => true,
+                'verify'          => false
+            ]);
+            $this->print_debug_log("Validate developer token Type=POST URL=http://license3.rvglobalsoft.com/validatetoken Devtoken=$devtokenkey");
+            $jwtkey = $this->generateSecretKey();
+            $form_params = [
+                'dev_email'=>$devemail,
+                'dev_token_key' => $devkey,
+                'site_ip' => $this->get_client_ip(),
+                'site_domain'  => $this->get_current_domain(),
+                'key' => $jwtkey,
+            ];
+            $res = $client->request('POST', 'http://license3.rvglobalsoft.com/developer/devlicenseaddsite', ['form_params' => $form_params]);
+            $this->print_debug_log('Server Response Status '.$res->getStatusCode());
+            $this->print_debug_log('Server Response Header '.json_encode((array) $res->getHeaders()));
+            $rescontent = json_decode($res->getBody(), true);
+            $this->response['status'] = $rescontent['status'];
+            $this->response['message'] = $rescontent['message'];
+            $this->response['info'] = $rescontent['info'];
+            $this->response['developer_license_jwt_key'] = $jwtkey;
+        } catch (\Exception $e) {
+            $this->print_debug_log('Validate developer token error '.$e->getMessage());
+            $this->response['message']  = $e->getMessage();
+        }
+
+        $this->response['exectime'] = (microtime(true) - $time_start);
+        return $this->print_response($this->response);
+    }
     
     public function generateSecretKey($length = 64)
     {
