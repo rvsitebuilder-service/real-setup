@@ -359,6 +359,9 @@ if ($action == 'developer_license_addnewsite') {
 if ($action == 'check_dev_mode') {
     $setupObj->check_dev_mode();
 }
+if ($action == 'check_server_license') {
+    $setupObj->check_server_license();
+}
 
 
 
@@ -1957,6 +1960,35 @@ class RVsitebuilder_Setup_API
         $this->print_install_log(__METHOD__.' status TRUE'.' timeusage '.$this->response['exectime']);
         return $this->print_response($this->response);
     }
+
+    public function check_server_license()
+    {
+        $time_start = microtime(true);
+        $this->print_debug_log('======'.__METHOD__.'======');
+
+        try {
+            $client = new Client([
+                'curl'            => [CURLOPT_SSL_VERIFYPEER => false, CURLOPT_SSL_VERIFYHOST => false],
+                'allow_redirects' => false,
+                'cookies'         => true,
+                'verify'          => false
+            ]);
+            $this->print_debug_log("Validate server license Type=GET URL=https://license3.rvglobalsoft.com/v3/getlicense/rvsitebuilder");
+          
+            $res = $client->request('GET', 'https://license3.rvglobalsoft.com/v3/getlicense/rvsitebuilder');
+            $this->print_debug_log('Server Response Status '.$res->getStatusCode());
+            $rescontent = unserialize(base64_decode($res->getBody()));
+            $this->response['status'] = ($rescontent['header']['is-error'] == true) ? false : true;
+            $this->response['message'] = ($rescontent['body']['issue_title']) ? $rescontent['body']['issue_title'] : '';
+        } catch (\Exception $e) {
+            $this->print_debug_log('Validate server license error '.$e->getMessage());
+            $this->response['message']  = $e->getMessage();
+        }
+        
+        $this->response['serverip'] = $this->get_site_ip();
+        $this->response['exectime'] = (microtime(true) - $time_start);
+        return $this->print_response($this->response);
+    }
     
     public function developer_license_addnewsite($devemail, $devkey)
     {
@@ -1975,7 +2007,7 @@ class RVsitebuilder_Setup_API
             $form_params = [
                 'dev_email'=>$devemail,
                 'dev_token_key' => $devkey,
-                'site_ip' => $this->get_client_ip(),
+                'site_ip' => $this->get_site_ip(),
                 'site_domain'  => $this->get_current_domain(),
                 'key' => $jwtkey,
             ];
@@ -2434,6 +2466,12 @@ class RVsitebuilder_Setup_API
         $domainname = str_replace("www.", "", $domainname);
         $this->print_debug_log("Current domain ".$domainname);
         return $domainname;
+    }
+
+    public function get_site_ip()
+    {
+        $this->print_debug_log('======'.__METHOD__.'======');
+        return $_SERVER['SERVER_ADDR'];
     }
     
     public function get_client_ip()

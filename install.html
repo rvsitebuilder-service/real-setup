@@ -696,39 +696,40 @@
                             <br>
                         </div>
                         <!-- TODO start delete it when CE edition release -->
-                        <div class="form-group">
-                            <div class="row">
-                                <div class="col col-lg-3">Developer Email:</div>
-                                <div class="col col-lg-4">
-                                    <input type="email"
-                                           class="form-control"
-                                           name="devemail"
-                                           id="devemail"
-                                           placeholder="Write your devloper email"
-                                           required />
+                        <div id="developerlicense"
+                             class="d-none">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col col-lg-3">Developer Email:</div>
+                                    <div class="col col-lg-4">
+                                        <input type="email"
+                                               class="form-control"
+                                               name="devemail"
+                                               id="devemail"
+                                               placeholder="Write your devloper email" />
+                                    </div>
+                                    <div class="help-block with-errors text-danger"></div>
                                 </div>
-                                <div class="help-block with-errors text-danger"></div>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="row">
-                                <div class="col col-lg-3">Developer Key:</div>
-                                <div class="col col-lg-4">
-                                    <input type="text"
-                                           class="form-control"
-                                           name="devkey"
-                                           id="devkey"
-                                           placeholder="Write your devloper token key"
-                                           required />
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col col-lg-3">Developer Key:</div>
+                                    <div class="col col-lg-4">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="devkey"
+                                               id="devkey"
+                                               placeholder="Write your devloper token key" />
+                                    </div>
+                                    <div class="help-block with-errors text-danger"></div>
+                                    <input type="hidden"
+                                           id="developer_license_jwt_key"
+                                           value="" />
                                 </div>
-                                <div class="help-block with-errors text-danger"></div>
-                                <input type="hidden"
-                                       id="developer_license_jwt_key"
-                                       value="" />
                             </div>
+                            <span id="dev_license_error"
+                                  class="d-none list-group-item list-group-item-action list-group-item-warning margin-b"></span>
                         </div>
-                        <span id="dev_license_error"
-                              class="d-none list-group-item list-group-item-action list-group-item-warning margin-b"></span>
                         <!-- TODO end delete it when CE edition release -->
                     </div>
                     <!-- end step block -->
@@ -745,7 +746,8 @@
                                              role="alert">
                                             <h4 class="alert-heading">Almost there!</h4>
                                             <p>
-                                                Please read through and accept the condition and agreement to continue
+                                                Please read through and accept the condition and agreement to
+                                                continue
                                                 RVsitebuilder installation.
                                             </p>
                                             <div class="form-check">
@@ -1078,28 +1080,29 @@
                     ajaxInvokeStep2 = true;
 
                     //TODO start delete it when CE edition release
-                    $("#dev_license_error").addClass("d-none");
-
-                    param = {
-                        action: "developer_license_addnewsite",
-                        devemail: $("#devemail").val(),
-                        devkey: $("#devkey").val(),
-                    };
-                    doAnAjaxSync("setupapiserver.php", param, "POST", function (error, data) {
-                        if (data.status == true) {
-                            $("#developer_license_jwt_key").val(data.developer_license_jwt_key)
-                            $("#smartwizard").smartWizard("next");
-                        } else {
-                            $("#dev_license_error").removeClass("d-none").text(data.message)
-                            ajaxInvokeStep2 = false;
-                            return false;
-                        }
-                    });
-
-                    return false;
+                    if ($("#developerlicense").hasClass("d-none") == false) {
+                        $("#dev_license_error").addClass("d-none");
+                        param = {
+                            action: "developer_license_addnewsite",
+                            devemail: $("#devemail").val(),
+                            devkey: $("#devkey").val(),
+                        };
+                        doAnAjaxSync("setupapiserver.php", param, "POST", function (error, data) {
+                            if (data.status == true) {
+                                $("#developer_license_jwt_key").val(data
+                                    .developer_license_jwt_key)
+                                $("#smartwizard").smartWizard("next");
+                            } else {
+                                $("#dev_license_error").removeClass("d-none").text(data.message)
+                                ajaxInvokeStep2 = false;
+                                return false;
+                            }
+                        });
+                        return false;
+                    }
                     //TODO stop delete it when CE edition release
 
-                    //$("#smartwizard").smartWizard("next");
+                    $("#smartwizard").smartWizard("next");
 
                 }
 
@@ -1180,6 +1183,20 @@
                     } else {
                         return true;
                     }
+                } else {
+                    return true;
+                }
+            });
+
+            //check server license
+            param = {
+                action: "check_server_license",
+            };
+            doAnAjaxSync("setupapiserver.php", param, "GET", function (error, data) {
+                if (data.status == false) {
+                    $("#developerlicense").removeClass("d-none").addClass("ftprequired");
+                    $("#devemail").attr("required", "required");
+                    $("#devkey").attr("required", "required");
                 } else {
                     return true;
                 }
