@@ -63,6 +63,7 @@ $installtype    = '';
 $devemail       = '';
 $devkey         = '';
 $devlicensejwtkey = '';
+$dbengine = 'mysql';
 
 //get
 if (isset($_GET['action'])) {
@@ -90,7 +91,7 @@ if (isset($_GET['dbpass'])) {
     $dbpassword     = $_GET['dbpass'];
 }
 if (isset($_GET['dbport'])) {
-    $dbport         = $_GET['dbpass'];
+    $dbport         = $_GET['dbport'];
 }
 if (isset($_GET['ftpaccount'])) {
     $ftpaccount     = $_GET['ftpaccount'];
@@ -151,6 +152,9 @@ if (isset($_GET['devkey'])) {
 }
 if (isset($_GET['devlicensejwtkey'])) {
     $devlicensejwtkey= $_GET['devlicensejwtkey'];
+}
+if (isset($_GET['dbengine'])) {
+    $dbengine= $_GET['dbengine'];
 }
 
 
@@ -244,6 +248,9 @@ if (isset($_POST['devkey'])) {
 if (isset($_POST['devlicensejwtkey'])) {
     $devlicensejwtkey= $_GET['devlicensejwtkey'];
 }
+if (isset($_POST['dbengine'])) {
+    $dbengine = $_POST['dbengine'];
+}
 
 $setupObj = new RVsitebuilder_Setup_API($responsetype, $rvsb_installing_token, $responsetype, $ignore_token, $rvlicensecode);
 
@@ -310,7 +317,7 @@ if ($action == 'download_vendor') {
 }
 
 if ($action == 'setup_env') {
-    $setupObj->setup_env($domainname, $publicpath, $dbhost, $dbname, $dbuser, $dbpassword, $ftpaccount, $ftppassword, $appname, $ftpserver, $ftpport, $domainport, $welcomeemailtype, $homeuser, $cptype, $devlicensejwtkey);
+    $setupObj->setup_env($domainname, $publicpath, $dbhost, $dbname, $dbuser, $dbpassword, $ftpaccount, $ftppassword, $appname, $ftpserver, $ftpport, $domainport, $welcomeemailtype, $homeuser, $cptype, $devlicensejwtkey, $dbengine, $dbport);
 }
 
 if ($action == 'download_common_pkg') {
@@ -351,7 +358,7 @@ if ($action == 'disk_required') {
     $setupObj->disk_required();
 }
 if ($action == 'test_database_ftp_connect') {
-    $setupObj->test_database_ftp_connect($dbhost, $dbname, $dbuser, $dbpassword, $ftpserver, $ftpaccount, $ftppassword, $ftpport);
+    $setupObj->test_database_ftp_connect($dbhost, $dbname, $dbuser, $dbpassword, $ftpserver, $ftpaccount, $ftppassword, $ftpport, $dbengine, $dbport);
 }
 if ($action == 'developer_license_addnewsite') {
     $setupObj->developer_license_addnewsite($devemail, $devkey);
@@ -724,6 +731,7 @@ class RVsitebuilder_Setup_API
             $this->response['status'] = false;
             $this->print_debug_log("Path not writeable ".dirname(__FILE__));
         }
+
         //test connect to mirror service
         $this->response['check_pre_require']['mirror_service']['check'] = true;
         $servicestatus = $this->checkserviceresponse($this->mirrorurl);
@@ -734,6 +742,7 @@ class RVsitebuilder_Setup_API
             $this->response['status'] = false;
             $this->print_debug_log('Download service is unavailable ('.$servicestatus['reason'].')');
         }
+
         //test connect to version service
         $this->response['check_pre_require']['version_service']['check'] = true;
         $servicestatus = $this->checkserviceresponse($this->getversionurl);
@@ -1247,7 +1256,7 @@ class RVsitebuilder_Setup_API
         return $res;
     }
     
-    public function setup_env($domainname, $publicpath, $dbhost, $dbname, $dbuser, $dbpassword, $ftpaccount, $ftppassword, $appname, $ftpserver, $ftpport, $domainport, $welcomeemailtype, $homeuser, $cptype, $devlicensejwtkey)
+    public function setup_env($domainname, $publicpath, $dbhost, $dbname, $dbuser, $dbpassword, $ftpaccount, $ftppassword, $appname, $ftpserver, $ftpport, $domainport, $welcomeemailtype, $homeuser, $cptype, $devlicensejwtkey, $dbengine, $dbport)
     {
         $time_start = microtime(true);
         $this->print_debug_log('======'.__METHOD__.'======');
@@ -1266,6 +1275,7 @@ class RVsitebuilder_Setup_API
         $env_data = [];
         $env_data['APP_URL'] = $appurl;
         $env_data['DB_HOST'] = $dbhost;
+        $env_data['DB_PORT'] = $dbport;
         $env_data['DB_DATABASE'] = $dbname;
         $env_data['DB_USERNAME'] = $dbuser;
         $env_data['DB_PASSWORD'] = $dbpassword;
@@ -1281,6 +1291,7 @@ class RVsitebuilder_Setup_API
         $env_data['WELCOME_EMAIL_TYPE']  = $welcomeemailtype;
         $env_data['CP_TYPE']  = $cptype;
         $env_data['MAIL_FROM_ADDRESS']  = 'admin'.'@'.$domainname;
+        $env_data['DB_CONNECTION'] = $dbengine;
         
         
         $this->print_debug_log("ENV data ".json_encode($env_data));
@@ -2782,19 +2793,21 @@ class RVsitebuilder_Setup_API
     
     
     
-    public function test_database_ftp_connect($dbhost, $dbname, $dbuser, $dbpassword, $ftpserver, $ftpaccount, $ftppassword, $ftpport)
+    public function test_database_ftp_connect($dbhost, $dbname, $dbuser, $dbpassword, $ftpserver, $ftpaccount, $ftppassword, $ftpport, $dbengine, $dbport)
     {
         $time_start = microtime(true);
         $this->print_debug_log('======'.__METHOD__.'======');
         
         ini_set('display_errors', 0);
         
-        $this->print_debug_log("Test Connect dbhost=$dbhost dbname=$dbname dbuser=$dbuser dbpassword=$dbpassword ftpserver=$ftpserver ftpaccount=$ftpaccount ftppassword=$ftppassword ftpport=$ftpport");
+        $this->print_debug_log("Test Connect dbhost=$dbhost dbname=$dbname dbuser=$dbuser dbpassword=$dbpassword ftpserver=$ftpserver ftpaccount=$ftpaccount ftppassword=$ftppassword ftpport=$ftpport dbengine=$dbengine dbport=$dbport");
+        
+        //TODO if engine not mysql to validate other engine
         
         //db
         $this->response['db_connect']['status'] = true;
         $this->response['db_connect']['message'] = "";
-        $conn = new mysqli($dbhost, $dbuser, $dbpassword, $dbname);
+        $conn = new mysqli($dbhost, $dbuser, $dbpassword, $dbname, $dbport);
         if ($conn->connect_error) {
             $this->print_debug_log("Database Connect Error ".$conn->connect_error);
             $this->response['db_connect']['status'] = false;
