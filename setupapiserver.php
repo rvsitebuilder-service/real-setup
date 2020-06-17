@@ -1989,8 +1989,8 @@ class RVsitebuilder_Setup_API
             $res = $client->request('GET', 'https://license3.rvglobalsoft.com/v3/getlicense/rvsitebuilder');
             $this->print_debug_log('Server Response Status '.$res->getStatusCode());
             $rescontent = unserialize(base64_decode($res->getBody()));
-            $this->response['status'] = ($rescontent['header']['is-error'] == true) ? false : true;
-            $this->response['message'] = ($rescontent['body']['issue_title']) ? $rescontent['body']['issue_title'] : '';
+            $this->response['status'] = (isset($rescontent['header']['is-error']) && $rescontent['header']['is-error'] == true) ? false : true;
+            $this->response['message'] = (isset($rescontent['body']['issue_title'])) ? $rescontent['body']['issue_title'] : '';
         } catch (\Exception $e) {
             $this->print_debug_log('Validate server license error '.$e->getMessage());
             $this->response['message']  = $e->getMessage();
