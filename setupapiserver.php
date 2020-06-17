@@ -2013,7 +2013,7 @@ class RVsitebuilder_Setup_API
                 'cookies'         => true,
                 'verify'          => false
             ]);
-            $this->print_debug_log("Validate developer token Type=POST URL=http://license3.rvglobalsoft.com/validatetoken Devtoken=$devtokenkey");
+            $this->print_debug_log("Validate developer token Type=POST URL=http://license3.rvglobalsoft.com/validatetoken Devtoken=$devkey");
             $jwtkey = $this->generateSecretKey();
             $form_params = [
                 'dev_email'=>$devemail,
