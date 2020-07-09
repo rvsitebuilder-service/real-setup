@@ -246,7 +246,7 @@ if (isset($_POST['devkey'])) {
     $devkey= $_POST['devkey'];
 }
 if (isset($_POST['devlicensejwtkey'])) {
-    $devlicensejwtkey= $_GET['devlicensejwtkey'];
+    $devlicensejwtkey= $_POST['devlicensejwtkey'];
 }
 if (isset($_POST['dbengine'])) {
     $dbengine = $_POST['dbengine'];
