@@ -1248,7 +1248,7 @@
             };
             doAnAjaxSync("setupapiserver.php", param, "GET", function (error, data) {
                 if (data.status == false) {
-                    $("#developerlicense").removeClass("d-none").addClass("ftprequired");
+                    $("#developerlicense").removeClass("d-none");
                     $("#devemail").attr("required", "required");
                     $("#devkey").attr("required", "required");
                 } else {
