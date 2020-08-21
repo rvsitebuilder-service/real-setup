@@ -1,0 +1,2068 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>RVsitebuilder 7 - Installer Wizard</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+    <!-- some fone -->
+    <link rel="stylesheet"
+          href="https://use.fontawesome.com/releases/v5.7.0/css/all.css"
+          integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ"
+          crossorigin="anonymous" />
+
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+          crossorigin="anonymous" />
+
+    <!-- Include SmartWizard CSS -->
+    <link href="src/css/smart_wizard.css"
+          rel="stylesheet"
+          type="text/css" />
+
+    <!-- Optional SmartWizard theme -->
+    <link href="src/css/smart_wizard_theme_circles.css"
+          rel="stylesheet"
+          type="text/css" />
+    <link href="src/css/smart_wizard_theme_arrows.css"
+          rel="stylesheet"
+          type="text/css" />
+    <link href="src/css/smart_wizard_theme_dots.css"
+          rel="stylesheet"
+          type="text/css" />
+</head>
+
+<body>
+    <div class="logo">
+        <div class="container">
+            <img src="logorvsitebuilder.png"
+                 height="50" />
+            <a id="rvdebug"
+               class=""
+               href="rvdebug.php"
+               target="_blank"
+               style="opacity: 0;">
+                _____rvdebug_____
+            </a>
+        </div>
+    </div>
+    <div class="container rv-wizard">
+        <div class="row">
+            <div class="col-md-12">
+                <h5 class="text-title">
+                    “Welcome to RVsitebuilder. Please complete 4 easy steps to install RVsitebuilder. Let's go!”
+                </h5>
+            </div>
+        </div>
+        <form action="#"
+              id="myForm"
+              role="form"
+              data-toggle="validator"
+              method="post"
+              accept-charset="utf-8">
+            <!-- SmartWizard html -->
+            <div id="smartwizard">
+                <!--  start wizard -->
+                <ul>
+                    <li>
+                        <a href="#form-step-0">Step 1<br /><small>Check server requirement</small></a>
+                    </li>
+                    <li>
+                        <a href="#form-step-1">Step 2<br /><small>Database setup</small></a>
+                    </li>
+                    <li>
+                        <a href="#form-step-2">Step 3<br /><small>Setup website properties</small></a>
+                    </li>
+                    <li>
+                        <a href="#form-step-3">Step 4<br /><small>Install your RVsitebuilder</small></a>
+                    </li>
+                </ul>
+
+                <div>
+                    <!-- start step block -->
+                    <div id="form-step-0"
+                         role="form"
+                         data-toggle="validator">
+                        <h5 class="title">PHP Version</h5>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-4">PHP version &gt;= 7.1.3</div>
+                                <div class="col col-lg-2">
+                                    <input type="text"
+                                           class="form-control border-0 font-weight-bold text-danger chk_pre_require"
+                                           name="phpversion"
+                                           style="background: none;"
+                                           value="FALSE"
+                                           id="phpversion"
+                                           placeholder=""
+                                           required
+                                           readonly />
+                                </div>
+                                <div class="help-block with-errors text-danger"></div>
+                            </div>
+                        </div>
+                        <h5 class="title">PHP Extension</h5>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-4">mysqlnd</div>
+                                <div class="col col-lg-2">
+                                    <input type="text"
+                                           class="form-control border-0 font-weight-bold text-danger chk_pre_require"
+                                           name="mysqlnd"
+                                           style="background: none;"
+                                           value="FALSE"
+                                           id="mysqlnd"
+                                           placeholder=""
+                                           required
+                                           readonly />
+                                </div>
+                                <div class="help-block with-errors text-danger"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-4">pdo</div>
+                                <div class="col col-lg-2">
+                                    <input type="text"
+                                           class="form-control border-0 font-weight-bold text-danger chk_pre_require"
+                                           name="pdo"
+                                           style="background: none;"
+                                           value="FALSE"
+                                           id="pdo"
+                                           placeholder=""
+                                           required
+                                           readonly />
+                                </div>
+                                <div class="help-block with-errors text-danger"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-4">imagick or gd</div>
+                                <div class="col col-lg-2">
+                                    <input type="text"
+                                           class="form-control border-0 font-weight-bold text-danger chk_pre_require"
+                                           name="image_lib"
+                                           style="background: none;"
+                                           value="FALSE"
+                                           id="image_lib"
+                                           placeholder=""
+                                           required
+                                           readonly />
+                                </div>
+                                <div class="help-block with-errors text-danger"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-4">curl</div>
+                                <div class="col col-lg-2">
+                                    <input type="text"
+                                           class="form-control border-0 font-weight-bold text-danger chk_pre_require"
+                                           name="curl"
+                                           style="background: none;"
+                                           value="FALSE"
+                                           id="curl"
+                                           placeholder=""
+                                           required
+                                           readonly />
+                                </div>
+                                <div class="help-block with-errors text-danger"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-4">iconv</div>
+                                <div class="col col-lg-2">
+                                    <input type="text"
+                                           class="form-control border-0 font-weight-bold text-danger chk_pre_require"
+                                           name="iconv"
+                                           style="background: none;"
+                                           value="FALSE"
+                                           id="iconv"
+                                           placeholder=""
+                                           required
+                                           readonly />
+                                </div>
+                                <div class="help-block with-errors text-danger"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-4">mbstring</div>
+                                <div class="col col-lg-2">
+                                    <input type="text"
+                                           class="form-control border-0 font-weight-bold text-danger chk_pre_require"
+                                           name="mbstring"
+                                           style="background: none;"
+                                           value="FALSE"
+                                           id="mbstring"
+                                           placeholder=""
+                                           required
+                                           readonly />
+                                </div>
+                                <div class="help-block with-errors text-danger"></div>
+                            </div>
+                        </div>
+                        <!--
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-4">fileinfo </div>
+                                <div class="col col-lg-2">
+                                    <input type="text" class="form-control border-0 font-weight-bold text-danger  chk_pre_require" name="fileinfo" style="background: none;" value="FALSE"
+                                        id="fileinfo" placeholder="" required readonly>
+                                </div>
+                                <div class="help-block with-errors text-danger"></div>
+                            </div>
+                        </div>
+                        -->
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-4">zip</div>
+                                <div class="col col-lg-2">
+                                    <input type="text"
+                                           class="form-control border-0 font-weight-bold text-danger chk_pre_require"
+                                           name="zip"
+                                           style="background: none;"
+                                           value="FALSE"
+                                           id="zip"
+                                           placeholder=""
+                                           required
+                                           readonly />
+                                </div>
+                                <div class="help-block with-errors text-danger"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-4">json</div>
+                                <div class="col col-lg-2">
+                                    <input type="text"
+                                           class="form-control border-0 font-weight-bold text-danger chk_pre_require"
+                                           name="json"
+                                           style="background: none;"
+                                           value="FALSE"
+                                           id="json"
+                                           placeholder=""
+                                           required
+                                           readonly />
+                                </div>
+                                <div class="help-block with-errors text-danger"></div>
+                            </div>
+                        </div>
+                        <h5 class="title">PHP Function</h5>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-4">parse_ini_file</div>
+                                <div class="col col-lg-2">
+                                    <input type="text"
+                                           class="form-control border-0 font-weight-bold text-danger chk_pre_require"
+                                           name="parse_ini_file"
+                                           style="background: none;"
+                                           value="FALSE"
+                                           id="parse_ini_file"
+                                           placeholder=""
+                                           required
+                                           readonly />
+                                </div>
+                                <div class="help-block with-errors text-danger"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-4">file_put_contents</div>
+                                <div class="col col-lg-2">
+                                    <input type="text"
+                                           class="form-control border-0 font-weight-bold text-danger chk_pre_require"
+                                           name="file_put_contents"
+                                           style="background: none;"
+                                           value="FALSE"
+                                           id="file_put_contents"
+                                           placeholder=""
+                                           required
+                                           readonly />
+                                </div>
+                                <div class="help-block with-errors text-danger"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-4">posix or getmyuid</div>
+                                <div class="col col-lg-2">
+                                    <input type="text"
+                                           class="form-control border-0 font-weight-bold text-danger chk_pre_require"
+                                           name="dir_and_file"
+                                           style="background: none;"
+                                           value="FALSE"
+                                           id="dir_and_file"
+                                           placeholder=""
+                                           required
+                                           readonly />
+                                </div>
+                                <div class="help-block with-errors text-danger"></div>
+                            </div>
+                        </div>
+                        <h5 class="title">PHP INI</h5>
+                        <!--  
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-4">allow_url_fopen </div>
+                                <div class="col col-lg-2">
+                                    <input type="text" class="form-control border-0 font-weight-bold text-danger  chk_pre_require" name="allow_url_fopen" style="background: none;" value="FALSE"
+                                        id="allow_url_fopen" placeholder="" required readonly>
+                                </div>
+                                <div class="help-block with-errors text-danger"></div>
+                            </div>
+                        </div>
+                        -->
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-4">memory_limit &gt;= 64</div>
+                                <div class="col col-lg-2">
+                                    <input type="text"
+                                           class="form-control border-0 font-weight-bold text-danger chk_pre_require"
+                                           name="memory_limit"
+                                           style="background: none;"
+                                           value="FALSE"
+                                           id="memory_limit"
+                                           placeholder=""
+                                           required
+                                           readonly />
+                                </div>
+                                <div class="help-block with-errors text-danger"></div>
+                            </div>
+                        </div>
+                        <h5 class="title">Service</h5>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-4">Download service</div>
+                                <div class="col col-lg-2">
+                                    <input type="text"
+                                           class="form-control border-0 font-weight-bold text-danger chk_pre_require"
+                                           name="mirror_service"
+                                           style="background: none;"
+                                           value="FALSE"
+                                           id="mirror_service"
+                                           placeholder=""
+                                           required
+                                           readonly />
+                                </div>
+                                <div class="help-block with-errors text-danger"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-4">Version service</div>
+                                <div class="col col-lg-2">
+                                    <input type="text"
+                                           class="form-control border-0 font-weight-bold text-danger chk_pre_require"
+                                           name="version_service"
+                                           style="background: none;"
+                                           value="FALSE"
+                                           id="version_service"
+                                           placeholder=""
+                                           required
+                                           readonly />
+                                </div>
+                                <div class="help-block with-errors text-danger"></div>
+                            </div>
+                        </div>
+
+                        <span id="chk_pre_require_error"
+                              class="d-none list-group-item list-group-item-action list-group-item-warning margin-b">
+                            <p class="font-weight-bold">We found this:</p>
+                            <ul id="chk_pre_require_error_list"></ul>
+                            <p class="font-weight-bold">
+                                Please correct, then click "Recheck" again.
+                            </p>
+                        </span>
+                        <button type="button"
+                                id="systemreg_recheck"
+                                class="btn btn-info">
+                            Recheck
+                        </button>
+                    </div>
+                    <!-- end step block -->
+
+                    <!-- start step block -->
+                    <div id="form-step-1"
+                         role="form"
+                         data-toggle="validator">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h5 class="text-step">
+                                        Please input database information.
+                                    </h5>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-2">Database engine:</div>
+                                <div class="col col-lg-4">
+                                    <select class="form-control"
+                                            name="dbengine"
+                                            id="dbengine"
+                                            required>
+                                        <option value="mysql"
+                                                selected>MySql</option>
+                                    </select>
+                                </div>
+                                <div class="help-block with-errors text-danger"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-2">Database host:</div>
+                                <div class="col col-lg-3">
+                                    <input type="text"
+                                           class="form-control"
+                                           name="dbhost"
+                                           id="dbhost"
+                                           placeholder="Write your database host"
+                                           required
+                                           value="localhost" />
+                                </div>
+                                <span class="pull-left mt-2">:</span>
+                                <div class="col col-lg-1">
+                                    <input type="text"
+                                           class="form-control"
+                                           name="dbport"
+                                           id="dbport"
+                                           placeholder="Write your database port"
+                                           required
+                                           value="3306"
+                                           style="margin-left:-3px;" />
+                                </div>
+                                <div class="help-block with-errors text-danger"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-2">Database name:</div>
+                                <div class="col col-lg-4">
+                                    <input type="text"
+                                           class="form-control"
+                                           name="dbname"
+                                           id="dbname"
+                                           placeholder="Write your database name"
+                                           required
+                                           value="" />
+                                </div>
+                                <div class="help-block with-errors text-danger"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-2">Database user:</div>
+                                <div class="col col-lg-4">
+                                    <input type="text"
+                                           class="form-control"
+                                           name="dbuser"
+                                           id="dbuser"
+                                           placeholder="Write your database user"
+                                           required
+                                           value="" />
+                                </div>
+                                <div class="help-block with-errors text-danger"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-2">Database password:</div>
+                                <div class="col col-lg-4">
+                                    <input type="password"
+                                           class="form-control"
+                                           name="dbpassword"
+                                           id="dbpassword"
+                                           placeholder="Write your database password"
+                                           required
+                                           value="" />
+                                </div>
+                                <div class="help-block with-errors text-danger"></div>
+                            </div>
+                        </div>
+                        <span id="connect_db_error"
+                              class="d-none list-group-item list-group-item-action list-group-item-warning margin-b"></span>
+
+                        <div id="ftpinfo"
+                             class="d-none">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col col-lg-2">FTP server:</div>
+                                    <div class="col col-lg-4">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="ftpserver"
+                                               id="ftpserver"
+                                               placeholder="Write your FTP server"
+                                               value="" />
+                                    </div>
+                                    <div class="help-block with-errors text-danger"></div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col col-lg-2">FTP username:</div>
+                                    <div class="col col-lg-4">
+                                        <input type="email"
+                                               class="form-control"
+                                               name="ftpusername"
+                                               id="ftpusername"
+                                               placeholder="Write your FTP username"
+                                               value="" />
+                                    </div>
+                                    <div class="help-block with-errors text-danger"></div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col col-lg-2">FTP password:</div>
+                                    <div class="col col-lg-4">
+                                        <input type="password"
+                                               class="form-control"
+                                               name="ftppassword"
+                                               id="ftppassword"
+                                               placeholder="Write your FTP password"
+                                               value="" />
+                                    </div>
+                                    <div class="help-block with-errors text-danger"></div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col col-lg-2">FTP port:</div>
+                                    <div class="col col-lg-4">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="ftpport"
+                                               id="ftpport"
+                                               placeholder="Write your FTP port"
+                                               value=""
+                                               pattern="^[0-9]{1,}$" />
+                                    </div>
+                                    <div class="help-block with-errors text-danger"></div>
+                                </div>
+                            </div>
+                            <span id="connect_ftp_error"
+                                  class="d-none list-group-item list-group-item-action list-group-item-warning margin-b"></span>
+                        </div>
+                    </div>
+                    <!-- end step block -->
+
+                    <!-- start step block -->
+                    <div id="form-step-2"
+                         role="form"
+                         data-toggle="validator">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h5 class="text-step">Please input website properties.</h5>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="title">Domain and Path</h5>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-3">Domain name:</div>
+                                <div class="col col-lg-4">
+                                    <input type="url"
+                                           class="form-control"
+                                           name="url"
+                                           id="url"
+                                           placeholder=""
+                                           required
+                                           disabled />
+                                </div>
+                                <div class="help-block with-errors text-danger"></div>
+                                <input type="hidden"
+                                       id="domainnamesetup" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-3">Home path:</div>
+                                <div class="col col-lg-4">
+                                    <input type="text"
+                                           class="form-control"
+                                           name="homepath"
+                                           id="homepath"
+                                           placeholder=""
+                                           required
+                                           disabled />
+                                </div>
+                                <div class="help-block with-errors text-danger"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-3">Public path:</div>
+                                <div class="col col-lg-4">
+                                    <input type="text"
+                                           class="form-control"
+                                           name="publicpath"
+                                           id="publicpath"
+                                           placeholder=""
+                                           required
+                                           disabled />
+                                </div>
+                                <div class="help-block with-errors text-danger"></div>
+                            </div>
+                        </div>
+                        <span id="path_writeable_error"
+                              class="d-none list-group-item list-group-item-action list-group-item-warning margin-b"></span>
+
+                        <h5 class="title">Admin</h5>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-3">Site brand:</div>
+                                <div class="col col-lg-4">
+                                    <input type="text"
+                                           class="form-control"
+                                           name="websitename"
+                                           id="websitename"
+                                           placeholder=""
+                                           required
+                                           value="" />
+                                </div>
+                                <div class="help-block with-errors text-danger"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-3">Admin E-mail:</div>
+                                <div class="col col-lg-4">
+                                    <input type="email"
+                                           class="form-control"
+                                           name="email"
+                                           id="email"
+                                           placeholder="Write your email address"
+                                           required />
+                                </div>
+                                <div class="help-block with-errors text-danger"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-3">Admin first name:</div>
+                                <div class="col col-lg-4">
+                                    <input type="text"
+                                           class="form-control"
+                                           name="firstname"
+                                           id="firstname"
+                                           placeholder="Write your firstname" />
+                                </div>
+                                <div class="help-block with-errors text-danger"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-3">Admin last name:</div>
+                                <div class="col col-lg-4">
+                                    <input type="text"
+                                           class="form-control"
+                                           name="lastname"
+                                           id="lastname"
+                                           placeholder="Write your lastname" />
+                                </div>
+                                <div class="help-block with-errors text-danger"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-3">Admin password:</div>
+                                <div class="col col-lg-4">
+                                    <input type="password"
+                                           class="form-control"
+                                           name="password"
+                                           id="password"
+                                           placeholder="Write your password"
+                                           required
+                                           data-minlength="6" />
+                                </div>
+                                <div class="help-block with-errors text-danger"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col col-lg-3">Password again:</div>
+                                <div class="col col-lg-4">
+                                    <input type="password"
+                                           class="form-control"
+                                           name="password2"
+                                           id="password2"
+                                           placeholder="Write your password again"
+                                           required
+                                           data-match="#password" />
+                                </div>
+                                <div class="help-block with-errors text-danger"></div>
+                            </div>
+                        </div>
+                        <!--TODO start delete it when CE edition release-->
+                        <div id="developerlicense"
+                             class="d-none">
+                            <h5 class="title">Developer license</h5>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col col-lg-3">Developer E-mail:</div>
+                                    <div class="col col-lg-4">
+                                        <input type="email"
+                                               class="form-control"
+                                               name="devemail"
+                                               id="devemail"
+                                               placeholder="Write your developer email" />
+                                    </div>
+                                    <div class="help-block with-errors text-danger"></div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col col-lg-3">Developer Key:</div>
+                                    <div class="col col-lg-4">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="devkey"
+                                               id="devkey"
+                                               placeholder="Write your devloper token key" />
+                                    </div>
+                                    <div class="help-block with-errors text-danger"></div>
+                                    <input type="hidden"
+                                           id="developer_license_jwt_key"
+                                           value="" />
+                                </div>
+                            </div>
+                            <span id="dev_license_error"
+                                  class="d-none list-group-item list-group-item-action list-group-item-warning margin-b"></span>
+                        </div>
+                        <!-- TODO end delete it when CE edition release -->
+                    </div>
+                    <!-- end step block -->
+
+                    <!-- start step block -->
+                    <div id="form-step-3"
+                         role="form"
+                         data-toggle="validator">
+                        <div id="confirmation">
+                            <div class="form-group">
+                                <div class="col col-lg-12">
+                                    <div>
+                                        <div class="alert alert-info"
+                                             role="alert">
+                                            <h4 class="alert-heading">Almost there!</h4>
+                                            <p>
+                                                Please read through and accept the condition and agreement to
+                                                continue
+                                                RVsitebuilder installation.
+                                            </p>
+                                            <div class="form-check">
+                                                <input class="form-check-input"
+                                                       type="checkbox"
+                                                       value=""
+                                                       id="confirmoverwrite" />
+                                                <label class="form-check-label"
+                                                       for="defaultCheck1">
+                                                    I accept that the installer will overwrite any files that exist
+                                                    whose names match a file name.
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input"
+                                                       type="checkbox"
+                                                       value=""
+                                                       id="confirmagreement" />
+                                                <label class="form-check-label"
+                                                       for="defaultCheck2">
+                                                    I agree with
+                                                    <a class="endusereula"
+                                                       href="https://rvsitebuilder.com/enduser-agreement"
+                                                       target="_blank">End User License Agreement</a>.
+                                                </label>
+                                            </div>
+                                            <br />
+                                            <div>
+                                                <button type="button"
+                                                        id="buttoninstall"
+                                                        class="btn btn-primary"
+                                                        disabled>
+                                                    Install
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="doinstall"
+                             class="d-none doinstall">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h5 class="text-step">Installation in progress.</h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-lg-4">Check License</div>
+                                <div class="col col-lg-2">
+                                    <i class="fa fa-sync fa-spin check_license"></i><span
+                                          class="check_license">Loading...</span>
+                                    <a class="check_license"
+                                       title=""
+                                       style="opacity: 0; width: 30px;">tu</a>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-lg-4">Disk space required</div>
+                                <div class="col col-lg-2">
+                                    <i class="fa fa-sync fa-spin disk_required"></i><span
+                                          class="disk_required">Loading...</span>
+                                    <a class="disk_required"
+                                       title=""
+                                       style="opacity: 0; width: 30px;">tu</a>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-lg-4">Download Framework</div>
+                                <div class="col col-lg-2">
+                                    <i class="fa fa-sync fa-spin download_framework"></i><span
+                                          class="download_framework">Loading...</span>
+                                    <a class="download_framework"
+                                       title=""
+                                       style="opacity: 0; width: 30px;">tu</a>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-lg-4">Download Vendor</div>
+                                <div class="col col-lg-2">
+                                    <i class="fa fa-sync fa-spin download_vendor"></i><span
+                                          class="download_vendor">Loading...</span>
+                                    <a class="download_vendor"
+                                       title=""
+                                       style="opacity: 0; width: 30px;">tu</a>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-lg-4">Setup ENV</div>
+                                <div class="col col-lg-2">
+                                    <i class="fa fa-sync fa-spin setup_env"></i><span
+                                          class="setup_env">Loading...</span>
+                                    <a class="setup_env"
+                                       title=""
+                                       style="opacity: 0; width: 30px;">tu</a>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-lg-4">Install Common Package</div>
+                                <div class="col col-lg-2">
+                                    <i class="fa fa-sync fa-spin download_common_pkg"></i><span
+                                          class="download_common_pkg">Loading...</span>
+                                    <a class="download_common_pkg"
+                                       title=""
+                                       style="opacity: 0; width: 30px;">tu</a>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-lg-4">Install Framework</div>
+                                <div class="col col-lg-2">
+                                    <i class="fa fa-sync fa-spin install_all_pkg"></i><span
+                                          class="install_all_pkg">Loading...</span>
+                                    <a class="install_all_pkg"
+                                       title=""
+                                       style="opacity: 0; width: 30px;">tu</a>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-lg-4">Artisan Command</div>
+                                <div class="col col-lg-2">
+                                    <i class="fa fa-sync fa-spin artisan_call"></i><span
+                                          class="artisan_call">Loading...</span>
+                                    <a class="artisan_call"
+                                       title=""
+                                       style="opacity: 0; width: 30px;">tu</a>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-lg-4">Finished setup</div>
+                                <div class="col col-lg-2">
+                                    <i class="fa fa-sync fa-spin finished_setup"></i><span
+                                          class="finished_setup">Loading...</span>
+                                    <a class="finished_setup"
+                                       title=""
+                                       style="opacity: 0; width: 30px;">tu</a>
+                                </div>
+                            </div>
+                            <div class="row"
+                                 style="opacity: 0;">
+                                <div class="col col-lg-4">Total execution time</div>
+                                <div class="col col-lg-2"><span class=""
+                                          id="exectime">0</span><span> Second</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end step block -->
+                </div>
+                <!-- end wizard -->
+            </div>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+            crossorigin="anonymous"></script>
+
+    <!-- Include jQuery Validator plugin -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/1000hz-bootstrap-validator/0.11.5/validator.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+
+    <!-- Include SmartWizard JavaScript source -->
+    <script type="text/javascript"
+            src="src/js/jquery.smartWizard.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // Toolbar extra buttons
+            var btnFinish = $("<button></button>")
+                .text("Finish")
+                .addClass("btn btn-info btn-finish d-none")
+                .on("click", function () {
+                    console.log("Finish Clicked");
+                });
+            var btnCancel = $("<button></button>")
+                .text("Cancel")
+                .addClass("btn btn-secondary btn-cancel")
+                .on("click", function () {
+                    $("#smartwizard").smartWizard("reset");
+                });
+            // Step show event
+            $("#smartwizard").on("showStep", function (e, anchorObject, stepNumber, stepDirection,
+                stepPosition) {
+                //alert("You are on step "+stepNumber+" now");
+                if (stepPosition === "first") {
+                    $("#prev-btn").addClass("disabled");
+                    $(".btn-cancel").addClass("d-none");
+                } else if (stepPosition === "final") {
+                    $("#next-btn").addClass("disabled");
+                } else {
+                    $("#prev-btn").removeClass("disabled");
+                    $("#next-btn").removeClass("disabled");
+                }
+            });
+            // Smart Wizard
+            $("#smartwizard").smartWizard({
+                selected: 0,
+                theme: "arrows",
+                transitionEffect: "slide",
+                showStepURLhash: true,
+                toolbarSettings: {
+                    toolbarPosition: "bottom",
+                    toolbarButtonPosition: "end",
+                    toolbarExtraButtons: [btnFinish, btnCancel],
+                },
+                anchorSettings: {
+                    markDoneStep: true, // add done css
+                    markAllPreviousStepsAsDone: true, // When a step selected by url hash, all previous steps are marked done
+                    removeDoneStepOnNavigateBack: true, // While navigate back done step after active step will be cleared
+                    enableAnchorOnDoneStep: true, // Enable/Disable the done steps navigation
+                },
+            });
+            // External Button Events
+            $("#reset-btn").on("click", function () {
+                // Reset wizard
+                $("#smartwizard").smartWizard("reset");
+                return true;
+            });
+
+            $("#prev-btn").on("click", function () {
+                // Navigate previous
+                $("#smartwizard").smartWizard("prev");
+                return true;
+            });
+
+            $("#next-btn").on("click", function () {
+                // Navigate next
+                $("#smartwizard").smartWizard("next");
+                return true;
+            });
+            //$("#theme_selector").on("change", function() {
+            //  // Change theme
+            //  $('#smartwizard').smartWizard("theme", $(this).val());
+            //  return true;
+            //});
+            //// Set selected theme on page refresh
+            //$("#theme_selector").change();
+
+            //bootstrap input validate default
+            var ajaxInvokeStep1 = false;
+            var ajaxInvokeStep2 = false;
+            $("#smartwizard").on("leaveStep", function (e, anchorObject, stepNumber, stepDirection) {
+                console.log("step " + stepNumber);
+
+                var elmForm = $("#form-step-" + stepNumber);
+
+                if (stepDirection === "forward" && elmForm) {
+                    elmForm.validator("validate");
+                    var elmErr = elmForm.children(".has-error");
+                    if (elmErr && elmErr.length > 0) {
+                        // Form validation failed
+                        return false;
+                    }
+                }
+                if (stepNumber == 0 && stepDirection === "forward") {
+                    var noerror = true;
+                    $("#form-step-0 .chk_pre_require").each(function () {
+                        if ($(this).val() === "FALSE") {
+                            $("#chk_pre_require_error").removeClass("d-none");
+                            console.log("pre check error");
+                            noerror = false;
+                            return noerror;
+                        }
+                    });
+                    return noerror;
+                }
+                if (stepNumber == 1 && ajaxInvokeStep1 == false && stepDirection === "forward") {
+                    $("#connect_db_error").addClass("d-none");
+                    $("#connect_ftp_error").addClass("d-none");
+
+                    ajaxInvokeStep1 = true;
+
+                    param = {
+                        action: "test_database_ftp_connect",
+                        dbhost: $("#dbhost").val(),
+                        dbname: $("#dbname").val(),
+                        dbuser: $("#dbuser").val(),
+                        dbpass: $("#dbpassword").val(),
+                        dbengine: $("#dbengine").val(),
+                        dbport: $("#dbport").val(),
+                        ftpserver: $("#ftpserver").val(),
+                        ftpaccount: $("#ftpusername").val(),
+                        ftppassword: $("#ftppassword").val(),
+                        ftpport: $("#ftpport").val(),
+                    };
+                    $.ajax({
+                        url: "setupapiserver.php",
+                        data: param,
+                        cache: false,
+                        type: "GET",
+                        dataType: "json",
+                        headers: {
+                            "Ignore-Token": 1,
+                        },
+                        error: function () {
+                            console.log("ajax check database/ftp connect error");
+                            $("#smartwizard").smartWizard("next");
+                        },
+                        success: function (data) {
+                            console.log(data);
+                            if (data.status == true) {
+                                if (data.db_connect.status == true && data.ftp_connect
+                                    .status == true) {
+                                    console.log("test database/ftp connect success");
+                                    $("#smartwizard").smartWizard("next");
+                                } else {
+                                    ajaxInvokeStep1 = false;
+                                    if (data.db_connect.status == false) {
+                                        console.log("test database connect error");
+                                        data.db_connect.message = data.db_connect.message
+                                            .replace('!', ':');
+                                        data.db_connect.message = data.db_connect.message +
+                                            '.';
+                                        $("#connect_db_error").removeClass("d-none").text(
+                                            data.db_connect.message);
+                                    }
+                                    if (data.ftp_connect.status == false) {
+                                        data.ftp_connect.message = data.ftp_connect.message
+                                            .replace('!', ':');
+                                        data.ftp_connect.message = data.ftp_connect
+                                            .message +
+                                            '.';
+                                        console.log("test ftp connect error");
+                                        $("#connect_ftp_error").removeClass("d-none").text(
+                                            data.ftp_connect.message);
+                                    }
+                                }
+                            }
+                        },
+                    });
+                    return false;
+                }
+                if (stepNumber == 2 && ajaxInvokeStep2 == false && stepDirection === "forward") {
+
+                    ajaxInvokeStep2 = true;
+
+                    $("#path_writeable_error").addClass("d-none");
+                    $("#dev_license_error").addClass("d-none");
+
+                    var writeable = false;
+                    var writeablereason = '';
+                    //TODO start delete it when CE edition release
+                    var devlicense = true;
+                    var devlicensereason = '';
+                    //TODO stop delete it when CE edition release
+
+                    //check writeable
+                    doAnAjaxSync("setupapiserver.php", {
+                        action: "pre_check_php"
+                    }, "GET", function (error, data) {
+                        if (typeof data === "object") {
+                            writeable = data.check_pre_require.path_writable.check;
+                            writeablereason = data.check_pre_require.path_writable.reason
+                        }
+                    });
+
+                    //TODO start delete it when CE edition release
+                    //check devlicense
+                    if ($("#developerlicense").hasClass("d-none") == false) {
+                        devlicense = false;
+                        param = {
+                            action: "developer_license_addnewsite",
+                            devemail: $("#devemail").val(),
+                            devkey: $("#devkey").val(),
+                        };
+                        doAnAjaxSync("setupapiserver.php", param, "POST", function (error, data) {
+                            devlicense = data.status;
+                            devlicensereason = data.message;
+                            if (data.status == true) {
+                                $("#developer_license_jwt_key").val(data
+                                    .developer_license_jwt_key)
+                            }
+                        });
+                    }
+                    //TODO stop delete it when CE edition release
+
+                    if (writeable == false) {
+                        $("#path_writeable_error").removeClass("d-none").text(writeablereason)
+                    }
+                    //TODO start delete it when CE edition release
+                    if (devlicense == false) {
+                        $("#dev_license_error").removeClass("d-none").text(devlicensereason)
+                    }
+                    //TODO stop delete it when CE edition release
+
+                    if (writeable == false || devlicense == false) {
+                        ajaxInvokeStep2 = false;
+                        return false;
+                    } else {
+                        $("#smartwizard").smartWizard("next");
+                    }
+
+                    $("#smartwizard").smartWizard("next");
+                }
+
+                //backward true away
+                if (stepDirection === "backward") {
+                    return true;
+                }
+            });
+
+            //system requrired recheck
+            $("#systemreg_recheck").on("click", function () {
+                window.location.reload();
+            });
+
+            //url value
+            //$("#url").val(window.location.origin);
+            //default app_url
+            //$("#websitename").val(window.location.hostname);
+            var location = window.location.href;
+            var url = location.replace("/rvsitebuilder/install.html#form-step-0", "");
+            //url value
+            $("#url").val(url);
+            //default app_url
+            var hostname = location.replace("/rvsitebuilder/install.html#form-step-0", "").replace(
+                /https:\/\/|http:\/\//, "");
+            $("#websitename").val(hostname);
+            $("#domainnamesetup").val(hostname);
+
+            //home path value
+            param = {
+                action: "get_user_path",
+            };
+            doAnAjaxSync("setupapiserver.php", param, "GET", function (error, data) {
+                if (data.status == true) {
+                    $("#homepath").val(data.homepath);
+                    //$("#publicpath").val(data.publicpath);
+                    $("#publicpath").val(data.currentpath);
+                } else {
+                    return true;
+                }
+            });
+
+            //check pre require value
+            param = {
+                action: "pre_check_php",
+            };
+            doAnAjaxSync("setupapiserver.php", param, "GET", function (error, data) {
+                if (typeof data === "object") {
+                    $.each(data.check_pre_require, function (key, value) {
+                        if (value.check == true) {
+                            $("#" + key).val(value.check.toString().toUpperCase());
+                            $("#" + key)
+                                .removeClass("text-danger")
+                                .addClass("text-success");
+                        } else {
+                            $("#chk_pre_require_error_list").append("<li>" + value.reason +
+                                "</li>");
+                            $("#chk_pre_require_error").removeClass("d-none");
+                            $(".sw-btn-next").addClass("disabled");
+                        }
+                    });
+                }
+                return true;
+            });
+
+            //check http as user
+            param = {
+                action: "check_http_as_user",
+            };
+            doAnAjaxSync("setupapiserver.php", param, "GET", function (error, data) {
+                if (data.status == true) {
+                    if (data.httpasuser == false) {
+                        $("#ftpinfo").removeClass("d-none").addClass("ftprequired");
+                        $("#ftpserver").attr("required", "required");
+                        $("#ftpusername").attr("required", "required");
+                        $("#ftppassword").attr("required", "required");
+                        $("#ftpport").attr("required", "required");
+                    } else {
+                        return true;
+                    }
+                } else {
+                    return true;
+                }
+            });
+
+            //check server license
+            param = {
+                action: "check_server_license",
+            };
+            doAnAjaxSync("setupapiserver.php", param, "GET", function (error, data) {
+                if (data.status == false) {
+                    $("#developerlicense").removeClass("d-none");
+                    $("#devemail").attr("required", "required");
+                    $("#devkey").attr("required", "required");
+                } else {
+                    return true;
+                }
+            });
+
+            //checkbox before install
+            $("#confirmoverwrite").change(function () {
+                if ($(this).prop("checked") == true && $("#confirmagreement").prop("checked") == true) {
+                    $("#buttoninstall").prop("disabled", false);
+                } else {
+                    $("#buttoninstall").prop("disabled", true);
+                }
+            });
+            $("#confirmagreement").change(function () {
+                if ($(this).prop("checked") == true && $("#confirmoverwrite").prop("checked") == true) {
+                    $("#buttoninstall").prop("disabled", false);
+                } else {
+                    $("#buttoninstall").prop("disabled", true);
+                }
+            });
+
+            //install button click
+            $("#buttoninstall").click(function () {
+                $("#confirmation").hide();
+                $("#doinstall").removeClass("d-none");
+                param = {
+                    action: "check_license",
+                };
+                doAnAjax("setupapiserver.php", param, "GET", function (error, data) {
+                    if (data === null || typeof data.status === "undefined" || data.status ==
+                        false) {
+                        $("span.check_license").text(typeof data.message == "undefined" ?
+                            "ERROR" : data.message);
+                        $("i.check_license").removeClass("fa fa-sync fa-spin").addClass(
+                            "fa fa-exclamation-circle");
+                    } else {
+                        $("span.check_license").text("");
+                        $("i.check_license").removeClass("fa fa-sync fa-spin").addClass(
+                            "fa fa-check-circle");
+                        $("a.check_license").attr("title", typeof data.exectime == "undefined" ?
+                            "0" + " s" : data.exectime.toString() + " s");
+                        $("#exectime").text(parseFloat($("#exectime").text()) + parseFloat(
+                            typeof data.exectime == "undefined" ? 0 : data.exectime));
+
+                        param = {
+                            action: "disk_required",
+                        };
+                        doAnAjax("setupapiserver.php", param, "GET", function (error, data) {
+                            if (data === null || typeof data.status === "undefined" ||
+                                data.status == false) {
+                                $("span.disk_required").text(typeof data.message ==
+                                    "undefined" ? "ERROR" : data.message);
+                                $("i.disk_required").removeClass("fa fa-sync fa-spin")
+                                    .addClass("fa fa-exclamation-circle");
+                            } else {
+                                $("span.disk_required").text("");
+                                $("i.disk_required").removeClass("fa fa-sync fa-spin")
+                                    .addClass("fa fa-check-circle");
+                                $("a.disk_required").attr("title", typeof data
+                                    .exectime == "undefined" ? "0" + " s" : data
+                                    .exectime.toString() + " s");
+                                $("#exectime").text(parseFloat($("#exectime").text()) +
+                                    parseFloat(typeof data.exectime == "undefined" ?
+                                        0 : data.exectime));
+
+                                param = {
+                                    action: "download_framework",
+                                    homeuser: $("#homepath").val(),
+                                    domainname: $("#domainnamesetup").val(),
+                                    publicpath: $("#publicpath").val(),
+                                };
+                                doAnAjax("setupapiserver.php", param, "GET", function (
+                                    error, data) {
+                                    if (data === null || typeof data.status ===
+                                        "undefined" || data.status == false) {
+                                        $("span.download_framework").text(
+                                            typeof data.message ==
+                                            "undefined" ? "ERROR" : data
+                                            .message);
+                                        $("i.download_framework").removeClass(
+                                            "fa fa-sync fa-spin").addClass(
+                                            "fa fa-exclamation-circle");
+                                    } else {
+                                        $("span.download_framework").text("");
+                                        $("i.download_framework").removeClass(
+                                            "fa fa-sync fa-spin").addClass(
+                                            "fa fa-check-circle");
+                                        $("a.download_framework").attr("title",
+                                            typeof data.exectime ==
+                                            "undefined" ? "0" + " s" : data
+                                            .exectime.toString() + " s");
+                                        $("#exectime").text(parseFloat($(
+                                                "#exectime").text()) +
+                                            parseFloat(typeof data
+                                                .exectime == "undefined" ?
+                                                0 : data.exectime));
+
+                                        param = {
+                                            action: "download_vendor",
+                                            homeuser: $("#homepath").val(),
+                                            domainname: $(
+                                                    "#domainnamesetup")
+                                                .val(),
+                                        };
+                                        doAnAjax("setupapiserver.php", param,
+                                            "GET",
+                                            function (error, data) {
+                                                if (data === null ||
+                                                    typeof data.status ===
+                                                    "undefined" || data
+                                                    .status == false) {
+                                                    $("span.download_vendor")
+                                                        .text(typeof data
+                                                            .message ==
+                                                            "undefined" ?
+                                                            "ERROR" : data
+                                                            .message);
+                                                    $("i.download_vendor")
+                                                        .removeClass(
+                                                            "fa fa-sync fa-spin"
+                                                        ).addClass(
+                                                            "fa fa-exclamation-circle"
+                                                        );
+                                                } else {
+                                                    $("span.download_vendor")
+                                                        .text("");
+                                                    $("i.download_vendor")
+                                                        .removeClass(
+                                                            "fa fa-sync fa-spin"
+                                                        ).addClass(
+                                                            "fa fa-check-circle"
+                                                        );
+                                                    $("a.download_vendor")
+                                                        .attr("title",
+                                                            typeof data
+                                                            .exectime ==
+                                                            "undefined" ?
+                                                            "0" + " s" :
+                                                            data.exectime
+                                                            .toString() +
+                                                            " s");
+                                                    $("#exectime").text(
+                                                        parseFloat($(
+                                                                "#exectime"
+                                                            )
+                                                            .text()) +
+                                                        parseFloat(
+                                                            typeof data
+                                                            .exectime ==
+                                                            "undefined" ?
+                                                            0 : data
+                                                            .exectime));
+
+                                                    param = {
+                                                        action: "setup_env",
+                                                        domainname: $(
+                                                            "#domainnamesetup"
+                                                        ).val(),
+                                                        domainport: window
+                                                            .location
+                                                            .port ==
+                                                            0 || window
+                                                            .location
+                                                            .port ==
+                                                            "" ? "" :
+                                                            window
+                                                            .location
+                                                            .port,
+                                                        publicpath: $(
+                                                            "#publicpath"
+                                                        ).val(),
+                                                        dbhost: $(
+                                                            "#dbhost"
+                                                        ).val(),
+                                                        dbname: $(
+                                                            "#dbname"
+                                                        ).val(),
+                                                        dbuser: $(
+                                                            "#dbuser"
+                                                        ).val(),
+                                                        dbpass: $(
+                                                            "#dbpassword"
+                                                        ).val(),
+                                                        ftpserver: $(
+                                                            "#ftpserver"
+                                                        ).val(),
+                                                        ftpaccount: $(
+                                                            "#ftpusername"
+                                                        ).val(),
+                                                        ftppassword: $(
+                                                            "#ftppassword"
+                                                        ).val(),
+                                                        appname: $(
+                                                            "#websitename"
+                                                        ).val(),
+                                                        ftpport: $(
+                                                            "#ftpport"
+                                                        ).val(),
+                                                        homeuser: $(
+                                                            "#homepath"
+                                                        ).val(),
+                                                        devlicensejwtkey: $(
+                                                                "#developer_license_jwt_key"
+                                                            )
+                                                            .val(),
+                                                        dbengine: $(
+                                                                "dbengine"
+                                                            )
+                                                            .val(),
+                                                        dbport: $(
+                                                                "dbport"
+                                                            )
+                                                            .val(),
+                                                    };
+                                                    doAnAjax(
+                                                        "setupapiserver.php",
+                                                        param, "POST",
+                                                        function (error,
+                                                            data) {
+                                                            if (data ===
+                                                                null ||
+                                                                typeof data
+                                                                .status ===
+                                                                "undefined" ||
+                                                                data
+                                                                .status ==
+                                                                false) {
+                                                                $("span.setup_env")
+                                                                    .text(
+                                                                        typeof data
+                                                                        .message ==
+                                                                        "undefined" ?
+                                                                        "ERROR" :
+                                                                        data
+                                                                        .message
+                                                                    );
+                                                                $("i.setup_env")
+                                                                    .removeClass(
+                                                                        "fa fa-sync fa-spin"
+                                                                    )
+                                                                    .addClass(
+                                                                        "fa fa-exclamation-circle"
+                                                                    );
+                                                            } else {
+                                                                $("span.setup_env")
+                                                                    .text(
+                                                                        ""
+                                                                    );
+                                                                $("i.setup_env")
+                                                                    .removeClass(
+                                                                        "fa fa-sync fa-spin"
+                                                                    )
+                                                                    .addClass(
+                                                                        "fa fa-check-circle"
+                                                                    );
+                                                                $("a.setup_env")
+                                                                    .attr(
+                                                                        "title",
+                                                                        typeof data
+                                                                        .exectime ==
+                                                                        "undefined" ?
+                                                                        "0" +
+                                                                        " s" :
+                                                                        data
+                                                                        .exectime
+                                                                        .toString() +
+                                                                        " s"
+                                                                    );
+                                                                $("#exectime")
+                                                                    .text(
+                                                                        parseFloat(
+                                                                            $(
+                                                                                "#exectime"
+                                                                            )
+                                                                            .text()
+                                                                        ) +
+                                                                        parseFloat(
+                                                                            typeof data
+                                                                            .exectime ==
+                                                                            "undefined" ?
+                                                                            0 :
+                                                                            data
+                                                                            .exectime
+                                                                        )
+                                                                    );
+
+                                                                param
+                                                                    = {
+                                                                        action: "download_common_pkg",
+                                                                        homeuser: $(
+                                                                                "#homepath"
+                                                                            )
+                                                                            .val(),
+                                                                        domainname: $(
+                                                                                "#domainnamesetup"
+                                                                            )
+                                                                            .val(),
+                                                                    };
+                                                                doAnAjax
+                                                                    ("setupapiserver.php",
+                                                                        param,
+                                                                        "GET",
+                                                                        function (
+                                                                            error,
+                                                                            data
+                                                                        ) {
+                                                                            if (data ===
+                                                                                null ||
+                                                                                typeof data
+                                                                                .status ===
+                                                                                "undefined" ||
+                                                                                data
+                                                                                .status ==
+                                                                                false
+                                                                            ) {
+                                                                                $("span.download_common_pkg")
+                                                                                    .text(
+                                                                                        typeof data
+                                                                                        .message ==
+                                                                                        "undefined" ?
+                                                                                        "ERROR" :
+                                                                                        data
+                                                                                        .message
+                                                                                    );
+                                                                                $("i.download_common_pkg")
+                                                                                    .removeClass(
+                                                                                        "fa fa-sync fa-spin"
+                                                                                    )
+                                                                                    .addClass(
+                                                                                        "fa fa-exclamation-circle"
+                                                                                    );
+                                                                            } else {
+                                                                                $("span.download_common_pkg")
+                                                                                    .text(
+                                                                                        ""
+                                                                                    );
+                                                                                $("i.download_common_pkg")
+                                                                                    .removeClass(
+                                                                                        "fa fa-sync fa-spin"
+                                                                                    )
+                                                                                    .addClass(
+                                                                                        "fa fa-check-circle"
+                                                                                    );
+                                                                                $("a.download_common_pkg")
+                                                                                    .attr(
+                                                                                        "title",
+                                                                                        typeof data
+                                                                                        .exectime ==
+                                                                                        "undefined" ?
+                                                                                        "0" +
+                                                                                        " s" :
+                                                                                        data
+                                                                                        .exectime
+                                                                                        .toString() +
+                                                                                        " s"
+                                                                                    );
+                                                                                $("#exectime")
+                                                                                    .text(
+                                                                                        parseFloat(
+                                                                                            $(
+                                                                                                "#exectime"
+                                                                                            )
+                                                                                            .text()
+                                                                                        ) +
+                                                                                        parseFloat(
+                                                                                            typeof data
+                                                                                            .exectime ==
+                                                                                            "undefined" ?
+                                                                                            0 :
+                                                                                            data
+                                                                                            .exectime
+                                                                                        )
+                                                                                    );
+
+                                                                                param
+                                                                                    = {
+                                                                                        action: "install_all_pkg",
+                                                                                        homeuser: $(
+                                                                                                "#homepath"
+                                                                                            )
+                                                                                            .val(),
+                                                                                        domainname: $(
+                                                                                                "#domainnamesetup"
+                                                                                            )
+                                                                                            .val(),
+                                                                                        publicpath: $(
+                                                                                                "#publicpath"
+                                                                                            )
+                                                                                            .val(),
+                                                                                        ftpserver: $(
+                                                                                                "#ftpserver"
+                                                                                            )
+                                                                                            .val(),
+                                                                                        ftpaccount: $(
+                                                                                                "#ftpusername"
+                                                                                            )
+                                                                                            .val(),
+                                                                                        ftppassword: $(
+                                                                                                "#ftppassword"
+                                                                                            )
+                                                                                            .val(),
+                                                                                        ftpport: $(
+                                                                                                "#ftpport"
+                                                                                            )
+                                                                                            .val(),
+                                                                                    };
+
+                                                                                doAnAjax
+                                                                                    ("setupapiserver.php",
+                                                                                        param,
+                                                                                        "POST",
+                                                                                        function (
+                                                                                            error,
+                                                                                            data
+                                                                                        ) {
+                                                                                            if (data ===
+                                                                                                null ||
+                                                                                                typeof data
+                                                                                                .status ===
+                                                                                                "undefined" ||
+                                                                                                data
+                                                                                                .status ==
+                                                                                                false
+                                                                                            ) {
+                                                                                                $("span.install_all_pkg")
+                                                                                                    .text(
+                                                                                                        typeof data
+                                                                                                        .message ==
+                                                                                                        "undefined" ?
+                                                                                                        "ERROR" :
+                                                                                                        data
+                                                                                                        .message
+                                                                                                    );
+                                                                                                $("i.install_all_pkg")
+                                                                                                    .removeClass(
+                                                                                                        "fa fa-sync fa-spin"
+                                                                                                    )
+                                                                                                    .addClass(
+                                                                                                        "fa fa-exclamation-circle"
+                                                                                                    );
+                                                                                            } else {
+                                                                                                $("span.install_all_pkg")
+                                                                                                    .text(
+                                                                                                        ""
+                                                                                                    );
+                                                                                                $("i.install_all_pkg")
+                                                                                                    .removeClass(
+                                                                                                        "fa fa-sync fa-spin"
+                                                                                                    )
+                                                                                                    .addClass(
+                                                                                                        "fa fa-check-circle"
+                                                                                                    );
+                                                                                                $("a.install_all_pkg")
+                                                                                                    .attr(
+                                                                                                        "title",
+                                                                                                        typeof data
+                                                                                                        .exectime ==
+                                                                                                        "undefined" ?
+                                                                                                        "0" +
+                                                                                                        " s" :
+                                                                                                        data
+                                                                                                        .exectime
+                                                                                                        .toString() +
+                                                                                                        " s"
+                                                                                                    );
+                                                                                                $("#exectime")
+                                                                                                    .text(
+                                                                                                        parseFloat(
+                                                                                                            $(
+                                                                                                                "#exectime"
+                                                                                                            )
+                                                                                                            .text()
+                                                                                                        ) +
+                                                                                                        parseFloat(
+                                                                                                            typeof data
+                                                                                                            .exectime ==
+                                                                                                            "undefined" ?
+                                                                                                            0 :
+                                                                                                            data
+                                                                                                            .exectime
+                                                                                                        )
+                                                                                                    );
+
+                                                                                                param
+                                                                                                    = {
+                                                                                                        action: "artisan_call",
+                                                                                                        homeuser: $(
+                                                                                                                "#homepath"
+                                                                                                            )
+                                                                                                            .val(),
+                                                                                                        domainname: $(
+                                                                                                                "#domainnamesetup"
+                                                                                                            )
+                                                                                                            .val(),
+                                                                                                        publicpath: $(
+                                                                                                                "#publicpath"
+                                                                                                            )
+                                                                                                            .val(),
+                                                                                                        adminemail: $(
+                                                                                                                "#email"
+                                                                                                            )
+                                                                                                            .val(),
+                                                                                                        adminpassword: $(
+                                                                                                                "#password"
+                                                                                                            )
+                                                                                                            .val(),
+                                                                                                        adminfirstname: $(
+                                                                                                                "#firstname"
+                                                                                                            )
+                                                                                                            .val(),
+                                                                                                        adminlastname: $(
+                                                                                                                "#lastname"
+                                                                                                            )
+                                                                                                            .val(),
+                                                                                                    };
+                                                                                                doAnAjax
+                                                                                                    ("setupapiserver.php",
+                                                                                                        param,
+                                                                                                        "POST",
+                                                                                                        function (
+                                                                                                            error,
+                                                                                                            data
+                                                                                                        ) {
+                                                                                                            if (data ===
+                                                                                                                null ||
+                                                                                                                typeof data
+                                                                                                                .status ===
+                                                                                                                "undefined" ||
+                                                                                                                data
+                                                                                                                .status ==
+                                                                                                                false
+                                                                                                            ) {
+                                                                                                                $("span.artisan_call")
+                                                                                                                    .text(
+                                                                                                                        typeof data
+                                                                                                                        .message ==
+                                                                                                                        "undefined" ?
+                                                                                                                        "ERROR" :
+                                                                                                                        data
+                                                                                                                        .message
+                                                                                                                    );
+                                                                                                                $("i.artisan_call")
+                                                                                                                    .removeClass(
+                                                                                                                        "fa fa-sync fa-spin"
+                                                                                                                    )
+                                                                                                                    .addClass(
+                                                                                                                        "fa fa-exclamation-circle"
+                                                                                                                    );
+                                                                                                            } else {
+                                                                                                                $("span.artisan_call")
+                                                                                                                    .text(
+                                                                                                                        ""
+                                                                                                                    );
+                                                                                                                $("i.artisan_call")
+                                                                                                                    .removeClass(
+                                                                                                                        "fa fa-sync fa-spin"
+                                                                                                                    )
+                                                                                                                    .addClass(
+                                                                                                                        "fa fa-check-circle"
+                                                                                                                    );
+                                                                                                                $("a.artisan_call")
+                                                                                                                    .attr(
+                                                                                                                        "title",
+                                                                                                                        typeof data
+                                                                                                                        .exectime ==
+                                                                                                                        "undefined" ?
+                                                                                                                        "0" +
+                                                                                                                        " s" :
+                                                                                                                        data
+                                                                                                                        .exectime
+                                                                                                                        .toString() +
+                                                                                                                        " s"
+                                                                                                                    );
+                                                                                                                $("#exectime")
+                                                                                                                    .text(
+                                                                                                                        parseFloat(
+                                                                                                                            $(
+                                                                                                                                "#exectime"
+                                                                                                                            )
+                                                                                                                            .text()
+                                                                                                                        ) +
+                                                                                                                        parseFloat(
+                                                                                                                            typeof data
+                                                                                                                            .exectime ==
+                                                                                                                            "undefined" ?
+                                                                                                                            0 :
+                                                                                                                            data
+                                                                                                                            .exectime
+                                                                                                                        )
+                                                                                                                    );
+
+                                                                                                                param
+                                                                                                                    = {
+                                                                                                                        action: "finished_setup",
+                                                                                                                        homeuser: $(
+                                                                                                                                "#homepath"
+                                                                                                                            )
+                                                                                                                            .val(),
+                                                                                                                        domainname: $(
+                                                                                                                                "#domainnamesetup"
+                                                                                                                            )
+                                                                                                                            .val(),
+                                                                                                                        publicpath: $(
+                                                                                                                                "#publicpath"
+                                                                                                                            )
+                                                                                                                            .val(),
+                                                                                                                        ftpserver: $(
+                                                                                                                                "#ftpserver"
+                                                                                                                            )
+                                                                                                                            .val(),
+                                                                                                                        ftpaccount: $(
+                                                                                                                                "#ftpusername"
+                                                                                                                            )
+                                                                                                                            .val(),
+                                                                                                                        ftppassword: $(
+                                                                                                                                "#ftppassword"
+                                                                                                                            )
+                                                                                                                            .val(),
+                                                                                                                        ftpport: $(
+                                                                                                                                "#ftpport"
+                                                                                                                            )
+                                                                                                                            .val(),
+                                                                                                                    };
+                                                                                                                doAnAjax
+                                                                                                                    ("setupapiserver.php",
+                                                                                                                        param,
+                                                                                                                        "POST",
+                                                                                                                        function (
+                                                                                                                            error,
+                                                                                                                            data
+                                                                                                                        ) {
+                                                                                                                            if (data ===
+                                                                                                                                null ||
+                                                                                                                                typeof data
+                                                                                                                                .status ===
+                                                                                                                                "undefined" ||
+                                                                                                                                data
+                                                                                                                                .status ==
+                                                                                                                                false
+                                                                                                                            ) {
+                                                                                                                                $("span.finished_setup")
+                                                                                                                                    .text(
+                                                                                                                                        typeof data
+                                                                                                                                        .message ==
+                                                                                                                                        "undefined" ?
+                                                                                                                                        "ERROR" :
+                                                                                                                                        data
+                                                                                                                                        .message
+                                                                                                                                    );
+                                                                                                                                $("i.finished_setup")
+                                                                                                                                    .removeClass(
+                                                                                                                                        "fa fa-sync fa-spin"
+                                                                                                                                    )
+                                                                                                                                    .addClass(
+                                                                                                                                        "fa fa-exclamation-circle"
+                                                                                                                                    );
+                                                                                                                            } else {
+                                                                                                                                $("span.finished_setup")
+                                                                                                                                    .text(
+                                                                                                                                        ""
+                                                                                                                                    );
+                                                                                                                                $("i.finished_setup")
+                                                                                                                                    .removeClass(
+                                                                                                                                        "fa fa-sync fa-spin"
+                                                                                                                                    )
+                                                                                                                                    .addClass(
+                                                                                                                                        "fa fa-check-circle"
+                                                                                                                                    );
+                                                                                                                                $("a.finished_setup")
+                                                                                                                                    .attr(
+                                                                                                                                        "title",
+                                                                                                                                        typeof data
+                                                                                                                                        .exectime ==
+                                                                                                                                        "undefined" ?
+                                                                                                                                        "0" +
+                                                                                                                                        " s" :
+                                                                                                                                        data
+                                                                                                                                        .exectime
+                                                                                                                                        .toString() +
+                                                                                                                                        " s"
+                                                                                                                                    );
+                                                                                                                                $("#exectime")
+                                                                                                                                    .text(
+                                                                                                                                        parseFloat(
+                                                                                                                                            $(
+                                                                                                                                                "#exectime"
+                                                                                                                                            )
+                                                                                                                                            .text()
+                                                                                                                                        ) +
+                                                                                                                                        parseFloat(
+                                                                                                                                            typeof data
+                                                                                                                                            .exectime ==
+                                                                                                                                            "undefined" ?
+                                                                                                                                            0 :
+                                                                                                                                            data
+                                                                                                                                            .exectime
+                                                                                                                                        )
+                                                                                                                                    );
+                                                                                                                            }
+
+                                                                                                                            param
+                                                                                                                                = {
+                                                                                                                                    action: "remove_installer_api",
+                                                                                                                                };
+                                                                                                                            doAnAjax
+                                                                                                                                ("setupapiserver.php",
+                                                                                                                                    param,
+                                                                                                                                    "GET",
+                                                                                                                                    function (
+                                                                                                                                        error,
+                                                                                                                                        data
+                                                                                                                                    ) {
+                                                                                                                                        $("#exectime")
+                                                                                                                                            .text(
+                                                                                                                                                parseFloat(
+                                                                                                                                                    $(
+                                                                                                                                                        "#exectime"
+                                                                                                                                                    )
+                                                                                                                                                    .text()
+                                                                                                                                                ) +
+                                                                                                                                                parseFloat(
+                                                                                                                                                    typeof data
+                                                                                                                                                    .exectime ==
+                                                                                                                                                    "undefined" ?
+                                                                                                                                                    0 :
+                                                                                                                                                    data
+                                                                                                                                                    .exectime
+                                                                                                                                                )
+                                                                                                                                            );
+                                                                                                                                    }
+                                                                                                                                );
+
+                                                                                                                            window
+                                                                                                                                .location
+                                                                                                                                .href =
+                                                                                                                                location
+                                                                                                                                .replace(
+                                                                                                                                    "/rvsitebuilder/install.html#form-step-0",
+                                                                                                                                    ""
+                                                                                                                                ) +
+                                                                                                                                "/admin/login";
+                                                                                                                        }
+                                                                                                                    );
+                                                                                                            }
+                                                                                                        }
+                                                                                                    );
+                                                                                            }
+                                                                                        }
+                                                                                    );
+                                                                            }
+                                                                        }
+                                                                    );
+                                                            }
+                                                        });
+                                                }
+                                            });
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+
+            //ajax function
+            function doAnAjax(url, param, type, callback) {
+                $.ajax({
+                    url: url,
+                    data: param,
+                    cache: false,
+                    type: type,
+                    dataType: "json",
+                    headers: {
+                        "Ignore-Token": 1,
+                    },
+                    error: function (error) {
+                        console.log(error);
+                        callback(error, null);
+                    },
+                    success: function (data) {
+                        console.log(data);
+                        callback(null, data);
+                    },
+                    timeout: 300000,
+                });
+            }
+
+            //ajax function async:false
+            function doAnAjaxSync(url, param, type, callback) {
+                $.ajax({
+                    url: url,
+                    data: param,
+                    cache: false,
+                    type: type,
+                    dataType: "json",
+                    headers: {
+                        "Ignore-Token": 1,
+                    },
+                    async: false,
+                    error: function (error) {
+                        console.log(error);
+                        callback(error, null);
+                    },
+                    success: function (data) {
+                        console.log(data);
+                        callback(null, data);
+                    },
+                    timeout: 300000,
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
