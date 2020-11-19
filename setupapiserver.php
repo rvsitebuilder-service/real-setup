@@ -65,6 +65,8 @@ $devemail       = '';
 $devkey         = '';
 $devlicensejwtkey = '';
 $dbengine = 'mysql';
+$dbcharset = '';
+$dbcollation = '';
 
 //get
 if (isset($_GET['action'])) {
@@ -157,7 +159,12 @@ if (isset($_GET['devlicensejwtkey'])) {
 if (isset($_GET['dbengine'])) {
     $dbengine = $_GET['dbengine'];
 }
-
+if (isset($_GET['dbcharset'])) {
+    $dbcharset = $_GET['dbcharset'];
+}
+if (isset($_GET['dbcollation'])) {
+    $dbcharset = $_GET['dbcollation'];
+}
 
 
 
@@ -251,6 +258,12 @@ if (isset($_POST['devlicensejwtkey'])) {
 }
 if (isset($_POST['dbengine'])) {
     $dbengine = $_POST['dbengine'];
+}
+if (isset($_POST['dbcharset'])) {
+    $dbcharset = $_POST['dbcharset'];
+}
+if (isset($_POST['dbcollation'])) {
+    $dbcharset = $_POST['dbcollation'];
 }
 
 $setupObj = new RVsitebuilder_Setup_API($responsetype, $rvsb_installing_token, $responsetype, $ignore_token, $rvlicensecode);
@@ -1274,6 +1287,7 @@ class RVsitebuilder_Setup_API
         $appurl = (!preg_match('/:\d+/', $domainname) && $domainport != '') ?  'https://' . $domainname . ':' . $domainport : 'https://' . $domainname;
 
         $env_data = [];
+        $env_data = $this->check_db_version($dbhost, $dbuser, $dbpassword);
         $env_data['APP_URL'] = $appurl;
         $env_data['DB_HOST'] = $dbhost;
         $env_data['DB_PORT'] = $dbport;
@@ -1310,6 +1324,39 @@ class RVsitebuilder_Setup_API
         return $this->print_response($this->response);
     }
 
+
+    public function check_db_version($dbhost, $dbuser, $dbpassword)
+    {
+        $env_data = [];
+        // TODO Check_db_connect
+        $mysqli = new mysqli($dbhost, $dbuser, $dbpassword);
+        if ($mysqli->connect_errno) {
+            echo "Failed to connect to MySQL: " . $mysqli->connect_error;
+            exit();
+        }
+        $dbinfo = $mysqli->server_info;
+        // ถ้าเป็น MySQL return version number เช่่น 5.7.32, 5.6.0
+        // ถ้าเป็น MariaDB return "[x.x.x]-[version_number]-["MariaDB"]" เช่น 5.5.5-10.2.36-[3]MariaDB
+
+        /* TODO empty  :
+           TODO Linux  : "10.0.17-MariaDB-log"
+           TODO window : "5.5.5-10.0.17-MariaDB-log"
+        */
+
+        // split pattern
+        $version = preg_split('[-]', $dbinfo);
+
+
+        if ($version[1] == null && $version[0] >= '5.3.3') {
+            $env_data['DB_CHARSET'] = "utf8mb4";
+            $env_data['DB_COLLATION'] = "utf8mb4_unicode_ci";
+        }
+        if ($version[1] != null && $version[1] >= "10.2") {
+            $env_data['DB_CHARSET'] = "utf8mb4";
+            $env_data['DB_COLLATION'] = "utf8mb4_unicode_ci";
+        }
+        return $env_data;
+    }
 
     public function download_common_pkg($homeuser, $domainname, $additionalpkg)
     {
