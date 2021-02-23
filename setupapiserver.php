@@ -21,13 +21,6 @@ register_shutdown_function(function () {
     }
 });
 
-require 'vendor/autoload.php';
-
-use GuzzleHttp\Client;
-use splitbrain\PHPArchive\Tar;
-use Symfony\Component\Filesystem\Filesystem;
-
-
 $headers = (function_exists('apache_request_headers') || is_callable('apache_request_headers'))  ? apache_request_headers() : rv_apache_request_headers();
 $headers = array_change_key_case($headers, CASE_UPPER);
 $responsetype = $headers['ACCEPT'] ?? 'application/json';
@@ -184,18 +177,6 @@ if ($action == 'check_dev_mode') {
 }
 if ($action == 'check_server_license') {
     $setupObj->check_server_license();
-}
-
-function getFrameworkVendorPath($filePath = ''): string
-{
-    $vendorDir = realpath(dirname($filePath) . '/../../../../../') . '/vendor';
-    return $vendorDir;
-}
-
-function getPackageBaseDir($filePath = ''): string
-{
-    $baseDir = realpath(dirname($filePath) . '/../../');
-    return $baseDir;
 }
 
 function rv_apache_request_headers(): array
