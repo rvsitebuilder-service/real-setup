@@ -181,10 +181,10 @@ class RVsitebuilder_Setup_API
 
         //php version
         $this->response['check_pre_require']['phpversion']['check'] = true;
-        if (version_compare(PHP_VERSION, '7.1.18', '<') == TRUE || version_compare(PHP_VERSION, '7.3.19', '>') == TRUE) {
+        if (version_compare(PHP_VERSION, '7.1.18', '<') == TRUE || version_compare(PHP_VERSION, '7.4.0', '>=') == TRUE) {
             $this->response['check_pre_require']['phpversion']['check'] = false;
-            $this->response['check_pre_require']['phpversion']['reason'] = 'System required PHP Version Between 7.1.18 to 7.3.19';
-            $this->response['message'] = 'System required PHP Version Between 7.1.18 to 7.3.19';
+            $this->response['check_pre_require']['phpversion']['reason'] = 'System required PHP Version Between 7.1.18 to 7.3.xx';
+            $this->response['message'] = 'System required PHP Version Between 7.1.18 to 7.3.xx';
             $this->response['status'] = false;
             $this->print_debug_log("PHP version false " . PHP_VERSION);
         }
@@ -544,10 +544,10 @@ class RVsitebuilder_Setup_API
         }
         $this->print_debug_log("Copy $source To $destination");
 
-        //delete appsconfig.json
-        if ($files->exists($homeuser . '/rvsitebuildercms/' . $domainname . '/storage/appsconfig.json')) {
-            $files->remove($homeuser . '/rvsitebuildercms/' . $domainname . '/storage/appsconfig.json');
-            $this->print_debug_log("Removed " . $homeuser . '/rvsitebuildercms/' . $domainname . '/storage/appsconfig.json');
+        //delete cacheAppSetting.json
+        if ($files->exists($homeuser . '/rvsitebuildercms/' . $domainname . '/storage/cacheAppSetting.json')) {
+            $files->remove($homeuser . '/rvsitebuildercms/' . $domainname . '/storage/cacheAppSetting.json');
+            $this->print_debug_log("Removed " . $homeuser . '/rvsitebuildercms/' . $domainname . '/storage/cacheAppSetting.json');
         }
 
         //delete framwork package
@@ -618,11 +618,11 @@ class RVsitebuilder_Setup_API
             return $res;
         }
 
-        //delete appsconfig.json
+        //delete cacheAppSetting.json
         $files = new Filesystem();
-        if (file_exists(dirname(__FILE__) . '/tmp/storage/appsconfig.json')) {
-            $files->remove(dirname(__FILE__) . '/tmp/storage/appsconfig.json');
-            $this->print_debug_log("Removed " . dirname(__FILE__) . '/tmp/storage/appsconfig.json');
+        if (file_exists(dirname(__FILE__) . '/tmp/storage/cacheAppSetting.json')) {
+            $files->remove(dirname(__FILE__) . '/tmp/storage/cacheAppSetting.json');
+            $this->print_debug_log("Removed " . dirname(__FILE__) . '/tmp/storage/cacheAppSetting.json');
         }
 
         //delete framwork package
