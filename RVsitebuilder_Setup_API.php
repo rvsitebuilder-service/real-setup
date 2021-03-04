@@ -950,6 +950,9 @@ class RVsitebuilder_Setup_API
         if (extension_loaded('mysqli')) {
             $mysqli = new mysqli($dbhost, $dbuser, $dbpassword);
             $dbinfo = $mysqli->server_info;
+            if (empty($dbinfo)) {
+                return $env_key_set;
+            }
             $version = preg_split('[-]', $dbinfo);
             //Mysql
             if ($version[1] == null && $version[0] >= '5.3.3') {
