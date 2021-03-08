@@ -907,7 +907,7 @@ class RVsitebuilder_Setup_API
         $appurl = (!preg_match('/:\d+/', $domainname) && $domainport != '') ?  'https://' . $domainname . ':' . $domainport : 'https://' . $domainname;
 
         $env_data = [];
-        // $env_data = $this->check_db_version($dbhost, $dbuser, $dbpassword);
+        $env_data = $this->check_db_version($dbhost, $dbuser, $dbpassword);
         $env_data['APP_URL'] = $appurl;
         $env_data['DB_HOST'] = $dbhost;
         $env_data['DB_PORT'] = $dbport;
