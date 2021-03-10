@@ -3,7 +3,7 @@
 register_shutdown_function(function () {
     //if header is sent , because worker function is responsed install task status
 
-    $this->print_install_log('setupapiserver > register_shutdown_function ');
+    print_install_log('setupapiserver > register_shutdown_function ');
 
     //ref https://www.php.net/manual/en/errorfunc.constants.php
     //error type 2 is warning
@@ -13,7 +13,7 @@ register_shutdown_function(function () {
         $message = ' This error has to be fixed by RVsitebuilder team. Please submit a ticket with Hosting Access and Domain name provided to us directly <a href="https://rvglobalsoft.com/tickets/new&deptId=5" target="_blank">Here.</a> ';
         if (isset($error['message'])) {
             $message = $message . ' (' . $error['message'] . ')';
-            $this->print_install_log($message);
+            print_install_log($message);
         }
     }
 });
