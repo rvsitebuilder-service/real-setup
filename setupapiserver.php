@@ -2,21 +2,18 @@
 
 register_shutdown_function(function () {
     //if header is sent , because worker function is responsed install task status
-    if (!headers_sent()) {
-        header('Content-type: application/json');
-        //ref https://www.php.net/manual/en/errorfunc.constants.php
-        //error type 2 is warning
-        $error = error_get_last();
-        if (null !== $error && $error['type'] != 2) {
-            $response = [];
-            $response['status'] = false;
-            $response['exectime'] = '';
-            $response['message'] = ' This error has to be fixed by RVsitebuilder team. Please submit a ticket with Hosting Access and Domain name provided to us directly <a href="https://rvglobalsoft.com/tickets/new&deptId=5" target="_blank">Here.</a> ';
-            if (isset($error['message'])) {
-                $response['message'] = $response['message'] . ' (' . $error['message'] . ')';
-            }
-            echo json_encode($response);
-            exit;
+
+    print_install_log('setupapiserver > register_shutdown_function ');
+
+    //ref https://www.php.net/manual/en/errorfunc.constants.php
+    //error type 2 is warning
+    $error = error_get_last();
+    if (null !== $error && $error['type'] != 2) {
+
+        $message = ' This error has to be fixed by RVsitebuilder team. Please submit a ticket with Hosting Access and Domain name provided to us directly <a href="https://rvglobalsoft.com/tickets/new&deptId=5" target="_blank">Here.</a> ';
+        if (isset($error['message'])) {
+            $message = $message . ' (' . $error['message'] . ')';
+            print_install_log($message);
         }
     }
 });
@@ -200,4 +197,24 @@ function rv_apache_request_headers(): array
         }
     }
     return ($arh);
+}
+
+function print_install_log($msg = '')
+{
+
+    if (file_exists(dirname(__FILE__) . '/install_log.txt')) {
+        file_put_contents(
+            dirname(__FILE__) . '/install_log.txt',
+            'INSTALL LOG >> ' . $msg . PHP_EOL,
+            FILE_APPEND | LOCK_EX
+        );
+    } elseif (file_exists(dirname(__FILE__) . '/../rvsitebuilder_install_log.txt')) {
+        file_put_contents(
+            dirname(__FILE__) . '/../rvsitebuilder_install_log.txt',
+            'INSTALL LOG >> ' . $msg . PHP_EOL,
+            FILE_APPEND | LOCK_EX
+        );
+    }
+
+    return true;
 }

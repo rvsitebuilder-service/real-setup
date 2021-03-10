@@ -946,35 +946,32 @@ class RVsitebuilder_Setup_API
 
     public function check_db_version($dbhost, $dbuser, $dbpassword)
     {
-        $env_data = [];
-        // TODO Check_db_connect
-        $mysqli = new mysqli($dbhost, $dbuser, $dbpassword);
-        if ($mysqli->connect_errno) {
-            echo "Failed to connect to MySQL: " . $mysqli->connect_error;
-            exit();
+        $env_key_set = [];
+        if (extension_loaded('mysqli')) {
+            $mysqli = new mysqli($dbhost, $dbuser, $dbpassword);
+            $dbinfo = $mysqli->server_info;
+            if (empty($dbinfo)) {
+                return $env_key_set;
+            }
+            $version = preg_split('[-]', $dbinfo);
+
+            //Mysql
+            if (
+                isset($version[1]) && $version[1] == null &&
+                isset($version[0]) && $version[0] >= '5.3.3'
+            ) {
+                $env_key_set['DB_CHARSET'] = "utf8mb4";
+                $env_key_set['DB_COLLATION'] = "utf8mb4_unicode_ci";
+            }
+            //MariaDB
+            if (isset($version[1]) && $version[1] != null && $version[1] >= "10.2") {
+                $env_key_set['DB_CHARSET'] = "utf8mb4";
+                $env_key_set['DB_COLLATION'] = "utf8mb4_unicode_ci";
+            }
+            return $env_key_set;
         }
-        $dbinfo = $mysqli->server_info;
-        // ถ้าเป็น MySQL return version number เช่่น 5.7.32, 5.6.0
-        // ถ้าเป็น MariaDB return "[x.x.x]-[version_number]-["MariaDB"]" เช่น 5.5.5-10.2.36-[3]MariaDB
 
-        /* TODO empty  :
-           TODO Linux  : "10.0.17-MariaDB-log"
-           TODO window : "5.5.5-10.0.17-MariaDB-log"
-        */
-
-        // split pattern
-        $version = preg_split('[-]', $dbinfo);
-
-
-        if ($version[1] == null && $version[0] >= '5.3.3') {
-            $env_data['DB_CHARSET'] = "utf8mb4";
-            $env_data['DB_COLLATION'] = "utf8mb4_unicode_ci";
-        }
-        if ($version[1] != null && $version[1] >= "10.2") {
-            $env_data['DB_CHARSET'] = "utf8mb4";
-            $env_data['DB_COLLATION'] = "utf8mb4_unicode_ci";
-        }
-        return $env_data;
+        return $env_key_set;
     }
 
     public function download_common_pkg($homeuser, $domainname, $additionalpkg)
