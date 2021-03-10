@@ -954,13 +954,17 @@ class RVsitebuilder_Setup_API
                 return $env_key_set;
             }
             $version = preg_split('[-]', $dbinfo);
+
             //Mysql
-            if ($version[1] == null && $version[0] >= '5.3.3') {
+            if (
+                isset($version[1]) && $version[1] == null &&
+                isset($version[0]) && $version[0] >= '5.3.3'
+            ) {
                 $env_key_set['DB_CHARSET'] = "utf8mb4";
                 $env_key_set['DB_COLLATION'] = "utf8mb4_unicode_ci";
             }
             //MariaDB
-            if ($version[1] != null && $version[1] >= "10.2") {
+            if (isset($version[1]) && $version[1] != null && $version[1] >= "10.2") {
                 $env_key_set['DB_CHARSET'] = "utf8mb4";
                 $env_key_set['DB_COLLATION'] = "utf8mb4_unicode_ci";
             }
