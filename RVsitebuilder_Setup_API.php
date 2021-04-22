@@ -2041,7 +2041,7 @@ class RVsitebuilder_Setup_API
             [
                 'headers'   => $headers,
                 'sink'      => $sink,
-                'timeout'   => 180
+                'timeout'   => 500
             ]
         );
 
