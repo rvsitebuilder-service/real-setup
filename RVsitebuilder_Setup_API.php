@@ -45,7 +45,7 @@ class RVsitebuilder_Setup_API
         //rvlicensecode
         $this->rvlicensecode = $rvlicensecode;
         //getversion url
-        $this->getversionurl = 'https://getversion.rvsitebuilder.com';
+        $this->getversionurl = $this->installerconfig['version'];
     }
 
     public function getInstallerConfig()
@@ -687,7 +687,7 @@ class RVsitebuilder_Setup_API
         //read rvsitebuilder.json
         $rvsbjson = json_decode(file_get_contents($homeuser . '/rvsitebuildercms/' . $domainname . '/rvsitebuilder.json'), true);
         // first download from key vendor-packages (bundle_vendor) if key exists
-        // link download = http://files.mirror1.rvsitebuilder.com/download/rvsitebuilder/framework%2Fbundle_vendor/version/0.0.8
+        // link download = https://files.mirror1.rvsitebuilder.com/download/rvsitebuilder/framework%2Fbundle_vendor/version/0.0.8
         // vendor-packages = rvsitebuilder\/framework\/bundle_vendor
         if (isset($rvsbjson['vendor-packages']) && key($rvsbjson['vendor-packages']) != '') {
             $this->print_debug_log("Download Vendor From bundle_vendor");
@@ -795,7 +795,7 @@ class RVsitebuilder_Setup_API
         $rvsbjson = json_decode(file_get_contents(dirname(__FILE__) . '/tmp/rvsitebuilder.json'), true);
 
         //first download from key vendor-packages (bundle_vendor) if key exists
-        // link download = http://files.mirror1.rvsitebuilder.com/download/rvsitebuilder/framework%2Fbundle_vendor/version/0.0.8
+        // link download = https://files.mirror1.rvsitebuilder.com/download/rvsitebuilder/framework%2Fbundle_vendor/version/0.0.8
         // vendor-packages = rvsitebuilder\/framework\/bundle_vendor
         if (isset($rvsbjson['vendor-packages']) && key($rvsbjson['vendor-packages']) != '') {
             $this->print_debug_log("Download Vendor From bundle_vendor");
