@@ -484,16 +484,19 @@ class RVsitebuilder_Setup_API
             $downloadurl = $this->mirrorurl . '/download/rvsitebuilder/framework/tier/latest';
             $sha512verify['version_type'] = 'latest';
             $sha512verify['getversionurl'] = '/getversions/tier/latest';
+        } elseif (isset($this->installerconfig['framework']['getversion']) && $this->installerconfig['framework']['getversion'] == 'alpha') {
+            $downloadurl = $this->mirrorurl . '/download/rvsitebuilder/framework/tier/alpha';
+            $sha512verify['version_type'] = 'alpha';
+            $sha512verify['getversionurl'] = '/getversions/tier/alpha';
+        } elseif (isset($this->installerconfig['framework']['getversion']) && $this->installerconfig['framework']['getversion'] == 'beta') {
+            $downloadurl = $this->mirrorurl . '/download/rvsitebuilder/framework/tier/beta';
+            $sha512verify['version_type'] = 'beta';
+            $sha512verify['getversionurl'] = '/getversions/tier/beta';
         } elseif (isset($this->installerconfig['framework']['getversion']) && preg_match('/[0-9]+\.[0-9]+\.[0-9]+/', $this->installerconfig['framework']['getversion'])) {
             $downloadurl = $this->mirrorurl . '/download/rvsitebuilder/framework/version/' . $this->installerconfig['framework']['getversion'];
             $sha512verify['version_type'] = 'version';
             $sha512verify['version'] = $this->installerconfig['framework']['getversion'];
             $sha512verify['getversionurl'] = '/getversion/rvsitebuilder/framework' . '/version/' . $this->installerconfig['framework']['getversion'];
-        } elseif (isset($this->installerconfig['framework']['getversion']) && $this->installerconfig['framework']['getversion'] == 'edge') {
-            $downloadurl = $this->mirrorurl . '/download/rvsitebuilderedge/framework/tier/edge';
-            $sha512verify['version_type'] = 'edge';
-            $sha512verify['getversionurl'] = '/getversions/tier/edge';
-            $sha512verify['name'] = 'rvsitebuilderedge/framework';
         }
 
         $this->print_debug_log("Download Framework URL " . $downloadurl);
@@ -588,16 +591,19 @@ class RVsitebuilder_Setup_API
             $downloadurl = $this->mirrorurl . '/download/rvsitebuilder/framework/tier/latest';
             $sha512verify['version_type'] = 'latest';
             $sha512verify['getversionurl'] = '/getversions/tier/latest';
+        } elseif (isset($this->installerconfig['framework']['getversion']) && $this->installerconfig['framework']['getversion'] == 'alpha') {
+            $downloadurl = $this->mirrorurl . '/download/rvsitebuilder/framework/tier/alpha';
+            $sha512verify['version_type'] = 'alpha';
+            $sha512verify['getversionurl'] = '/getversions/tier/alpha';
+        } elseif (isset($this->installerconfig['framework']['getversion']) && $this->installerconfig['framework']['getversion'] == 'beta') {
+            $downloadurl = $this->mirrorurl . '/download/rvsitebuilder/framework/tier/beta';
+            $sha512verify['version_type'] = 'beta';
+            $sha512verify['getversionurl'] = '/getversions/tier/beta';
         } elseif (isset($this->installerconfig['framework']['getversion']) && preg_match('/[0-9]+\.[0-9]+\.[0-9]+/', $this->installerconfig['framework']['getversion'])) {
             $downloadurl = $this->mirrorurl . '/download/rvsitebuilder/framework/version/' . $this->installerconfig['framework']['getversion'];
             $sha512verify['version_type'] = 'version';
             $sha512verify['version'] = $this->installerconfig['framework']['getversion'];
             $sha512verify['getversionurl'] = '/getversion/rvsitebuilder/framework' . '/version/' . $this->installerconfig['framework']['getversion'];
-        } elseif (isset($this->installerconfig['framework']['getversion']) && $this->installerconfig['framework']['getversion'] == 'edge') {
-            $downloadurl = $this->mirrorurl . '/download/rvsitebuilderedge/framework/tier/edge';
-            $sha512verify['version_type'] = 'edge';
-            $sha512verify['getversionurl'] = '/getversions/tier/edge';
-            $sha512verify['name'] = 'rvsitebuilderedge/framework';
         }
 
         $this->print_debug_log("Download Framework URL " . $downloadurl);
@@ -987,7 +993,6 @@ class RVsitebuilder_Setup_API
             'queuesharedhost',
             'scheduler',
             'wysiwyg',
-            //'marketing'
         ];
 
         if ($additionalpkg != '') {
@@ -1033,16 +1038,19 @@ class RVsitebuilder_Setup_API
                 $downloadurl = $this->mirrorurl . '/download/rvsitebuilder/' . $pkg . '/tier/latest';
                 $sha512verify['version_type'] = 'latest';
                 $sha512verify['getversionurl'] = '/getversions/tier/latest';
+            } elseif (isset($this->installerconfig[$pkg]['getversion']) && $this->installerconfig[$pkg]['getversion'] == 'alpha') {
+                $downloadurl = $this->mirrorurl . '/download/rvsitebuilder/' . $pkg . '/tier/alpha';
+                $sha512verify['version_type'] = 'alpha';
+                $sha512verify['getversionurl'] = '/getversions/tier/alpha';
+            } elseif (isset($this->installerconfig[$pkg]['getversion']) && $this->installerconfig[$pkg]['getversion'] == 'beta') {
+                $downloadurl = $this->mirrorurl . '/download/rvsitebuilder/' . $pkg . '/tier/beta';
+                $sha512verify['version_type'] = 'beta';
+                $sha512verify['getversionurl'] = '/getversions/tier/beta';
             } elseif (isset($this->installerconfig[$pkg]['getversion']) && preg_match('/[0-9]+\.[0-9]+\.[0-9]+/', $this->installerconfig[$pkg]['getversion'])) {
                 $downloadurl = $this->mirrorurl . '/download/rvsitebuilder/' . $pkg . '/version/' . $this->installerconfig[$pkg]['getversion'];
                 $sha512verify['version_type'] = 'version';
                 $sha512verify['version'] = $this->installerconfig[$pkg]['getversion'];
                 $sha512verify['getversionurl'] = 'getversion/rvsitebuilder/' . $pkg . '/version/' . $this->installerconfig[$pkg]['getversion'];
-            } elseif (isset($this->installerconfig[$pkg]['getversion']) && $this->installerconfig[$pkg]['getversion'] == 'edge') {
-                $downloadurl = $this->mirrorurl . '/download/rvsitebuilderedge/' . $pkg . '/tier/edge';
-                $sha512verify['version_type'] = 'edge';
-                $sha512verify['getversionurl'] = '/getversions/tier/edge';
-                $sha512verify['name'] = 'rvsitebuilderedge/' . $pkg;
             }
 
             $this->print_debug_log("Download Common Package URL " . $downloadurl);
@@ -1151,16 +1159,19 @@ class RVsitebuilder_Setup_API
                 $downloadurl = $this->mirrorurl . '/download/rvsitebuilder/' . $pkg . '/tier/latest';
                 $sha512verify['version_type'] = 'latest';
                 $sha512verify['getversionurl'] = '/getversions/tier/latest';
+            } elseif (isset($this->installerconfig[$pkg]['getversion']) && $this->installerconfig[$pkg]['getversion'] == 'alpha') {
+                $downloadurl = $this->mirrorurl . '/download/rvsitebuilder/' . $pkg . '/tier/alpha';
+                $sha512verify['version_type'] = 'alpha';
+                $sha512verify['getversionurl'] = '/getversions/tier/alpha';
+            } elseif (isset($this->installerconfig[$pkg]['getversion']) && $this->installerconfig[$pkg]['getversion'] == 'beta') {
+                $downloadurl = $this->mirrorurl . '/download/rvsitebuilder/' . $pkg . '/tier/beta';
+                $sha512verify['version_type'] = 'beta';
+                $sha512verify['getversionurl'] = '/getversions/tier/beta';
             } elseif (isset($this->installerconfig[$pkg]['getversion']) && preg_match('/[0-9]+\.[0-9]+\.[0-9]+/', $this->installerconfig[$pkg]['getversion'])) {
                 $downloadurl = $this->mirrorurl . '/download/rvsitebuilder/' . $pkg . '/version/' . $this->installerconfig[$pkg]['getversion'];
                 $sha512verify['version_type'] = 'version';
                 $sha512verify['version'] = $this->installerconfig[$pkg]['getversion'];
                 $sha512verify['getversionurl'] = '/getversion/rvsitebuilder/' . $pkg . '/version/' . $this->installerconfig[$pkg]['getversion'];
-            } elseif (isset($this->installerconfig[$pkg]['getversion']) && $this->installerconfig[$pkg]['getversion'] == 'edge') {
-                $downloadurl = $this->mirrorurl . '/download/rvsitebuilderedge/' . $pkg . '/tier/edge';
-                $sha512verify['version_type'] = 'edge';
-                $sha512verify['getversionurl'] = '/getversions/tier/edge';
-                $sha512verify['name'] = 'rvsitebuilderedge/' . $pkg;
             }
 
             $this->print_debug_log("Download Common Package URL " . $downloadurl);
@@ -2079,14 +2090,14 @@ class RVsitebuilder_Setup_API
                 } else {
                     $versionsha512 = $verify_arr[urldecode($sha512verify['name'])]['versions'][$sha512verify['version']]['sha512'];
                 }
-                // stable|latest|edge
+                // stable|latest|beta|alpha
             } else {
                 $versions_path = dirname(__FILE__) . '/' . $sha512verify['version_type'] . 'versions.json';
                 if (file_exists($versions_path)) {
                     $getversions = file_get_contents($versions_path);
                     $verify_arr = json_decode($getversions, true);
                 } else {
-                    $getversions = $client->request('GET', $this->getversionurl . $sha512verify['getversionurl']); //***** stable | latest | edge version *****
+                    $getversions = $client->request('GET', $this->getversionurl . $sha512verify['getversionurl']); //***** stable | latest | alpha | beta version *****
                     file_put_contents($versions_path, $getversions->getBody());
                     $verify_arr = json_decode($getversions->getBody(), true);
                 }
