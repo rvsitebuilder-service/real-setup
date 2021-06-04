@@ -183,8 +183,8 @@ class RVsitebuilder_Setup_API
         $this->response['check_pre_require']['phpversion']['check'] = true;
         if (version_compare(PHP_VERSION, '7.1.18', '<') == TRUE || version_compare(PHP_VERSION, '7.4.0', '>=') == TRUE) {
             $this->response['check_pre_require']['phpversion']['check'] = false;
-            $this->response['check_pre_require']['phpversion']['reason'] = 'System required PHP Version Between 7.1.18 to 7.3.xx';
-            $this->response['message'] = 'System required PHP Version Between 7.1.18 to 7.3.xx';
+            $this->response['check_pre_require']['phpversion']['reason'] = 'System required PHP Version Between 7.1.18 to 7.3';
+            $this->response['message'] = 'System required PHP Version Between 7.1.18 to 7.3';
             $this->response['status'] = false;
             $this->print_debug_log("PHP version false " . PHP_VERSION);
         }
