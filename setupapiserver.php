@@ -94,7 +94,7 @@ if (file_exists($configfile) && $installtype == 'provision') {
         $adminpassword = $provisionconfig['provisioning']['admin_password'];
     }
     if (isset($provisionconfig['provisioning']['admin_name']) && $provisionconfig['provisioning']['admin_name'] != '') {
-        $adminpassword = $provisionconfig['provisioning']['admin_name'];
+        $adminname = $provisionconfig['provisioning']['admin_name'];
     }
     if (isset($provisionconfig['provisioning']['admin_firstname'])   && $provisionconfig['provisioning']['admin_firstname'] != '') {
         $adminfirstname = $provisionconfig['provisioning']['admin_firstname'];

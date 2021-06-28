@@ -179,15 +179,7 @@ class RVsitebuilder_Setup_API
 
         $this->response['status'] = true;
 
-        //php version
-        // $this->response['check_pre_require']['phpversion']['check'] = true;
-        // if (version_compare(PHP_VERSION, '7.3', '<') == TRUE) {
-        // $this->response['check_pre_require']['phpversion']['check'] = false;
-        // $this->response['check_pre_require']['phpversion']['reason'] = 'System required PHP Version 7.3+';
-        // $this->response['message'] = 'System required PHP Version 7.3+';
-        // $this->response['status'] = false;
-        // $this->print_debug_log("PHP version false " . PHP_VERSION);
-        // }
+        // php version
         $current_version = substr(PHP_VERSION, 0, 2);
         $installer = $this->getInstallerConfig();
         $getversion_url = $installer['version'] . "getrequire/rvsitebuilder/framework/version/" . $installer['framework']['version'];
@@ -201,8 +193,8 @@ class RVsitebuilder_Setup_API
                 $this->response['check_pre_require']['phpversion']['check'] = true;
             } else {
                 $this->response['check_pre_require']['phpversion']['check'] = false;
-                $this->response['check_pre_require']['phpversion']['reason'] = 'System required PHP Version' . $matches[0][0] . ' - ' . $matches[0][count($matches) - 1];
-                $this->response['message'] = 'System required PHP Version 7.3+';
+                $this->response['check_pre_require']['phpversion']['reason'] = 'System required PHP Version ' . $matches[0][0] . ' - ' . $matches[0][count($matches) - 1];
+                $this->response['message'] = 'System required PHP Version ' . $matches[0][0] . ' - ' . $matches[0][count($matches) - 1];
                 $this->response['status'] = false;
                 $this->print_debug_log("PHP version false " . PHP_VERSION);
             }
