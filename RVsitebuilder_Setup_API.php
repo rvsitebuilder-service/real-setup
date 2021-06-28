@@ -182,14 +182,19 @@ class RVsitebuilder_Setup_API
         // php version
         $current_version = substr(PHP_VERSION, 0, 2);
         $installer = $this->getInstallerConfig();
-        $getversion_url = $installer['version'] . "getrequire/rvsitebuilder/framework/version/" . $installer['framework']['version'];
+        $framework = $installer['framework']['version'];
+        if ($framework == 'beta' || $framework == 'stable') {
+            $getversion_url = $installer['version'] . "getrequire/rvsitebuilder/framework/tier/" . $framework;
+        } else {
+            $getversion_url = $installer['version'] . "getrequire/rvsitebuilder/framework/version/" . $framework;
+        }
+
         $getversion = file_get_contents($getversion_url);
         $getversion = json_decode($getversion, true);
         $php_require = $getversion['data']['require']['require']['php'];
         preg_match_all('/\d+\.\d+/', $php_require, $matches);
         if (!empty($matches[0])) {
             if (in_array($current_version, $matches[0], TRUE)) {
-                // In array
                 $this->response['check_pre_require']['phpversion']['check'] = true;
             } else {
                 $this->response['check_pre_require']['phpversion']['check'] = false;
