@@ -180,14 +180,34 @@ class RVsitebuilder_Setup_API
         $this->response['status'] = true;
 
         //php version
-        $this->response['check_pre_require']['phpversion']['check'] = true;
-        if (version_compare(PHP_VERSION, '7.3', '<') == TRUE) {
-            $this->response['check_pre_require']['phpversion']['check'] = false;
-            $this->response['check_pre_require']['phpversion']['reason'] = 'System required PHP Version 7.3+';
-            $this->response['message'] = 'System required PHP Version 7.3+';
-            $this->response['status'] = false;
-            $this->print_debug_log("PHP version false " . PHP_VERSION);
+        // $this->response['check_pre_require']['phpversion']['check'] = true;
+        // if (version_compare(PHP_VERSION, '7.3', '<') == TRUE) {
+        // $this->response['check_pre_require']['phpversion']['check'] = false;
+        // $this->response['check_pre_require']['phpversion']['reason'] = 'System required PHP Version 7.3+';
+        // $this->response['message'] = 'System required PHP Version 7.3+';
+        // $this->response['status'] = false;
+        // $this->print_debug_log("PHP version false " . PHP_VERSION);
+        // }
+        $current_version = substr(PHP_VERSION, 0, 2);
+        $installer = $this->getInstallerConfig();
+        $getversion_url = $installer['version'] . "getrequire/rvsitebuilder/framework/version/" . $installer['framework']['version'];
+        $getversion = file_get_contents($getversion_url);
+        $getversion = json_decode($getversion, true);
+        $php_require = $getversion['data']['require']['require']['php'];
+        preg_match_all('/\d+\.\d+/', $php_require, $matches);
+        if (!empty($matches[0])) {
+            if (in_array($current_version, $matches[0], TRUE)) {
+                // In array
+                $this->response['check_pre_require']['phpversion']['check'] = true;
+            } else {
+                $this->response['check_pre_require']['phpversion']['check'] = false;
+                $this->response['check_pre_require']['phpversion']['reason'] = 'System required PHP Version' . $matches[0][0] . ' - ' . $matches[0][count($matches) - 1];
+                $this->response['message'] = 'System required PHP Version 7.3+';
+                $this->response['status'] = false;
+                $this->print_debug_log("PHP version false " . PHP_VERSION);
+            }
         }
+
         //php ini
         $this->response['check_pre_require']['phpini']['check'] = true;
         $this->response['check_pre_require']['phpini']['reason'] = '';
@@ -1256,7 +1276,7 @@ class RVsitebuilder_Setup_API
     }
 
 
-    public function artisan_call($homeuser, $domainname, $publicpath, $adminemail, $adminpassword, $adminfirstname, $adminlastname, $isrepair)
+    public function artisan_call($homeuser, $domainname, $publicpath, $adminemail, $adminpassword, $adminname, $adminfirstname, $adminlastname, $isrepair)
     {
         $time_start = microtime(true);
         $this->print_debug_log('======' . __METHOD__ . '======');
@@ -1357,6 +1377,14 @@ class RVsitebuilder_Setup_API
             $this->print_debug_log("Update user info to DB adminpassword=$adminpassword");
             $unit_time_start = microtime(true);
             $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1, 'update_key' => 'password', 'update_val' => $adminpassword]);
+            $this->print_debug_log($kernel->output());
+            $unit_exec_time = (microtime(true) - $unit_time_start);
+            $this->print_install_log('artisan rvsitebuilder:updateuserinfo-run timeusage ' . $unit_exec_time);
+        }
+        if ($adminname != '') {
+            $this->print_debug_log("Update user info to DB adminname=$adminname");
+            $unit_time_start = microtime(true);
+            $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1, 'update_key' => 'name', 'update_val' => $adminname]);
             $this->print_debug_log($kernel->output());
             $unit_exec_time = (microtime(true) - $unit_time_start);
             $this->print_install_log('artisan rvsitebuilder:updateuserinfo-run timeusage ' . $unit_exec_time);
