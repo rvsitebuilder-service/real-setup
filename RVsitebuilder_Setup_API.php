@@ -182,7 +182,7 @@ class RVsitebuilder_Setup_API
         // php version
         $current_version = substr(PHP_VERSION, 0, 2);
         $installer = $this->getInstallerConfig();
-        $framework = $installer['framework']['version'];
+        $framework = $installer['framework']['getversion'];
         if ($framework == 'beta' || $framework == 'stable') {
             $getversion_url = $installer['version'] . "getrequire/rvsitebuilder/framework/tier/" . $framework;
         } else {
