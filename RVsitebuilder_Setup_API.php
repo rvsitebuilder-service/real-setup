@@ -198,8 +198,8 @@ class RVsitebuilder_Setup_API
                 $this->response['check_pre_require']['phpversion']['check'] = true;
             } else {
                 $this->response['check_pre_require']['phpversion']['check'] = false;
-                $this->response['check_pre_require']['phpversion']['reason'] = 'System required PHP Version ' . $matches[0][0] . ' - ' . $matches[0][count($matches) - 1];
-                $this->response['message'] = 'System required PHP Version ' . $matches[0][0] . ' - ' . $matches[0][count($matches) - 1];
+                $this->response['check_pre_require']['phpversion']['reason'] = 'System required PHP Version ' . current($matches[0]) . ' - ' . end($matches[0]);
+                $this->response['message'] = 'System required PHP Version ' . current($matches[0]) . ' - ' . end($matches[0]);
                 $this->response['status'] = false;
                 $this->print_debug_log("PHP version false " . PHP_VERSION);
             }
