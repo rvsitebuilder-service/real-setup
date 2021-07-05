@@ -1273,7 +1273,7 @@ class RVsitebuilder_Setup_API
     }
 
 
-    public function artisan_call($homeuser, $domainname, $publicpath, $adminemail, $adminpassword, $adminfirstname, $adminlastname, $isrepair)
+    public function artisan_call($homeuser, $domainname, $publicpath, $adminemail, $adminpassword, $adminname, $adminfirstname, $adminlastname, $isrepair)
     {
         $time_start = microtime(true);
         $this->print_debug_log('======' . __METHOD__ . '======');
@@ -1374,6 +1374,14 @@ class RVsitebuilder_Setup_API
             $this->print_debug_log("Update user info to DB adminpassword=$adminpassword");
             $unit_time_start = microtime(true);
             $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1, 'update_key' => 'password', 'update_val' => $adminpassword]);
+            $this->print_debug_log($kernel->output());
+            $unit_exec_time = (microtime(true) - $unit_time_start);
+            $this->print_install_log('artisan rvsitebuilder:updateuserinfo-run timeusage ' . $unit_exec_time);
+        }
+        if ($adminname != '') {
+            $this->print_debug_log("Update user info to DB adminname=$adminname");
+            $unit_time_start = microtime(true);
+            $kernel->call('rvsitebuilder:updateuserinfo-run', ['user_id' => 1, 'update_key' => 'name', 'update_val' => $adminname]);
             $this->print_debug_log($kernel->output());
             $unit_exec_time = (microtime(true) - $unit_time_start);
             $this->print_install_log('artisan rvsitebuilder:updateuserinfo-run timeusage ' . $unit_exec_time);
@@ -1479,7 +1487,7 @@ class RVsitebuilder_Setup_API
         }
 
         //call artisan
-        $app = require_once($homeuser . '/rvsitebuildercms/' . $domainname . '/bootstrap/app.php');
+        $app = require_once  $homeuser . '/rvsitebuildercms/' . $domainname . '/bootstrap/app.php';
         $this->print_debug_log('require_one ' . $homeuser . '/rvsitebuildercms/' . $domainname . '/bootstrap/app.php');
         $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 
