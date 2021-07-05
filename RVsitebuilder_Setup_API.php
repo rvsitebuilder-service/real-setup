@@ -184,9 +184,9 @@ class RVsitebuilder_Setup_API
         $installer = $this->getInstallerConfig();
         $framework = $installer['framework']['getversion'];
         if ($framework == 'beta' || $framework == 'stable') {
-            $getversion_url = $installer['version'] . "getrequire/rvsitebuilder/framework/tier/" . $framework;
+            $getversion_url = $installer['version'] . "/getrequire/rvsitebuilder/framework/tier/" . $framework;
         } else {
-            $getversion_url = $installer['version'] . "getrequire/rvsitebuilder/framework/version/" . $framework;
+            $getversion_url = $installer['version'] . "/getrequire/rvsitebuilder/framework/version/" . $framework;
         }
 
         $getversion = file_get_contents($getversion_url);
