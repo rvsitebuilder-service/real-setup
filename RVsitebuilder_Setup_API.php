@@ -180,7 +180,7 @@ class RVsitebuilder_Setup_API
         $this->response['status'] = true;
 
         // php version
-        $current_version = substr(PHP_VERSION, 0, 2);
+        $current_version = substr(PHP_VERSION, 0, 3);
         $installer = $this->getInstallerConfig();
         $framework = $installer['framework']['getversion'];
         if ($framework == 'beta' || $framework == 'stable') {
