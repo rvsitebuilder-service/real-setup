@@ -42,7 +42,6 @@ $ftpserver      = $_GET['ftpserver'] ?? $_POST['ftpserver'] ?? '';
 $ftpport        = $_GET['ftpport'] ?? $_POST['ftpport'] ?? 21;
 $adminemail     = $_GET['adminemail'] ?? $_POST['adminemail'] ?? '';
 $adminpassword  = $_GET['adminpassword'] ?? $_POST['adminpassword'] ?? '';
-$adminname      = $_GET['adminname'] ?? $_POST['adminname'] ?? '';
 $adminfirstname = $_GET['adminfirstname'] ?? $_POST['adminfirstname'] ?? '';
 $adminlastname  = $_GET['adminlastname'] ?? $_POST['adminlastname'] ?? '';
 $domainport     = $_GET['domainport'] ?? $_POST['domainport'] ?? '';
@@ -139,7 +138,7 @@ if ($action == 'install_all_pkg' && $homeuser != '' && $domainname != '' && $pub
 }
 
 if ($action == 'artisan_call') {
-    $setupObj->artisan_call($homeuser, $domainname, $publicpath, $adminemail, $adminpassword, $adminname, $adminfirstname, $adminlastname, $isrepair);
+    $setupObj->artisan_call($homeuser, $domainname, $publicpath, $adminemail, $adminpassword, $adminfirstname, $adminlastname, $isrepair);
 }
 if ($action == 'artisan_cmd_run') {
     $setupObj->artisan_cmd_run($homeuser, $domainname, $artisancmd, $artisanparam);
