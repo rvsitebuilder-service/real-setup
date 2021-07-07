@@ -62,7 +62,7 @@ $dbcollation = $_GET['dbcollation'] ?? $_POST['dbcollation'] ?? '';
 
 require "RVsitebuilder_Setup_API.php";
 
-$setupObj = new RVsitebuilder_Setup_API($responsetype, $rvsb_installing_token, $call_responsetype, $ignore_token, $rvlicensecode);
+$setupObj = new RVsitebuilder_Setup_API($responsetype, $rvsb_installing_token, $responsetype, $ignore_token, $rvlicensecode);
 
 //provision
 $provisionconfig = [];
