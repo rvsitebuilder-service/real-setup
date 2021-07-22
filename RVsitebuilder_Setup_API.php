@@ -1686,8 +1686,8 @@ class RVsitebuilder_Setup_API
             ]);
             $headers = [
                 'RV-Product' => 'rvsitebuilder',
-                'RV-License-Code' => base64_encode(json_encode(['ips' => [$this->get_site_ip()]])),
-                'RV-Forword-REMOTE-ADDR' => $this->get_site_ip()
+                'RV-License-Code' => base64_encode(json_encode(['ips' => [$this->get_site_ip()]]))
+                //'RV-Forword-REMOTE-ADDR' => $this->get_site_ip()
             ];
             $this->print_debug_log("Validate server license Type=GET URL=https://license3.rvglobalsoft.com/v3/getlicense/rvsitebuilder");
             $res = $client->request('GET', 'https://license3.rvglobalsoft.com/v3/getlicense/rvsitebuilder', ['headers' => $headers]);
