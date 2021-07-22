@@ -42,6 +42,7 @@ $ftpserver      = $_GET['ftpserver'] ?? $_POST['ftpserver'] ?? '';
 $ftpport        = $_GET['ftpport'] ?? $_POST['ftpport'] ?? 21;
 $adminemail     = $_GET['adminemail'] ?? $_POST['adminemail'] ?? '';
 $adminpassword  = $_GET['adminpassword'] ?? $_POST['adminpassword'] ?? '';
+$adminname      = $_GET['adminname'] ?? $_POST['adminname'] ?? '';
 $adminfirstname = $_GET['adminfirstname'] ?? $_POST['adminfirstname'] ?? '';
 $adminlastname  = $_GET['adminlastname'] ?? $_POST['adminlastname'] ?? '';
 $domainport     = $_GET['domainport'] ?? $_POST['domainport'] ?? '';
@@ -86,11 +87,14 @@ if (file_exists($configfile) && $installtype == 'provision') {
     if (isset($provisionconfig['provisioning']['db_port']) && $provisionconfig['provisioning']['db_port'] != '') {
         $dbport = $provisionconfig['provisioning']['db_port'];
     }
-    if (isset($provisionconfig['provisioning']['admin_email'])       && $provisionconfig['provisioning']['admin_email'] != '') {
+    if (isset($provisionconfig['provisioning']['admin_email']) && $provisionconfig['provisioning']['admin_email'] != '') {
         $adminemail = $provisionconfig['provisioning']['admin_email'];
     }
-    if (isset($provisionconfig['provisioning']['admin_password'])    && $provisionconfig['provisioning']['admin_password'] != '') {
+    if (isset($provisionconfig['provisioning']['admin_password']) && $provisionconfig['provisioning']['admin_password'] != '') {
         $adminpassword = $provisionconfig['provisioning']['admin_password'];
+    }
+    if (isset($provisionconfig['provisioning']['admin_name']) && $provisionconfig['provisioning']['admin_name'] != '') {
+        $adminname = $provisionconfig['provisioning']['admin_name'];
     }
     if (isset($provisionconfig['provisioning']['admin_firstname'])   && $provisionconfig['provisioning']['admin_firstname'] != '') {
         $adminfirstname = $provisionconfig['provisioning']['admin_firstname'];
@@ -135,7 +139,7 @@ if ($action == 'install_all_pkg' && $homeuser != '' && $domainname != '' && $pub
 }
 
 if ($action == 'artisan_call') {
-    $setupObj->artisan_call($homeuser, $domainname, $publicpath, $adminemail, $adminpassword, $adminfirstname, $adminlastname, $isrepair);
+    $setupObj->artisan_call($homeuser, $domainname, $publicpath, $adminemail, $adminpassword, $adminname, $adminfirstname, $adminlastname, $isrepair);
 }
 if ($action == 'artisan_cmd_run') {
     $setupObj->artisan_cmd_run($homeuser, $domainname, $artisancmd, $artisanparam);
