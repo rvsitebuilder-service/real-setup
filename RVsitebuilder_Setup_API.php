@@ -180,29 +180,27 @@ class RVsitebuilder_Setup_API
         $this->response['status'] = true;
 
         // php version
-        $current_version = substr(PHP_VERSION, 0, 3);
         $installer = $this->getInstallerConfig();
         $framework = $installer['framework']['getversion'];
-        if ($framework == 'beta' || $framework == 'stable') {
+        if ($framework == 'beta' || $framework == 'alpha' || $framework == 'stable' || $framework == 'latest') {
             $getversion_url = $installer['version'] . "/getrequire/rvsitebuilder/framework/tier/" . $framework;
         } else {
             $getversion_url = $installer['version'] . "/getrequire/rvsitebuilder/framework/version/" . $framework;
         }
 
+        $current_version = substr(PHP_VERSION, 0, 3);
         $getversion = file_get_contents($getversion_url);
         $getversion = json_decode($getversion, true);
-        $php_require = $getversion['data']['require']['require']['php'];
+        $php_require = $getversion['data']['require']['require']['php'] ?? '7.3';
         preg_match_all('/\d+\.\d+/', $php_require, $matches);
-        if (!empty($matches[0])) {
-            if (in_array($current_version, $matches[0], TRUE)) {
-                $this->response['check_pre_require']['phpversion']['check'] = true;
-            } else {
-                $this->response['check_pre_require']['phpversion']['check'] = false;
-                $this->response['check_pre_require']['phpversion']['reason'] = 'System required PHP Version ' . current($matches[0]) . ' - ' . end($matches[0]);
-                $this->response['message'] = 'System required PHP Version ' . current($matches[0]) . ' - ' . end($matches[0]);
-                $this->response['status'] = false;
-                $this->print_debug_log("PHP version false " . PHP_VERSION);
-            }
+        if (in_array($current_version, $matches[0], TRUE)) {
+            $this->response['check_pre_require']['phpversion']['check'] = true;
+        } else {
+            $this->response['check_pre_require']['phpversion']['check'] = false;
+            $this->response['check_pre_require']['phpversion']['reason'] = 'System required PHP Version ' . current($matches[0]) . ' - ' . end($matches[0]);
+            $this->response['message'] = 'System required PHP Version ' . current($matches[0]) . ' - ' . end($matches[0]);
+            $this->response['status'] = false;
+            $this->print_debug_log("PHP version false " . PHP_VERSION);
         }
 
         //php ini
