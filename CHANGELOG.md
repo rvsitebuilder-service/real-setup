@@ -1,5 +1,12 @@
 RVsitebuilderCMS real-setup changelog
 
+## [2.1.0-beta.1](https://github.com/rvsitebuilder-service/real-setup/compare/v2.0.0...v2.1.0-beta.1) (2021-09-06)
+
+
+### :memo: Feature
+
+* support for CMS7.4 ([91c3832](https://github.com/rvsitebuilder-service/real-setup/commit/91c38327a7f716a8abf993fabcdd618e8be6ef2a))
+
 ## [2.0.0](https://github.com/rvsitebuilder-service/real-setup/compare/v1.0.0...v2.0.0) (2021-08-26)
 
 
