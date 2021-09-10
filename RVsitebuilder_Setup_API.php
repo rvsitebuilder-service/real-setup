@@ -189,10 +189,15 @@ class RVsitebuilder_Setup_API
         }
 
         $current_version = substr(PHP_VERSION, 0, 3);
-        $getversion = file_get_contents($getversion_url);
-        $getversion = json_decode($getversion, true);
+        $c = curl_init();
+        curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($c, CURLOPT_URL, $URL);
+        $contents = curl_exec($c);
+        curl_close($c);
+        $getversion = json_decode($contents,true);
         $php_require = $getversion['data']['require']['require']['php'] ?? '7.3';
         preg_match_all('/\d+\.\d+/', $php_require, $matches);
+
         if (in_array($current_version, $matches[0], TRUE)) {
             $this->response['check_pre_require']['phpversion']['check'] = true;
         } else {
