@@ -191,7 +191,7 @@ class RVsitebuilder_Setup_API
         $current_version = substr(PHP_VERSION, 0, 3);
         $c = curl_init();
         curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($c, CURLOPT_URL, $URL);
+        curl_setopt($c, CURLOPT_URL, $getversion_url);
         $contents = curl_exec($c);
         curl_close($c);
         $getversion = json_decode($contents,true);
