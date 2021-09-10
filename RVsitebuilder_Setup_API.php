@@ -1104,25 +1104,19 @@ class RVsitebuilder_Setup_API
             //     list($product_name, $app_name) = preg_split('/\//', $update_package_name, 2);
             //     $app_name = urldecode($app_name);
             //     $package_name_encoded = urlencode($app_name);
-
             //     if (is_dir(dirname(__FILE__) . '/tmp/' . $product_name . '/' . $app_name)) {
             //         $this->print_debug_log("Is DIR " . dirname(__FILE__) . '/tmp/' . $product_name . '/' . $app_name . " continue ");
             //         continue;
             //     }
-
             //     if ($update_package_version != '') {
             //         $update_package_version = '/version/' . $update_package_version;
             //     }
-
             //     $downloadvendorurl = $this->mirrorurl . '/download/' . $product_name . '/' . urlencode($app_name) . $update_package_version;
             //     $sha512vendorverify['name'] = urlencode($app_name);
             //     $sha512vendorverify['type'] = 'vendor';
             //     $sha512vendorverify['getversionurl'] = '/getversion/vendor/' . urlencode($app_name) . $update_package_version;
             //     $sha512vendorverify['version'] = $rvsbjson['packages'][$package_key]['version'];
-
-
             //     $this->print_debug_log("Download vendor URL " . $downloadvendorurl);
-
             //     $downloadvendor = $this->doDownload('GET', $downloadvendorurl, dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz', $sha512vendorverify);
             //     if ($downloadvendor['success'] == false) {
             //         if ($files->exists(dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz')) {
@@ -1141,7 +1135,6 @@ class RVsitebuilder_Setup_API
             //         $this->print_debug_log("Can not extract " . dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz ' . $extractvendor['message']);
             //         return $res;
             //     }
-
             //     $files->remove(dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz');
             //     $this->print_debug_log("Removed " . dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz');
             // }
@@ -1227,23 +1220,18 @@ class RVsitebuilder_Setup_API
             //     list($product_name, $app_name) = preg_split('/\//', $update_package_name, 2);
             //     $app_name = urldecode($app_name);
             //     $package_name_encoded = urlencode($app_name);
-
             //     if (is_dir($homeuser . '/rvsitebuildercms/' . $domainname . '/' . $product_name . '/' . $app_name)) {
             //         $this->print_debug_log("Is DIR " . $homeuser . '/rvsitebuildercms/' . $domainname . '/' . $product_name . '/' . $app_name . " continue ");
             //         continue;
             //     }
-
             //     if ($update_package_version != '') {
             //         $update_package_version = '/version/' . $update_package_version;
             //     }
-
             //     $downloadvendorurl = $this->mirrorurl . '/download/' . $product_name . '/' . urlencode($app_name) . $update_package_version;
             //     $sha512vendorverify['name'] = $rvsbjson['packages'][$package_key]['name'];
             //     $sha512vendorverify['type'] = 'vendor';
             //     $sha512vendorverify['getversionurl'] = '/getversion/' . $product_name . '/' . urlencode($app_name) . $update_package_version;
             //     $sha512vendorverify['version'] = $rvsbjson['packages'][$package_key]['version'];
-
-
             //     $this->print_debug_log("Download vendor URL " . $downloadvendorurl);
             //     $downloadvendor = $this->doDownload('GET', $downloadvendorurl, dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz', $sha512vendorverify);
             //     if ($downloadvendor['success'] == false) {
@@ -1263,7 +1251,6 @@ class RVsitebuilder_Setup_API
             //         $this->print_debug_log("Can not extract " . dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz ' . $extractvendor['message']);
             //         return $res;
             //     }
-
             //     $files->remove(dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz');
             //     $this->print_debug_log("Removed " . dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz');
             // }
