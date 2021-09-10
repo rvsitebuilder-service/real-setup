@@ -1,5 +1,12 @@
 RVsitebuilderCMS real-setup changelog
 
+### [2.1.3](https://github.com/rvsitebuilder-service/real-setup/compare/v2.1.2...v2.1.3) (2021-09-10)
+
+
+### :bug: Bug fixed
+
+* baseapp no longer has rvsitebuilder.json ([f2f9f3d](https://github.com/rvsitebuilder-service/real-setup/commit/f2f9f3d4312df93bcc2e9eb27d93290523abbe88))
+
 ### [2.1.2](https://github.com/rvsitebuilder-service/real-setup/compare/v2.1.1...v2.1.2) (2021-09-10)
 
 
