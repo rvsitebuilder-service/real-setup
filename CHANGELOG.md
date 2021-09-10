@@ -1,5 +1,12 @@
 RVsitebuilderCMS real-setup changelog
 
+### [2.1.2](https://github.com/rvsitebuilder-service/real-setup/compare/v2.1.1...v2.1.2) (2021-09-10)
+
+
+### :bug: Bug fixed
+
+* edit variable ([2d3df00](https://github.com/rvsitebuilder-service/real-setup/commit/2d3df00ca99f008dcd48778550fb47d9d7585a15))
+
 ### [2.1.1](https://github.com/rvsitebuilder-service/real-setup/compare/v2.1.0...v2.1.1) (2021-09-10)
 
 
