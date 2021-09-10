@@ -194,7 +194,7 @@ class RVsitebuilder_Setup_API
         curl_setopt($c, CURLOPT_URL, $getversion_url);
         $contents = curl_exec($c);
         curl_close($c);
-        $getversion = json_decode($contents,true);
+        $getversion = json_decode($contents, true);
         $php_require = $getversion['data']['require']['require']['php'] ?? '7.3';
         preg_match_all('/\d+\.\d+/', $php_require, $matches);
 
@@ -1096,54 +1096,55 @@ class RVsitebuilder_Setup_API
                 return $res;
             }
 
-            $rvsbjson = json_decode(file_get_contents(dirname(__FILE__) . '/tmp/packages/rvsitebuilder/' . $pkg . '/rvsitebuilder.json'), true);
-            foreach ($rvsbjson['packages'] as $package_key => $value) {
-                $update_package_name = $rvsbjson['packages'][$package_key]['name'];
-                $update_package_version = isset($rvsbjson['packages'][$package_key]['version']) ? $rvsbjson['packages'][$package_key]['version'] : '';
-                list($product_name, $app_name) = preg_split('/\//', $update_package_name, 2);
-                $app_name = urldecode($app_name);
-                $package_name_encoded = urlencode($app_name);
+            // baseapp no longer has rvsitebuilder.json
+            // $rvsbjson = json_decode(file_get_contents(dirname(__FILE__) . '/tmp/packages/rvsitebuilder/' . $pkg . '/rvsitebuilder.json'), true);
+            // foreach ($rvsbjson['packages'] as $package_key => $value) {
+            //     $update_package_name = $rvsbjson['packages'][$package_key]['name'];
+            //     $update_package_version = isset($rvsbjson['packages'][$package_key]['version']) ? $rvsbjson['packages'][$package_key]['version'] : '';
+            //     list($product_name, $app_name) = preg_split('/\//', $update_package_name, 2);
+            //     $app_name = urldecode($app_name);
+            //     $package_name_encoded = urlencode($app_name);
 
-                if (is_dir(dirname(__FILE__) . '/tmp/' . $product_name . '/' . $app_name)) {
-                    $this->print_debug_log("Is DIR " . dirname(__FILE__) . '/tmp/' . $product_name . '/' . $app_name . " continue ");
-                    continue;
-                }
+            //     if (is_dir(dirname(__FILE__) . '/tmp/' . $product_name . '/' . $app_name)) {
+            //         $this->print_debug_log("Is DIR " . dirname(__FILE__) . '/tmp/' . $product_name . '/' . $app_name . " continue ");
+            //         continue;
+            //     }
 
-                if ($update_package_version != '') {
-                    $update_package_version = '/version/' . $update_package_version;
-                }
+            //     if ($update_package_version != '') {
+            //         $update_package_version = '/version/' . $update_package_version;
+            //     }
 
-                $downloadvendorurl = $this->mirrorurl . '/download/' . $product_name . '/' . urlencode($app_name) . $update_package_version;
-                $sha512vendorverify['name'] = urlencode($app_name);
-                $sha512vendorverify['type'] = 'vendor';
-                $sha512vendorverify['getversionurl'] = '/getversion/vendor/' . urlencode($app_name) . $update_package_version;
-                $sha512vendorverify['version'] = $rvsbjson['packages'][$package_key]['version'];
+            //     $downloadvendorurl = $this->mirrorurl . '/download/' . $product_name . '/' . urlencode($app_name) . $update_package_version;
+            //     $sha512vendorverify['name'] = urlencode($app_name);
+            //     $sha512vendorverify['type'] = 'vendor';
+            //     $sha512vendorverify['getversionurl'] = '/getversion/vendor/' . urlencode($app_name) . $update_package_version;
+            //     $sha512vendorverify['version'] = $rvsbjson['packages'][$package_key]['version'];
 
 
-                $this->print_debug_log("Download vendor URL " . $downloadvendorurl);
+            //     $this->print_debug_log("Download vendor URL " . $downloadvendorurl);
 
-                $downloadvendor = $this->doDownload('GET', $downloadvendorurl, dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz', $sha512vendorverify);
-                if ($downloadvendor['success'] == false) {
-                    if ($files->exists(dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz')) {
-                        $files->remove(dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz');
-                    }
-                    $res['message'] = 'Can not download vendor ' . $downloadvendorurl . ' ' . $downloadvendor['message'];
-                    $this->print_debug_log("Can not download vendor URL " . $downloadvendorurl . ' ' . $downloadvendor['message']);
-                    return $res;
-                }
-                $extractvendor = $this->doExtract(dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz', dirname(__FILE__) . '/tmp/');
-                if ($extractvendor['success'] == false) {
-                    if ($files->exists(dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz')) {
-                        $files->remove(dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz');
-                    }
-                    $res['message'] = 'Can not extract vendor ' . $package_name_encoded . ' ' . $extractvendor['message'];
-                    $this->print_debug_log("Can not extract " . dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz ' . $extractvendor['message']);
-                    return $res;
-                }
+            //     $downloadvendor = $this->doDownload('GET', $downloadvendorurl, dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz', $sha512vendorverify);
+            //     if ($downloadvendor['success'] == false) {
+            //         if ($files->exists(dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz')) {
+            //             $files->remove(dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz');
+            //         }
+            //         $res['message'] = 'Can not download vendor ' . $downloadvendorurl . ' ' . $downloadvendor['message'];
+            //         $this->print_debug_log("Can not download vendor URL " . $downloadvendorurl . ' ' . $downloadvendor['message']);
+            //         return $res;
+            //     }
+            //     $extractvendor = $this->doExtract(dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz', dirname(__FILE__) . '/tmp/');
+            //     if ($extractvendor['success'] == false) {
+            //         if ($files->exists(dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz')) {
+            //             $files->remove(dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz');
+            //         }
+            //         $res['message'] = 'Can not extract vendor ' . $package_name_encoded . ' ' . $extractvendor['message'];
+            //         $this->print_debug_log("Can not extract " . dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz ' . $extractvendor['message']);
+            //         return $res;
+            //     }
 
-                $files->remove(dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz');
-                $this->print_debug_log("Removed " . dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz');
-            }
+            //     $files->remove(dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz');
+            //     $this->print_debug_log("Removed " . dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz');
+            // }
 
             $files->remove(dirname(__FILE__) . '/' . $pkg . '.tar.gz');
             $this->print_debug_log("Removed " . dirname(__FILE__) . '/' . $pkg . '.tar.gz');
@@ -1218,54 +1219,54 @@ class RVsitebuilder_Setup_API
                 return $res;
             }
 
-            $rvsbjson = json_decode(file_get_contents($homeuser . '/rvsitebuildercms/' . $domainname . '/packages/rvsitebuilder/' . $pkg . '/rvsitebuilder.json'), true);
+            // baseapp no longer has rvsitebuilder.json
+            // $rvsbjson = json_decode(file_get_contents($homeuser . '/rvsitebuildercms/' . $domainname . '/packages/rvsitebuilder/' . $pkg . '/rvsitebuilder.json'), true);
+            // foreach ($rvsbjson['packages'] as $package_key => $value) {
+            //     $update_package_name = $rvsbjson['packages'][$package_key]['name'];
+            //     $update_package_version = isset($rvsbjson['packages'][$package_key]['version']) ? $rvsbjson['packages'][$package_key]['version'] : '';
+            //     list($product_name, $app_name) = preg_split('/\//', $update_package_name, 2);
+            //     $app_name = urldecode($app_name);
+            //     $package_name_encoded = urlencode($app_name);
 
-            foreach ($rvsbjson['packages'] as $package_key => $value) {
-                $update_package_name = $rvsbjson['packages'][$package_key]['name'];
-                $update_package_version = isset($rvsbjson['packages'][$package_key]['version']) ? $rvsbjson['packages'][$package_key]['version'] : '';
-                list($product_name, $app_name) = preg_split('/\//', $update_package_name, 2);
-                $app_name = urldecode($app_name);
-                $package_name_encoded = urlencode($app_name);
+            //     if (is_dir($homeuser . '/rvsitebuildercms/' . $domainname . '/' . $product_name . '/' . $app_name)) {
+            //         $this->print_debug_log("Is DIR " . $homeuser . '/rvsitebuildercms/' . $domainname . '/' . $product_name . '/' . $app_name . " continue ");
+            //         continue;
+            //     }
 
-                if (is_dir($homeuser . '/rvsitebuildercms/' . $domainname . '/' . $product_name . '/' . $app_name)) {
-                    $this->print_debug_log("Is DIR " . $homeuser . '/rvsitebuildercms/' . $domainname . '/' . $product_name . '/' . $app_name . " continue ");
-                    continue;
-                }
+            //     if ($update_package_version != '') {
+            //         $update_package_version = '/version/' . $update_package_version;
+            //     }
 
-                if ($update_package_version != '') {
-                    $update_package_version = '/version/' . $update_package_version;
-                }
-
-                $downloadvendorurl = $this->mirrorurl . '/download/' . $product_name . '/' . urlencode($app_name) . $update_package_version;
-                $sha512vendorverify['name'] = $rvsbjson['packages'][$package_key]['name'];
-                $sha512vendorverify['type'] = 'vendor';
-                $sha512vendorverify['getversionurl'] = '/getversion/' . $product_name . '/' . urlencode($app_name) . $update_package_version;
-                $sha512vendorverify['version'] = $rvsbjson['packages'][$package_key]['version'];
+            //     $downloadvendorurl = $this->mirrorurl . '/download/' . $product_name . '/' . urlencode($app_name) . $update_package_version;
+            //     $sha512vendorverify['name'] = $rvsbjson['packages'][$package_key]['name'];
+            //     $sha512vendorverify['type'] = 'vendor';
+            //     $sha512vendorverify['getversionurl'] = '/getversion/' . $product_name . '/' . urlencode($app_name) . $update_package_version;
+            //     $sha512vendorverify['version'] = $rvsbjson['packages'][$package_key]['version'];
 
 
-                $this->print_debug_log("Download vendor URL " . $downloadvendorurl);
-                $downloadvendor = $this->doDownload('GET', $downloadvendorurl, dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz', $sha512vendorverify);
-                if ($downloadvendor['success'] == false) {
-                    if ($files->exists(dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz')) {
-                        $files->remove(dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz');
-                    }
-                    $res['message'] = 'Can not download vendor ' . $downloadvendorurl . ' ' . $downloadvendor['message'];
-                    $this->print_debug_log("Can not download vendor URL " . $downloadvendorurl . ' ' . $downloadvendor['message']);
-                    return $res;
-                }
-                $extractvendor = $this->doExtract(dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz', $homeuser . '/rvsitebuildercms/' . $domainname . '/');
-                if ($extractvendor['success'] == false) {
-                    if ($files->exists(dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz')) {
-                        $files->remove(dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz');
-                    }
-                    $res['message'] = 'Can not extract vendor ' . $package_name_encoded . ' ' . $extractvendor['message'];
-                    $this->print_debug_log("Can not extract " . dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz ' . $extractvendor['message']);
-                    return $res;
-                }
+            //     $this->print_debug_log("Download vendor URL " . $downloadvendorurl);
+            //     $downloadvendor = $this->doDownload('GET', $downloadvendorurl, dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz', $sha512vendorverify);
+            //     if ($downloadvendor['success'] == false) {
+            //         if ($files->exists(dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz')) {
+            //             $files->remove(dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz');
+            //         }
+            //         $res['message'] = 'Can not download vendor ' . $downloadvendorurl . ' ' . $downloadvendor['message'];
+            //         $this->print_debug_log("Can not download vendor URL " . $downloadvendorurl . ' ' . $downloadvendor['message']);
+            //         return $res;
+            //     }
+            //     $extractvendor = $this->doExtract(dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz', $homeuser . '/rvsitebuildercms/' . $domainname . '/');
+            //     if ($extractvendor['success'] == false) {
+            //         if ($files->exists(dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz')) {
+            //             $files->remove(dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz');
+            //         }
+            //         $res['message'] = 'Can not extract vendor ' . $package_name_encoded . ' ' . $extractvendor['message'];
+            //         $this->print_debug_log("Can not extract " . dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz ' . $extractvendor['message']);
+            //         return $res;
+            //     }
 
-                $files->remove(dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz');
-                $this->print_debug_log("Removed " . dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz');
-            }
+            //     $files->remove(dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz');
+            //     $this->print_debug_log("Removed " . dirname(__FILE__) . '/' . $package_name_encoded . '.tar.gz');
+            // }
 
             $files->remove(dirname(__FILE__) . '/' . $pkg . '.tar.gz');
             $this->print_debug_log("Removed " . dirname(__FILE__) . '/' . $pkg . '.tar.gz');
