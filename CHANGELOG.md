@@ -1,5 +1,12 @@
 RVsitebuilderCMS real-setup changelog
 
+### [2.1.1](https://github.com/rvsitebuilder-service/real-setup/compare/v2.1.0...v2.1.1) (2021-09-10)
+
+
+### :bug: Bug fixed
+
+* curl getversion ([a2e03e1](https://github.com/rvsitebuilder-service/real-setup/commit/a2e03e1843c7953282ce7f3581c1a3688a657f18))
+
 ## [2.1.0](https://github.com/rvsitebuilder-service/real-setup/compare/v2.0.0...v2.1.0) (2021-09-06)
 
 
