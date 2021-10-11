@@ -1,5 +1,12 @@
 RVsitebuilderCMS real-setup changelog
 
+### [2.1.4](https://github.com/rvsitebuilder-service/real-setup/compare/v2.1.3...v2.1.4) (2021-10-11)
+
+
+### :bug: Bug fixed
+
+* validate-extension ([e7b6796](https://github.com/rvsitebuilder-service/real-setup/commit/e7b6796337fa1dfbf02dd2d170e98ddf38f1bf02))
+
 ### [2.1.3](https://github.com/rvsitebuilder-service/real-setup/compare/v2.1.2...v2.1.3) (2021-09-10)
 
 
