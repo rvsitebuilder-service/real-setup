@@ -336,6 +336,14 @@ class RVsitebuilder_Setup_API
             $this->response['status'] = false;
             $this->print_debug_log("PHP xml false");
         }
+        $this->response['check_pre_require']['pdo_mysql']['check'] = true;
+        if (!extension_loaded('pdo_mysql')) {
+            $this->response['check_pre_require']['pdo_mysql']['check'] = false;
+            $this->response['check_pre_require']['pdo_mysql']['reason'] = 'Cannot load PHP Extension (pdo_mysql)';
+            $this->response['message'] = $this->response['message'].' / Can not load PHP Extension (pdo_mysql)';
+            $this->response['status'] = false;
+            $this->print_debug_log("PHP pdo_mysql false");
+        }
 
         // mysql version
         $this->response['check_pre_require']['mysql_version']['check'] = true;
