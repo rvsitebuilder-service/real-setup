@@ -1,5 +1,13 @@
 RVsitebuilderCMS real-setup changelog
 
+### [2.1.5](https://github.com/rvsitebuilder-service/real-setup/compare/v2.1.4...v2.1.5) (2021-10-14)
+
+
+### :bug: Bug fixed
+
+* require pdo_mysql ([d366b3f](https://github.com/rvsitebuilder-service/real-setup/commit/d366b3ffd1e4ceca6999780ddd9957e0003a40d5))
+* require pdo_mysql ([33dfcb4](https://github.com/rvsitebuilder-service/real-setup/commit/33dfcb450cbdc5ea01370f6d354a12401462e6f3))
+
 ### [2.1.4](https://github.com/rvsitebuilder-service/real-setup/compare/v2.1.3...v2.1.4) (2021-10-11)
 
 
