@@ -284,7 +284,7 @@ class RVsitebuilder_Setup_API
         if (!extension_loaded('fileinfo')) {
             $this->response['check_pre_require']['fileinfo']['check'] = false;
             $this->response['check_pre_require']['fileinfo']['reason'] = 'Cannot load PHP Extension (fileinfo)';
-            $this->response['message'] = $this->response['message'].' / Can not load PHP Extension (fileinfo)';
+            $this->response['message'] = $this->response['message'] . ' / Can not load PHP Extension (fileinfo)';
             $this->response['status'] = false;
             $this->print_debug_log("PHP fileinfo false");
         }
@@ -292,7 +292,7 @@ class RVsitebuilder_Setup_API
         if (!extension_loaded('exif')) {
             $this->response['check_pre_require']['exif']['check'] = false;
             $this->response['check_pre_require']['exif']['reason'] = 'Cannot load PHP Extension (exif)';
-            $this->response['message'] = $this->response['message'].' / Can not load PHP Extension (exif)';
+            $this->response['message'] = $this->response['message'] . ' / Can not load PHP Extension (exif)';
             $this->response['status'] = false;
             $this->print_debug_log("PHP exif false");
         }
@@ -300,7 +300,7 @@ class RVsitebuilder_Setup_API
         if (!extension_loaded('bcmath')) {
             $this->response['check_pre_require']['bcmath']['check'] = false;
             $this->response['check_pre_require']['bcmath']['reason'] = 'Cannot load PHP Extension (bcmath)';
-            $this->response['message'] = $this->response['message'].' / Can not load PHP Extension (bcmath)';
+            $this->response['message'] = $this->response['message'] . ' / Can not load PHP Extension (bcmath)';
             $this->response['status'] = false;
             $this->print_debug_log("PHP bcmath false");
         }
@@ -308,7 +308,7 @@ class RVsitebuilder_Setup_API
         if (!extension_loaded('ctype')) {
             $this->response['check_pre_require']['ctype']['check'] = false;
             $this->response['check_pre_require']['ctype']['reason'] = 'Cannot load PHP Extension (ctype)';
-            $this->response['message'] = $this->response['message'].' / Can not load PHP Extension (ctype)';
+            $this->response['message'] = $this->response['message'] . ' / Can not load PHP Extension (ctype)';
             $this->response['status'] = false;
             $this->print_debug_log("PHP ctype false");
         }
@@ -316,7 +316,7 @@ class RVsitebuilder_Setup_API
         if (!extension_loaded('openssl')) {
             $this->response['check_pre_require']['openssl']['check'] = false;
             $this->response['check_pre_require']['openssl']['reason'] = 'Cannot load PHP Extension (openssl)';
-            $this->response['message'] = $this->response['message'].' / Can not load PHP Extension (openssl)';
+            $this->response['message'] = $this->response['message'] . ' / Can not load PHP Extension (openssl)';
             $this->response['status'] = false;
             $this->print_debug_log("PHP openssl false");
         }
@@ -324,7 +324,7 @@ class RVsitebuilder_Setup_API
         if (!extension_loaded('tokenizer')) {
             $this->response['check_pre_require']['tokenizer']['check'] = false;
             $this->response['check_pre_require']['tokenizer']['reason'] = 'Cannot load PHP Extension (tokenizer)';
-            $this->response['message'] = $this->response['message'].' / Can not load PHP Extension (tokenizer)';
+            $this->response['message'] = $this->response['message'] . ' / Can not load PHP Extension (tokenizer)';
             $this->response['status'] = false;
             $this->print_debug_log("PHP tokenizer false");
         }
@@ -332,7 +332,7 @@ class RVsitebuilder_Setup_API
         if (!extension_loaded('xml')) {
             $this->response['check_pre_require']['xml']['check'] = false;
             $this->response['check_pre_require']['xml']['reason'] = 'Cannot load PHP Extension (xml)';
-            $this->response['message'] = $this->response['message'].' / Can not load PHP Extension (xml)';
+            $this->response['message'] = $this->response['message'] . ' / Can not load PHP Extension (xml)';
             $this->response['status'] = false;
             $this->print_debug_log("PHP xml false");
         }
@@ -340,7 +340,7 @@ class RVsitebuilder_Setup_API
         if (!extension_loaded('pdo_mysql')) {
             $this->response['check_pre_require']['pdo_mysql']['check'] = false;
             $this->response['check_pre_require']['pdo_mysql']['reason'] = 'Cannot load PHP Extension (pdo_mysql)';
-            $this->response['message'] = $this->response['message'].' / Can not load PHP Extension (pdo_mysql)';
+            $this->response['message'] = $this->response['message'] . ' / Can not load PHP Extension (pdo_mysql)';
             $this->response['status'] = false;
             $this->print_debug_log("PHP pdo_mysql false");
         }
@@ -348,10 +348,10 @@ class RVsitebuilder_Setup_API
         // mysql version
         $this->response['check_pre_require']['mysql_version']['check'] = true;
         $mysql_version = $this->get_mysql_version();
-        if($mysql_version == false){
+        if ($mysql_version == false) {
             $this->response['check_pre_require']['mysql_version']['check'] = false;
             $this->response['check_pre_require']['mysql_version']['reason'] = 'MySQL version 5.7 or above';
-            $this->response['message'] = $this->response['message'].' / MySQL version 5.7 or above';
+            $this->response['message'] = $this->response['message'] . ' / MySQL version 5.7 or above';
             $this->response['status'] = false;
             $this->print_debug_log("mysql_version false");
         }
@@ -483,38 +483,36 @@ class RVsitebuilder_Setup_API
         $publicpath = $userpathinfo['publicpath'];
 
         // read file
-        if(file_exists($publicpath."/.mysqlversion")){
-            $mysql_file = fopen($publicpath."/.mysqlversion", "r") or die("Unable to open file!");
+        if (file_exists($publicpath . "/.mysqlversion")) {
+            $mysql_file = fopen($publicpath . "/.mysqlversion", "r") or die("Unable to open file!");
             $version_number = fgets($mysql_file);
             fclose($mysql_file);
-            if(version_compare($version_number,"5.7.0") >= 0){
-                unlink($publicpath."/.mysqlversion");
+            if (version_compare($version_number, "5.7.0") >= 0) {
+                unlink($publicpath . "/.mysqlversion");
                 return true;
             }
             return false;
-        }
-        elseif(file_exists($publicpath."/.mariadbversion")){
-            $mysql_file = fopen($publicpath."/.mariadbversion", "r") or die("Unable to open file!");
+        } elseif (file_exists($publicpath . "/.mariadbversion")) {
+            $mysql_file = fopen($publicpath . "/.mariadbversion", "r") or die("Unable to open file!");
             $version_number = fgets($mysql_file);
             fclose($mysql_file);
-            if(version_compare($version_number,"10.2.0") >= 0){
-                unlink($publicpath."/.mariadbversion");
+            if (version_compare($version_number, "10.2.0") >= 0) {
+                unlink($publicpath . "/.mariadbversion");
                 return true;
             }
             return false;
-        }
-        else{
-        // shell execute
+        } else {
+            // shell execute
             $version = [];
-            if(function_exists('shell_exec')){
+            if (function_exists('shell_exec')) {
                 $output = shell_exec('mysql -V');
                 preg_match('@[0-9]+\.[0-9]+\.[0-9]+@', $output, $version);
-                if($version[0] != '' && version_compare($version[0],"5.7.0") >= 0){
+                if ($version[0] != '' && version_compare($version[0], "5.7.0") >= 0) {
                     return true;
                 }
                 return false;
             }
-                return true;
+            return true;
         }
     }
 
@@ -590,12 +588,17 @@ class RVsitebuilder_Setup_API
         //remove first if /home/<user>/rvsitebuildercms/$domainname/bootstrap/cache
         if (file_exists($homeuser . '/rvsitebuildercms/' . $domainname . '/bootstrap/cache')) {
             $files->remove($homeuser . '/rvsitebuildercms/' . $domainname . '/bootstrap/cache');
-            $this->print_debug_log("Removed old framwork path " . $homeuser . '/rvsitebuildercms/' . $domainname . '/bootstrap/cache');
+            $this->print_debug_log("Removed old framework path " . $homeuser . '/rvsitebuildercms/' . $domainname . '/bootstrap/cache');
         }
         //remove first if /home/<user>/rvsitebuildercms/$domainname/storage
         if (file_exists($homeuser . '/rvsitebuildercms/' . $domainname . '/storage')) {
             $files->remove($homeuser . '/rvsitebuildercms/' . $domainname . '/storage');
-            $this->print_debug_log("Removed old framwork path " . $homeuser . '/rvsitebuildercms/' . $domainname . '/storage');
+            $this->print_debug_log("Removed old framework path " . $homeuser . '/rvsitebuildercms/' . $domainname . '/storage');
+        }
+        //remove first if /home/<user>/rvsitebuildercms/$domainname/vendor/bin/
+        if (file_exists($homeuser . '/rvsitebuildercms/' . $domainname . '/vendor/bin')) {
+            $files->remove($homeuser . '/rvsitebuildercms/' . $domainname . '/vendor/bin');
+            $this->print_debug_log("Removed old framework path " . $homeuser . '/rvsitebuildercms/' . $domainname . '/vendor/bin');
         }
 
         //download framework url
@@ -1790,8 +1793,8 @@ class RVsitebuilder_Setup_API
             $rescontent = unserialize(base64_decode($res->getBody()));
             $this->response['status'] = (isset($rescontent['header']['is-error']) && $rescontent['header']['is-error'] == true) ? false : true;
             $this->response['message'] = (isset($rescontent['body']['issue_title'])) ? $rescontent['body']['issue_title'] : '';
-            if(preg_match('/not found ip/',$this->response['message'])){
-                $this->response['message'] = $this->response['message']." or your public ip address running behind NAT ip please add server public ip address https://support.rvglobalsoft.com/hc/en-us/articles/360000134954-Ordering-and-Changing-IP-for-RV-Product-Licenses";
+            if (preg_match('/not found ip/', $this->response['message'])) {
+                $this->response['message'] = $this->response['message'] . " or your public ip address running behind NAT ip please add server public ip address https://support.rvglobalsoft.com/hc/en-us/articles/360000134954-Ordering-and-Changing-IP-for-RV-Product-Licenses";
             }
         } catch (\Exception $e) {
             $this->print_debug_log('Validate server license error ' . $e->getMessage());
