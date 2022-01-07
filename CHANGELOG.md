@@ -1,5 +1,12 @@
 RVsitebuilderCMS real-setup changelog
 
+### [2.1.6](https://github.com/rvsitebuilder-service/real-setup/compare/v2.1.5...v2.1.6) (2022-01-07)
+
+
+### :bug: Bug fixed
+
+* remove vendor/bin before copy overwrite ([91be241](https://github.com/rvsitebuilder-service/real-setup/commit/91be24111c26bfc8c8d22b7c0b5cc340405e48c9))
+
 ### [2.1.5](https://github.com/rvsitebuilder-service/real-setup/compare/v2.1.4...v2.1.5) (2021-10-14)
 
 
